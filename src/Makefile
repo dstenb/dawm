@@ -11,7 +11,7 @@ PREFIX=/usr/local
 all: wm
 
 wm : $(OBJFILES)
-	$(CC) -o wm $(OBJFILES) -lncurses -pthread
+	$(CC) -o wm $(OBJFILES)
 
 %.o: %.c
 	$(CC_COMPILE) -o $@ $<
@@ -30,7 +30,7 @@ version.h:
 	@echo "#ifndef _VERSION_H_" >  version.h
 	@echo "#define _VERSION_H_" >> version.h
 	@echo -n "#define VERSION \"" >> version.h
-	@git show -s --pretty=format:"dfm commit %h (%ai)\"%n" >> version.h
+	@git show -s --pretty=format:"commit %h (%ai)\"%n" >> version.h
 	@echo "#endif" >> version.h
 
 
