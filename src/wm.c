@@ -1,5 +1,16 @@
 #include "wm.h"
 
+static unsigned long wm_getcolor(struct wm *, const char *);
+
+unsigned long wm_getcolor(struct wm *wm, const char *str) {
+	Colormap cmap = DefaultColormap(wm->dpy, wm->screen);
+	XColor color;
+
+	if(!XAllocNamedColor(wm->dpy, cmap, str, &color, &color))
+		die("error, cannot allocate color '%s'\n", str);
+	return color.pixel;
+}
+
 struct wm *wm_init(void)
 {
 	struct wm *wm;
@@ -8,7 +19,7 @@ struct wm *wm_init(void)
 		die("couldn't malloc\n");
 
 	if (!(wm->dpy = XOpenDisplay(NULL)))
-		die("couldn't open display\n");
+		die("couldn't open display '%s'\n", getenv("DISPLAY"));
 
 	/* TODO check for other window managers */
 

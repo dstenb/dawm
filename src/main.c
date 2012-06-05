@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include "config.h"
 #include "utils.h"
 #include "version.h"
 #include "wm.h"
@@ -24,6 +25,7 @@ void version(void)
 
 int main(int argc, char **argv)
 {
+	struct config *cfg;
 	struct wm *wm;
 	int i;
 
@@ -36,6 +38,8 @@ int main(int argc, char **argv)
 			exit(1);
 		}
 	}
+
+	cfg = config_init();
 
 	wm = wm_init();
 	wm_eventloop(wm);
