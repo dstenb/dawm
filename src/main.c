@@ -27,12 +27,23 @@ int main(int argc, char **argv)
 {
 	struct config *cfg;
 	struct wm *wm;
+	char *cfg_str = NULL;
 	int i;
 
 	for (i = 1; i < argc; i++) {
 		if (streq(argv[i], "-v") || streq(argv[i], "--version")) {
 			version();
 			exit(0);
+		} else if (streq(argv[i], "--display") ||
+				streq(argv[i], "-d")) {
+			if (++i == argc)
+				die("missing argument for %s\n", argv[i - 1]);
+			setenv("DISPLAY", argv[i], 1);
+		} else if (streq(argv[i], "--config") ||
+				streq(argv[i], "-c")) {
+			if (++i == argc)
+				die("missing argument for %s\n", argv[i - 1]);
+			cfg_str = argv[i];
 		} else {
 			usage(argv[0]);
 			exit(1);
