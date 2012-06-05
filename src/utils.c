@@ -1,5 +1,26 @@
 #include "utils.h"
 
+void die(const char *fmt, ...)
+{
+	va_list val;
+
+	fprintf(stderr, "wm: ");
+	va_start(val, fmt);
+	vfprintf(stderr, fmt, val);
+	va_end(val);
+	exit(EXIT_FAILURE);
+}
+
+void error(const char *fmt, ...)
+{
+	va_list val;
+
+	fprintf(stderr, "wm: ");
+	va_start(val, fmt);
+	vfprintf(stderr, fmt, val);
+	va_end(val);
+}
+
 char *strfvs(char **v, char c)
 {
 	char *s = NULL;

@@ -25,11 +25,7 @@ void version(void)
 int main(int argc, char **argv)
 {
 	struct wm *wm;
-	char *cmd_str;
 	int i;
-
-	cmd_str = strfvs(argv, ' ');
-	printf("'%s'\n", cmd_str);
 
 	for (i = 1; i < argc; i++) {
 		if (streq(argv[i], "-v") || streq(argv[i], "--version")) {
@@ -41,17 +37,13 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if ((wm = wm_init())) {
-		wm_eventloop(wm);
+	wm = wm_init();
+	wm_eventloop(wm);
 
-		if (wm->restart)
-			execlp("/bin/sh", "sh" , "-c", cmd_str, NULL);
+	if (wm->restart)
+		execlp("/bin/sh", "sh" , "-c", strfvs(argv, ' '), NULL);
 
-		wm_destroy(wm);
-	} else {
-		fprintf(stderr, "OH noes\n");
-		exit(EXIT_FAILURE);
-	}
+	wm_destroy(wm);
 
 	return 0;
 }

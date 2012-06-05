@@ -11,7 +11,7 @@ PREFIX=/usr/local
 all: wm
 
 wm : $(OBJFILES)
-	$(CC) -o wm $(OBJFILES)
+	$(CC) -o wm $(OBJFILES) -lX11
 
 %.o: %.c
 	$(CC_COMPILE) -o $@ $<
