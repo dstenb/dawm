@@ -51,6 +51,7 @@ void key_print(struct key *);
 /* returns the KeyAction responding to the key, returns INVALID if not found */
 KeyAction key_action_from_str(const char *);
 
+/* returns non-zero if the string describes a modifier */
 int str_to_modifier(const char *);
 
 #endif
