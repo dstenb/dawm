@@ -68,8 +68,7 @@ struct wm *wm_init(void)
 	XSetWindowAttributes attr;
 	struct wm *wm;
 
-	if (!(wm = calloc(1, sizeof(struct wm))))
-		die("couldn't malloc\n");
+	wm = xcalloc(1, sizeof(struct wm));
 
 	if (!(wm->dpy = XOpenDisplay(NULL)))
 		die("couldn't open display '%s'\n", getenv("DISPLAY"));

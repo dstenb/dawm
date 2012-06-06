@@ -33,8 +33,7 @@ char *strfvs(char **v, char c)
 		for (i = 1; v[i]; i++)
 			l += strlen(v[1]) + 1;
 
-		if (!(s = calloc(l, sizeof(char))))
-			return NULL;
+		s = xcalloc(l, sizeof(char));
 
 		p = s;
 		for (i = 0; v[i]; i++) {
@@ -45,4 +44,31 @@ char *strfvs(char **v, char c)
 	}
 
 	return s;
+}
+
+void *xcalloc(size_t nmemb, size_t size)
+{
+	void *data;
+
+	if (!(data = calloc(nmemb, size)))
+		die("couldn't malloc %u bytes\n", nmemb * size);
+	return data;
+}
+
+void *xmalloc(size_t size)
+{
+	void *data;
+
+	if (!(data = malloc(size)))
+		die("couldn't malloc %u bytes\n", size);
+	return data;
+}
+
+char *xstrdup(const char *str)
+{
+	char *cpy;
+
+	if (!(cpy = strdup(str)))
+		die("couldn't malloc %u bytes\n", sizeof(char) * strlen(str));
+	return cpy;
 }

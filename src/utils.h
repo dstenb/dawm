@@ -14,4 +14,10 @@ void error(const char *fmt, ...);
 
 char *strfvs(char **, char);
 
+void *xcalloc(size_t, size_t);
+
+void *xmalloc(size_t);
+
+char *xstrdup(const char *);
+
 #endif
