@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include "common.h"
 #include "config.h"
 #include "utils.h"
 #include "version.h"
@@ -22,7 +23,7 @@ void usage(const char *cmd)
 /* prints a version message */
 void version(void)
 {
-	printf("wm: %s\n", VERSION);
+	printf("%s: %s\n", WMNAME, VERSION);
 }
 
 int main(int argc, char **argv)

@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define WMNAME "placeholder name"
+
 struct rect {
 	int x, y, w, h;
 };

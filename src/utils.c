@@ -4,7 +4,7 @@ void die(const char *fmt, ...)
 {
 	va_list val;
 
-	fprintf(stderr, "wm: ");
+	fprintf(stderr, "%s: ", WMNAME);
 	va_start(val, fmt);
 	vfprintf(stderr, fmt, val);
 	va_end(val);
@@ -15,7 +15,7 @@ void error(const char *fmt, ...)
 {
 	va_list val;
 
-	fprintf(stderr, "wm: ");
+	fprintf(stderr, "%s: ", WMNAME);
 	va_start(val, fmt);
 	vfprintf(stderr, fmt, val);
 	va_end(val);
