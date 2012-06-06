@@ -6,6 +6,8 @@
 
 static unsigned long wm_getcolor(struct wm *, const char *);
 static void wm_checkotherwm(struct wm *);
+static void wm_create_client(struct wm *, Window, XWindowAttributes *);
+static void wm_create_monitors(struct wm *);
 static void wm_grab_keys(struct wm *);
 static void wm_keypress(struct wm *, struct key *);
 static void wm_quit(struct wm *, const char *);
@@ -57,6 +59,21 @@ void wm_checkotherwm(struct wm *wm)
 	XSync(wm->dpy, False);
 }
 
+void wm_create_client(struct wm *wm, Window win, XWindowAttributes *wa)
+{
+	struct client *c = client_create(win, wa);
+
+	/* TODO */
+	/* fix client rules */
+}
+
+/* TODO: fix Xinerama */
+void wm_create_monitors(struct wm *wm)
+{
+	wm->mons = monitor_create(wm->cfg, wm->width, wm->height);
+	wm->selmon = wm->mons;
+}
+
 unsigned long wm_getcolor(struct wm *wm, const char *str)
 {
 	Colormap cmap = DefaultColormap(wm->dpy, wm->screen);
@@ -87,6 +104,9 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 	wm->height = DisplayHeight(wm->dpy, wm->screen);
 	wm->cmd = cmd;
 	wm->keys = cfg->keys;
+	wm->cfg = cfg;
+
+	wm_create_monitors(wm);
 
 	attr.event_mask = DEFAULT_EVENT_MASK;
 	XChangeWindowAttributes(wm->dpy, wm->root, CWEventMask, &attr);
@@ -220,6 +240,19 @@ void wm_handler_maprequest(struct wm *wm, XEvent *ev)
 	(void)wm;
 	(void)ev;
 	error("%s\n", __func__);
+
+	static XWindowAttributes wa;
+	XMapRequestEvent *mrev = &ev->xmaprequest;
+
+	if(!XGetWindowAttributes(wm->dpy, mrev->window, &wa))
+		return;
+	if(wa.override_redirect)
+		return;
+	if(!find_client_by_window(wm->mons, mrev->window)) {
+		error("didn't find window!\n");
+		wm_create_client(wm, mrev->window, &wa);
+		/*manage(mrev->window, &wa);*/
+	}
 }
 
 void wm_handler_motionnotify(struct wm *wm, XEvent *ev)

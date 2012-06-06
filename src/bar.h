@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <X11/Xlib.h>
 
 enum bar_placement {
 	BAR_TOP,
@@ -11,6 +12,8 @@ enum bar_placement {
 
 struct bar {
 	/* TODO font */
+	Drawable drawable;
+	GC gc;
 	int visible;
 	int height;
 	char cmdbuf[1024];
@@ -20,8 +23,8 @@ struct bar {
 
 struct bar *bar_init(void);
 
-struct bar_show(struct bar *, int);
+void bar_show(struct bar *, int);
 
-struct bar_update(struct bar *);
+void bar_update(struct bar *);
 
 #endif

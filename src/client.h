@@ -3,8 +3,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <X11/Xlib.h>
 
 #include "common.h"
+#include "utils.h"
 
 struct client {
 	struct rect cur_r; /* current position and size */
@@ -13,7 +15,11 @@ struct client {
 	int floating; /* non-zero if floating */
 	int fullscreen; /* non-zero if fullscreen */
 
+	Window win;
+
 	struct client *next;
 };
+
+struct client *client_create(Window, XWindowAttributes *);
 
 #endif

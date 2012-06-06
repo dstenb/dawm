@@ -8,15 +8,21 @@
 
 #include "config.h"
 #include "keys.h"
+#include "monitor.h"
 #include "utils.h"
 
 struct wm {
 	Display *dpy;
 	Window root;
+
 	int screen;
 	int width, height;
 
+	struct monitor *mons;
+	struct monitor *selmon;
+
 	struct key *keys;
+	struct config *cfg;
 	const char *cmd;
 };
 
