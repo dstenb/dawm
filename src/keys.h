@@ -17,10 +17,12 @@
 #define MOD_SUPER Mod4Mask
 
 typedef enum {
-	SPAWN,
-	KILL,
-	QUIT,
-	RESTART
+	KillAction,
+	QuitAction,
+	RestartAction,
+	SpawnAction,
+	LASTAction,
+	InvalidAction = -1
 } KeyAction;
 
 struct key {
@@ -45,5 +47,10 @@ struct key *key_free_all(struct key *);
 
 /* print a key list, for development purposes */
 void key_print(struct key *);
+
+/* returns the KeyAction responding to the key, returns INVALID if not found */
+KeyAction key_action_from_str(const char *);
+
+int str_to_modifier(const char *);
 
 #endif

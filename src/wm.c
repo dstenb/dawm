@@ -248,14 +248,14 @@ void wm_keypress(struct wm *wm, struct key *key)
 	error("%s\n", __func__);
 
 	switch(key->action) {
-		case SPAWN:
+		case SpawnAction:
 			printf("%s: spawn(%s)!\n", __func__, key->args);
 			/* TODO */
 			break;
-		case QUIT:
+		case QuitAction:
 			wm_quit(wm, "received exit key command");
 			break;
-		case RESTART:
+		case RestartAction:
 			wm_restart(wm);
 			break;
 		default:
