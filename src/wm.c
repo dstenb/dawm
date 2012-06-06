@@ -8,6 +8,8 @@ static unsigned long wm_getcolor(struct wm *, const char *);
 static void wm_checkotherwm(struct wm *);
 static void wm_grab_keys(struct wm *);
 static void wm_keypress(struct wm *, struct key *);
+static void wm_quit(struct wm *, const char *);
+static void wm_restart(struct wm *);
 static int wm_xerror_checkotherwm(Display *, XErrorEvent *);
 static int wm_xerror(Display *, XErrorEvent *);
 
@@ -252,18 +254,31 @@ void wm_keypress(struct wm *wm, struct key *key)
 			/* TODO */
 			break;
 		case QUIT:
-			printf("%s: quit!\n", __func__);
-			/* TODO */
+			wm_quit(wm, "received exit key command");
 			break;
 		case RESTART:
-			printf("%s. restarting!\n", __func__);
-			/* TODO */
+			wm_restart(wm);
 			break;
 		default:
 			error("unhandled key action (%d), fix this!\n",
 					key->action);
 			break;
 	}
+}
+
+void wm_quit(struct wm *wm, const char *reason)
+{
+	(void)wm;
+	if (reason)
+		die("quitting (%s)\n", reason);
+	die("quitting\n");
+}
+
+void wm_restart(struct wm *wm)
+{
+	printf("%s. restarting!\n", __func__);
+	if (wm->cmd)
+		execlp("/bin/sh", "sh" , "-c", wm->cmd, NULL);
 }
 
 int wm_xerror(Display *dpy, XErrorEvent *ee)
