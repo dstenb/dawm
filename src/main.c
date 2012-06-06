@@ -29,8 +29,11 @@ int main(int argc, char **argv)
 {
 	struct config *cfg;
 	struct wm *wm;
+	char *cmd = NULL;
 	char *cfg_str = NULL;
 	int i;
+
+	error("starting!\n");
 
 	for (i = 1; i < argc; i++) {
 		if (STREQ(argv[i], "-v") || STREQ(argv[i], "--version")) {
@@ -52,14 +55,13 @@ int main(int argc, char **argv)
 		}
 	}
 
+	cmd = strfvs(argv, ' ');
+	printf("cmd: %s\n", cmd);
+
 	cfg = config_init();
 
-	wm = wm_init();
+	wm = wm_init(cmd);
 	wm_eventloop(wm);
-
-	if (wm->restart)
-		execlp("/bin/sh", "sh" , "-c", strfvs(argv, ' '), NULL);
-
 	wm_destroy(wm);
 
 	return 0;

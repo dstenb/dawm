@@ -5,17 +5,20 @@
 #include <stdio.h>
 #include <X11/Xlib.h>
 
+#include "keys.h"
 #include "utils.h"
 
 struct wm {
 	Display *dpy;
 	Window root;
 	int screen;
-	int restart;
 	int width, height;
+
+	struct key *keys;
+	const char *cmd;
 };
 
-struct wm *wm_init(void);
+struct wm *wm_init(const char *);
 
 int wm_eventloop(struct wm *);
 

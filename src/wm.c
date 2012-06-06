@@ -6,6 +6,8 @@
 
 static unsigned long wm_getcolor(struct wm *, const char *);
 static void wm_checkotherwm(struct wm *);
+static void wm_grab_keys(struct wm *);
+static void wm_keypress(struct wm *, struct key *);
 static int wm_xerror_checkotherwm(Display *, XErrorEvent *);
 static int wm_xerror(Display *, XErrorEvent *);
 
@@ -63,7 +65,7 @@ unsigned long wm_getcolor(struct wm *wm, const char *str)
 	return color.pixel;
 }
 
-struct wm *wm_init(void)
+struct wm *wm_init(const char *cmd)
 {
 	XSetWindowAttributes attr;
 	struct wm *wm;
@@ -81,7 +83,7 @@ struct wm *wm_init(void)
 
 	wm->width = DisplayWidth(wm->dpy, wm->screen);
 	wm->height = DisplayHeight(wm->dpy, wm->screen);
-	wm->restart = 0;
+	wm->cmd = cmd;
 
 	attr.event_mask = DEFAULT_EVENT_MASK;
 	XChangeWindowAttributes(wm->dpy, wm->root, CWEventMask, &attr);
@@ -89,12 +91,17 @@ struct wm *wm_init(void)
 	printf("wm->width: %i\n", wm->width);
 	printf("wm->height: %i\n", wm->height);
 
-    XGrabKey(wm->dpy, XKeysymToKeycode(wm->dpy, XStringToKeysym("F1")), Mod1Mask, wm->root,
-            True, GrabModeAsync, GrabModeAsync);
-    XGrabButton(wm->dpy, 1, Mod1Mask, wm->root, True, ButtonPressMask, GrabModeAsync,
-            GrabModeAsync, None, None);
-    XGrabButton(wm->dpy, 3, Mod1Mask, wm->root, True, ButtonPressMask, GrabModeAsync,
-            GrabModeAsync, None, None);
+	/* TODO: remove this and add keys as an argument to the init func. */
+	wm->keys = key_default_bindings();
+
+	/* grab the manager's key bindings */
+	wm_grab_keys(wm);
+
+	/* TODO: to be removed */
+	XGrabButton(wm->dpy, 1, Mod1Mask, wm->root, True, ButtonPressMask, GrabModeAsync,
+			GrabModeAsync, None, None);
+	XGrabButton(wm->dpy, 3, Mod1Mask, wm->root, True, ButtonPressMask, GrabModeAsync,
+			GrabModeAsync, None, None);
 
 	return wm;
 }
@@ -115,6 +122,17 @@ int wm_destroy(struct wm *wm)
 {
 	free(wm);
 	return 0;
+}
+
+void wm_grab_keys(struct wm *wm)
+{
+	struct key *key;
+
+	for (key = wm->keys; key; key = key->next) {
+		XGrabKey(wm->dpy, XKeysymToKeycode(wm->dpy, key->keysym),
+				key->mod, wm->root, True, GrabModeAsync,
+				GrabModeAsync);
+	}
 }
 
 void wm_handler_buttonpress(struct wm *wm, XEvent *ev)
@@ -173,12 +191,20 @@ void wm_handler_focusin(struct wm *wm, XEvent *ev)
 	error("%s\n", __func__);
 }
 
+/* TODO cleanup */
 void wm_handler_keypress(struct wm *wm, XEvent *ev)
 {
-	(void)wm;
-	(void)ev;
-	error("%s\n", __func__);
+	XKeyEvent *kev;
+	struct key *key;
 
+	kev = &ev->xkey;
+	for (key = wm->keys; key; key = key->next) {
+		if (XKeysymToKeycode(wm->dpy, key->keysym) == kev->keycode
+				&& (kev->state & key->mod))
+			wm_keypress(wm, key);
+	}
+
+	error("%s\n", __func__);
 }
 
 void wm_handler_mappingnotify(struct wm *wm, XEvent *ev)
@@ -214,6 +240,30 @@ void wm_handler_unmapnotify(struct wm *wm, XEvent *ev)
 	(void)wm;
 	(void)ev;
 	error("%s\n", __func__);
+}
+
+void wm_keypress(struct wm *wm, struct key *key)
+{
+	error("%s\n", __func__);
+
+	switch(key->action) {
+		case SPAWN:
+			printf("%s: spawn(%s)!\n", __func__, key->args);
+			/* TODO */
+			break;
+		case QUIT:
+			printf("%s: quit!\n", __func__);
+			/* TODO */
+			break;
+		case RESTART:
+			printf("%s. restarting!\n", __func__);
+			/* TODO */
+			break;
+		default:
+			error("unhandled key action (%d), fix this!\n",
+					key->action);
+			break;
+	}
 }
 
 int wm_xerror(Display *dpy, XErrorEvent *ee)
