@@ -5,18 +5,17 @@
 #include <stdio.h>
 #include <limits.h>
 
+#include "errno.h"
+#include "keys.h"
 #include "utils.h"
 
 struct config {
-
-
+	struct key *keys;
 };
 
 struct config *config_init(void);
 
 int config_load(struct config *, const char *);
-
-int config_load_default(struct config *);
 
 char *config_default_path(void);
 

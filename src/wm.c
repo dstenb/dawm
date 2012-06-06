@@ -67,7 +67,7 @@ unsigned long wm_getcolor(struct wm *wm, const char *str)
 	return color.pixel;
 }
 
-struct wm *wm_init(const char *cmd)
+struct wm *wm_init(struct config *cfg, const char *cmd)
 {
 	XSetWindowAttributes attr;
 	struct wm *wm;
@@ -86,6 +86,7 @@ struct wm *wm_init(const char *cmd)
 	wm->width = DisplayWidth(wm->dpy, wm->screen);
 	wm->height = DisplayHeight(wm->dpy, wm->screen);
 	wm->cmd = cmd;
+	wm->keys = cfg->keys;
 
 	attr.event_mask = DEFAULT_EVENT_MASK;
 	XChangeWindowAttributes(wm->dpy, wm->root, CWEventMask, &attr);
@@ -93,8 +94,6 @@ struct wm *wm_init(const char *cmd)
 	printf("wm->width: %i\n", wm->width);
 	printf("wm->height: %i\n", wm->height);
 
-	/* TODO: remove this and add keys as an argument to the init func. */
-	wm->keys = key_default_bindings();
 
 	/* grab the manager's key bindings */
 	wm_grab_keys(wm);

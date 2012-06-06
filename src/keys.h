@@ -40,8 +40,8 @@ struct key *key_append(struct key *, struct key *);
 /* returns a key list of the default bindings */
 struct key *key_default_bindings(void);
 
-/* recursively frees a key list */
-void key_free_all(struct key *);
+/* recursively frees a key list. returns a NULL pointer for convenience */
+struct key *key_free_all(struct key *);
 
 /* print a key list, for development purposes */
 void key_print(struct key *);

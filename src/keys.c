@@ -35,7 +35,7 @@ struct key *key_default_bindings(void)
 	return head;
 }
 
-void key_free_all(struct key *key)
+struct key *key_free_all(struct key *key)
 {
 	struct key *tmp;
 
@@ -45,6 +45,8 @@ void key_free_all(struct key *key)
 		free(tmp->args);
 		free(tmp);
 	}
+
+	return NULL;
 }
 
 void key_print(struct key *key)

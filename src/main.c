@@ -58,9 +58,12 @@ int main(int argc, char **argv)
 	cmd = strfvs(argv, ' ');
 	printf("cmd: %s\n", cmd);
 
+	cfg_str = cfg_str ? cfg_str : config_default_path();
 	cfg = config_init();
+	if (config_load(cfg, cfg_str) != 0)
+		error("error loading '%s': %s\n", cfg_str, strerror(errno));
 
-	wm = wm_init(cmd);
+	wm = wm_init(cfg, cmd);
 	wm_eventloop(wm);
 	wm_destroy(wm);
 

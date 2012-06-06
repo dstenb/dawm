@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <X11/Xlib.h>
 
+#include "config.h"
 #include "keys.h"
 #include "utils.h"
 
@@ -19,7 +20,7 @@ struct wm {
 	const char *cmd;
 };
 
-struct wm *wm_init(const char *);
+struct wm *wm_init(struct config *, const char *);
 
 int wm_eventloop(struct wm *);
 
