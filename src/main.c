@@ -10,6 +10,7 @@
 static void usage(const char *);
 static void version(void);
 
+/* prints an usage message */
 void usage(const char *cmd)
 {
 	version();
@@ -18,6 +19,7 @@ void usage(const char *cmd)
 	printf("  -v, --version      print version message.\n");
 }
 
+/* prints a version message */
 void version(void)
 {
 	printf("wm: %s\n", VERSION);
@@ -31,16 +33,16 @@ int main(int argc, char **argv)
 	int i;
 
 	for (i = 1; i < argc; i++) {
-		if (streq(argv[i], "-v") || streq(argv[i], "--version")) {
+		if (STREQ(argv[i], "-v") || STREQ(argv[i], "--version")) {
 			version();
 			exit(0);
-		} else if (streq(argv[i], "--display") ||
-				streq(argv[i], "-d")) {
+		} else if (STREQ(argv[i], "--display") ||
+				STREQ(argv[i], "-d")) {
 			if (++i == argc)
 				die("missing argument for %s\n", argv[i - 1]);
 			setenv("DISPLAY", argv[i], 1);
-		} else if (streq(argv[i], "--config") ||
-				streq(argv[i], "-c")) {
+		} else if (STREQ(argv[i], "--config") ||
+				STREQ(argv[i], "-c")) {
 			if (++i == argc)
 				die("missing argument for %s\n", argv[i - 1]);
 			cfg_str = argv[i];
