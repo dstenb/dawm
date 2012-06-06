@@ -19,10 +19,10 @@ void error(const char *fmt, ...);
 /* concatenates a NULL-terminated list of strings to one */
 char *strfvs(char **, char);
 
-/* malloc() wrapper that will exit if unable to allocate */
+/* calloc() wrapper that will exit if unable to allocate */
 void *xcalloc(size_t, size_t);
 
-/* calloc() wrapper that will exit if unable to allocate */
+/* malloc() wrapper that will exit if unable to allocate */
 void *xmalloc(size_t);
 
 /* strdup() wrapper that will exit if unable to allocate */
