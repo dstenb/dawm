@@ -8,10 +8,11 @@ static void wm_handler_keypress(struct wm *, XEvent *);
 static void wm_handler_buttonpress(struct wm *, XEvent *);
 static void wm_handler_motionnotify(struct wm *, XEvent *);
 
+static int (*xerrxlib) (Display *, XErrorEvent *);
 
 void wm_checkotherwm(struct wm *wm)
 {
-	XSetErrorHandler(wm_xerror_checkotherwm);
+	xerrxlib = XSetErrorHandler(wm_xerror_checkotherwm);
 	/* this causes an error if some other window manager is running */
 	XSelectInput(wm->dpy, DefaultRootWindow(wm->dpy),
 			SubstructureRedirectMask);
@@ -22,7 +23,10 @@ void wm_checkotherwm(struct wm *wm)
 
 int wm_xerror(Display *dpy, XErrorEvent *ee)
 {
-	error("wm_xerror\n");
+	fprintf(stderr, "dwm: fatal error: request code=%d, error code=%d\n",
+			ee->request_code, ee->error_code);
+	return xerrxlib(dpy, ee); /* may call exit */
+
 }
 
 int wm_xerror_checkotherwm(Display *dpy, XErrorEvent *ee)
@@ -42,6 +46,7 @@ unsigned long wm_getcolor(struct wm *wm, const char *str) {
 
 struct wm *wm_init(void)
 {
+	XSetWindowAttributes attr;
 	struct wm *wm;
 
 	if (!(wm = calloc(1, sizeof(struct wm))))
@@ -51,13 +56,19 @@ struct wm *wm_init(void)
 		die("couldn't open display '%s'\n", getenv("DISPLAY"));
 
 	/* check if another wm is running */
-	/*wm_checkotherwm(wm);*/
-
 	wm->screen = DefaultScreen(wm->dpy);
 	wm->root = RootWindow(wm->dpy, wm->screen);
+
+	wm_checkotherwm(wm);
+
 	wm->width = DisplayWidth(wm->dpy, wm->screen);
 	wm->height = DisplayHeight(wm->dpy, wm->screen);
 	wm->restart = 0;
+
+	attr.event_mask = SubstructureRedirectMask | SubstructureNotifyMask |
+		ButtonPressMask | PointerMotionMask | EnterWindowMask |
+		LeaveWindowMask | StructureNotifyMask | PropertyChangeMask;
+	XChangeWindowAttributes(wm->dpy, wm->root, CWEventMask, &attr);
 
 	printf("wm->width: %i\n", wm->width);
 	printf("wm->height: %i\n", wm->height);
