@@ -21,6 +21,14 @@ void error(const char *fmt, ...)
 	va_end(val);
 }
 
+void spawn(const char *cmd)
+{
+	if (cmd && fork() == 0) {
+		execlp("/bin/sh", "sh" , "-c", cmd, NULL);
+		exit(1);
+	}
+}
+
 char *strfvs(char **v, char c)
 {
 	char *s = NULL;

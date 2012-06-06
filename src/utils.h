@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "common.h"
 
@@ -13,10 +14,13 @@
 #define ARRSIZE(x) (int)(sizeof(x) / sizeof(*x))
 
 /* prints an error message and exits */
-void die(const char *fmt, ...);
+void die(const char *, ...);
 
 /* prints an error message */
-void error(const char *fmt, ...);
+void error(const char *, ...);
+
+/* spawn a process in the background */
+void spawn(const char *);
 
 /* concatenates a NULL-terminated list of strings to one */
 char *strfvs(char **, char);
