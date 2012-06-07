@@ -18,6 +18,8 @@ void usage(const char *cmd)
 	printf("\nUsage: %s [OPTION]...\n\n", cmd);
 	printf("  -h, --help         print this message.\n");
 	printf("  -v, --version      print version message.\n");
+	printf("  -c, --config       select a custom configuration file.\n");
+	printf("  -d, --display      select a custom display.\n");
 }
 
 /* prints a version message */
