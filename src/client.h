@@ -36,6 +36,8 @@ struct client *client_create(Window, XWindowAttributes *);
 
 void client_raise(struct client *, Display *);
 
+void client_select_input(struct client *, Display *);
+
 void client_set_border(struct client *, Display *, int);
 
 void client_set_name(struct client *, const char *);

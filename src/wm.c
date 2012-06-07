@@ -1,6 +1,6 @@
 #include "wm.h"
 
-#define DEFAULT_EVENT_MASK SubstructureRedirectMask | SubstructureNotifyMask \
+#define WM_EVENT_MASK SubstructureRedirectMask | SubstructureNotifyMask \
 	| ButtonPressMask | PointerMotionMask | EnterWindowMask \
 	| LeaveWindowMask | StructureNotifyMask | PropertyChangeMask
 
@@ -78,8 +78,7 @@ void wm_create_client(struct wm *wm, Window win, XWindowAttributes *wa)
 
 	/* TODO: fix size & wm hints */
 
-	/* TODO: XSelectInput on the window */
-	/* client_select_input(c, wm->dpy) */ 
+	client_select_input(c, wm->dpy);
 
 	client_raise(c, wm->dpy);
 
@@ -126,7 +125,7 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 
 	wm_create_monitors(wm);
 
-	attr.event_mask = DEFAULT_EVENT_MASK;
+	attr.event_mask = WM_EVENT_MASK;
 	XChangeWindowAttributes(wm->dpy, wm->root, CWEventMask, &attr);
 
 	printf("wm->width: %i\n", wm->width);

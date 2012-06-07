@@ -1,5 +1,8 @@
 #include "client.h"
 
+#define CLIENT_EVENT_MASK EnterWindowMask | FocusChangeMask | \
+	PropertyChangeMask | StructureNotifyMask
+
 struct client *client_create(Window win, XWindowAttributes *wa)
 {
 	struct client *c = xcalloc(1, sizeof(struct client));
@@ -22,6 +25,11 @@ void client_raise(struct client *c, Display *dpy)
 {
 	if (c->floating)
 		XRaiseWindow(dpy, c->win);
+}
+
+void client_select_input(struct client *c, Display *dpy)
+{
+	XSelectInput(dpy, c->win, CLIENT_EVENT_MASK);
 }
 
 void client_set_border(struct client *c, Display *dpy, int bsize)
