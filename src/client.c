@@ -18,6 +18,24 @@ struct client *client_create(Window win, XWindowAttributes *wa)
 	return c;
 }
 
+void client_raise(struct client *c, Display *dpy)
+{
+	if (c->floating)
+		XRaiseWindow(dpy, c->win);
+}
+
+void client_set_border(struct client *c, Display *dpy, int bsize)
+{
+	XWindowChanges wc;
+
+	c->bsize = bsize;
+
+	wc.border_width = c->bsize;
+	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc);
+
+	/* TODO: fix border color */
+}
+
 void client_set_name(struct client *c, const char *str)
 {
 	strncpy(c->name, str, CLIENT_NAME_SIZE);

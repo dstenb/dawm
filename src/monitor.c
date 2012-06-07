@@ -1,5 +1,15 @@
 #include "monitor.h"
 
+void monitor_add_client(struct monitor *mon, struct client *c)
+{
+	c->mon = mon;
+	c->next = mon->clients;
+	mon->clients = c;
+
+	c->snext = mon->cstack;
+	mon->cstack = c;
+}
+
 struct monitor *monitor_append(struct monitor *mons, struct monitor *new)
 {
 	struct monitor *trav;
@@ -11,6 +21,11 @@ struct monitor *monitor_append(struct monitor *mons, struct monitor *new)
 	} else {
 		return new;
 	}
+}
+
+void monitor_arrange(struct monitor *mon)
+{
+	/* TODO */
 }
 
 struct monitor *monitor_create(struct config *cfg, int width, int height)
@@ -30,6 +45,16 @@ struct monitor *monitor_create(struct config *cfg, int width, int height)
 	return mon;
 }
 
+void monitor_focus(struct monitor *mon, struct client *c)
+{
+	/* TODO */
+}
+
+void monitor_select_client(struct monitor *mon, struct client *c)
+{
+	c->mon->sel = c;
+}
+
 struct client *find_client_by_window(struct monitor *mon, Window win)
 {
 	struct client *c;
@@ -42,19 +67,4 @@ struct client *find_client_by_window(struct monitor *mon, Window win)
 	}
 
 	return NULL;
-}
-
-void monitor_add_client(struct monitor *mon, struct client *c)
-{
-	c->mon = mon;
-	c->next = mon->clients;
-	mon->clients = c;
-
-	c->snext = mon->cstack;
-	mon->cstack = c;
-}
-
-void monitor_select_client(struct monitor *mon, struct client *c)
-{
-	c->mon->sel = c;
 }

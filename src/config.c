@@ -7,6 +7,9 @@ struct config *config_init(void)
 	struct config *cfg = xcalloc(1, sizeof(struct config));
 
 	cfg->keys = key_default_keys();
+	cfg->topbar = 1;
+	cfg->showbar = 1;
+	cfg->bsize = 1;
 
 	return cfg;
 }

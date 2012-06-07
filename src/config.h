@@ -12,6 +12,7 @@
 struct config {
 	int topbar;
 	int showbar;
+	int bsize;
 	struct key *keys;
 };
 

@@ -20,6 +20,8 @@ struct client {
 	int floating; /* non-zero if floating */
 	int fullscreen; /* non-zero if fullscreen */
 
+	int bsize; /* border size */
+
 	Window win;
 
 	struct monitor *mon;
@@ -28,7 +30,13 @@ struct client {
 	struct client *snext;
 };
 
+/* client_apply_rules(struct client *, feawfeaw) */
+
 struct client *client_create(Window, XWindowAttributes *);
+
+void client_raise(struct client *, Display *);
+
+void client_set_border(struct client *, Display *, int);
 
 void client_set_name(struct client *, const char *);
 
