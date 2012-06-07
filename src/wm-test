@@ -1,0 +1,8 @@
+#! /bin/bash
+
+urxvt &
+urxvt &
+
+nitrogen --restore &
+
+valgrind ./wm -c config

@@ -33,4 +33,6 @@ version.h:
 	@git show -s --pretty=format:"commit %h (%ai)\"%n" >> version.h
 	@echo "#endif" >> version.h
 
+test:
+	@xinit ./wm-test -- :1
 
