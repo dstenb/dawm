@@ -10,6 +10,8 @@
 #include "utils.h"
 
 struct config {
+	int topbar;
+	int showbar;
 	struct key *keys;
 };
 
@@ -21,5 +23,7 @@ int config_load(struct config *, const char *);
 
 /* returns the default config path */
 char *config_default_path(void);
+
+void config_free(struct config *);
 
 #endif

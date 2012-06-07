@@ -6,7 +6,7 @@ struct config *config_init(void)
 {
 	struct config *cfg = xcalloc(1, sizeof(struct config));
 
-	cfg->keys = key_default_bindings();
+	cfg->keys = key_default_keys();
 
 	return cfg;
 }
@@ -86,4 +86,10 @@ char *config_default_path(void)
 	snprintf(buf, sizeof(buf), "%s/.config/wmrc", getenv("HOME"));
 
 	return xstrdup(buf);
+}
+
+void config_free(struct config *cfg)
+{
+	key_free_all(cfg->keys);
+	free(cfg);
 }
