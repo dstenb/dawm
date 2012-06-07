@@ -11,6 +11,15 @@ struct config *config_init(void)
 	cfg->showbar = 1;
 	cfg->bsize = 1;
 
+	cfg->col_normfg = xstrdup("#FFFFFF");
+	cfg->col_normbg = xstrdup("#000000");
+	cfg->col_normborder = xstrdup("#000000");
+
+	cfg->col_selfg = xstrdup("#FFFFFF");
+	cfg->col_selbg = xstrdup("#000000");
+	cfg->col_selborder = xstrdup("#FF0000");
+
+
 	return cfg;
 }
 

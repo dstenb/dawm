@@ -6,6 +6,7 @@
 #include <X11/Xlib.h>
 
 #include "common.h"
+#include "config.h"
 #include "utils.h"
 #include "xutils.h"
 
@@ -45,5 +46,8 @@ void client_set_border(struct client *, Display *, int);
 void client_set_name(struct client *, const char *);
 
 void client_update_title(struct client *, Display *);
+
+/* initializes the colors that are used by all clients */
+void clients_init_colors(struct config *, Display *, int);
 
 #endif

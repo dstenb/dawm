@@ -141,6 +141,8 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 	XGrabButton(wm->dpy, 3, Mod1Mask, wm->root, True, ButtonPressMask, GrabModeAsync,
 			GrabModeAsync, None, None);
 
+	clients_init_colors(wm->cfg, wm->dpy, wm->screen);
+
 	return wm;
 }
 

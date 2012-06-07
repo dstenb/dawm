@@ -14,6 +14,16 @@ struct config {
 	int showbar;
 	int bsize;
 	struct key *keys;
+
+	/* normal window colors */
+	char *col_normfg;
+	char *col_normbg;
+	char *col_normborder;
+
+	/* selected window colors */
+	char *col_selfg;
+	char *col_selbg;
+	char *col_selborder;
 };
 
 /* init a config struct, will set all the settings to the default values */
