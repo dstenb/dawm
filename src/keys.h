@@ -16,6 +16,8 @@
 #define MOD_SHIFT ShiftMask
 #define MOD_SUPER Mod4Mask
 
+#define MOD_CTRL_SUPER (MOD_CTRL | MOD_SUPER)
+
 typedef enum {
 	KillAction,
 	QuitAction,
@@ -33,23 +35,23 @@ struct key {
 	struct key *next;
 };
 
-/* creates a new key struct */
-struct key *key_create(unsigned int, KeySym, KeyAction, char *, struct key *);
+/* returns the KeyAction responding to the key, returns INVALID if not found */
+KeyAction key_action_from_str(const char *);
 
 /* appends two key lists to one, will return the head pointer */
 struct key *key_append(struct key *, struct key *);
 
+/* copies a key struct */
+struct key *key_copy(struct key *);
+
+/* creates a new key struct */
+struct key *key_create(unsigned int, KeySym, KeyAction, char *, struct key *);
+
 /* returns a key list of the default bindings */
-struct key *key_default_bindings(void);
+struct key *key_default_keys(void);
 
 /* recursively frees a key list. returns a NULL pointer for convenience */
 struct key *key_free_all(struct key *);
-
-/* print a key list, for development purposes */
-void key_print(struct key *);
-
-/* returns the KeyAction responding to the key, returns INVALID if not found */
-KeyAction key_action_from_str(const char *);
 
 /* returns non-zero if the string describes a modifier */
 int str_to_modifier(const char *);
