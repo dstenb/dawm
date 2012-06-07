@@ -4,7 +4,6 @@
 	| ButtonPressMask | PointerMotionMask | EnterWindowMask \
 	| LeaveWindowMask | StructureNotifyMask | PropertyChangeMask
 
-static unsigned long wm_getcolor(struct wm *, const char *);
 static void wm_checkotherwm(struct wm *);
 static void wm_create_client(struct wm *, Window, XWindowAttributes *);
 static void wm_create_monitors(struct wm *);
@@ -63,8 +62,34 @@ void wm_create_client(struct wm *wm, Window win, XWindowAttributes *wa)
 {
 	struct client *c = client_create(win, wa);
 
-	/* TODO */
-	/* fix client rules */
+	c->mon = wm->selmon;
+
+	client_update_title(c, wm->dpy);
+
+	/* TODO: fix client rules (rule.h) */
+
+	/* TODO: fix border setup */
+
+	/* TODO: configureevent */
+
+	/* TODO: check for fullscreen and dialog */
+
+	/* TODO: fix size & wm hints */
+
+	/* TODO: XSelectInput on the window */
+
+	/* if (c->isfloating)
+	 * client_raise(c, wm->dpy);
+	 * */
+
+	monitor_add_client(c->mon, c);
+	monitor_select_client(c->mon, c);
+
+	XMapWindow(wm->dpy, c->win);
+
+	/* TODO: monitor_arrange(c->mon) */
+
+	/* TODO: monitor_focus(c->mon, c) */
 }
 
 /* TODO: fix Xinerama */
@@ -72,16 +97,6 @@ void wm_create_monitors(struct wm *wm)
 {
 	wm->mons = monitor_create(wm->cfg, wm->width, wm->height);
 	wm->selmon = wm->mons;
-}
-
-unsigned long wm_getcolor(struct wm *wm, const char *str)
-{
-	Colormap cmap = DefaultColormap(wm->dpy, wm->screen);
-	XColor color;
-
-	if(!XAllocNamedColor(wm->dpy, cmap, str, &color, &color))
-		die("error, cannot allocate color '%s'\n", str);
-	return color.pixel;
 }
 
 struct wm *wm_init(struct config *cfg, const char *cmd)
@@ -114,7 +129,6 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 	printf("wm->width: %i\n", wm->width);
 	printf("wm->height: %i\n", wm->height);
 
-
 	/* grab the manager's key bindings */
 	wm_grab_keys(wm);
 
@@ -141,6 +155,10 @@ int wm_eventloop(struct wm *wm)
 
 int wm_destroy(struct wm *wm)
 {
+	config_free(wm->cfg);
+
+	XUngrabKey(wm->dpy, AnyKey, AnyModifier, wm->root);
+	XCloseDisplay(wm->dpy);
 	free(wm);
 	return 0;
 }
@@ -158,9 +176,16 @@ void wm_grab_keys(struct wm *wm)
 
 void wm_handler_buttonpress(struct wm *wm, XEvent *ev)
 {
+	XButtonPressedEvent *bpev = &ev->xbutton;
+	struct client *c;
+
+	c = find_client_by_window(wm->mons, bpev->window);
+
 	(void)wm;
 	(void)ev;
 	error("%s\n", __func__);
+
+	
 }
 
 void wm_handler_clientmessage(struct wm *wm, XEvent *ev)
@@ -237,10 +262,6 @@ void wm_handler_mappingnotify(struct wm *wm, XEvent *ev)
 
 void wm_handler_maprequest(struct wm *wm, XEvent *ev)
 {
-	(void)wm;
-	(void)ev;
-	error("%s\n", __func__);
-
 	static XWindowAttributes wa;
 	XMapRequestEvent *mrev = &ev->xmaprequest;
 
@@ -248,11 +269,10 @@ void wm_handler_maprequest(struct wm *wm, XEvent *ev)
 		return;
 	if(wa.override_redirect)
 		return;
-	if(!find_client_by_window(wm->mons, mrev->window)) {
-		error("didn't find window!\n");
+	if(!find_client_by_window(wm->mons, mrev->window))
 		wm_create_client(wm, mrev->window, &wa);
-		/*manage(mrev->window, &wa);*/
-	}
+
+	error("%s\n", __func__);
 }
 
 void wm_handler_motionnotify(struct wm *wm, XEvent *ev)
@@ -299,7 +319,7 @@ void wm_keypress(struct wm *wm, struct key *key)
 
 void wm_quit(struct wm *wm, const char *reason)
 {
-	(void)wm;
+	wm_destroy(wm);
 	if (reason)
 		die("quitting (%s)\n", reason);
 	die("quitting\n");

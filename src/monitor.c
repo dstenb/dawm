@@ -19,7 +19,9 @@ struct monitor *monitor_create(struct config *cfg, int width, int height)
 
 	/*m->bar = bar_create(cfg);*/
 	mon->clients = NULL;
-	mon->focused = NULL;
+	mon->cstack = NULL;
+	mon->sel = NULL;
+
 	mon->next = NULL;
 
 	mon->width = width;
@@ -42,4 +44,17 @@ struct client *find_client_by_window(struct monitor *mon, Window win)
 	return NULL;
 }
 
+void monitor_add_client(struct monitor *mon, struct client *c)
+{
+	c->mon = mon;
+	c->next = mon->clients;
+	mon->clients = c;
 
+	c->snext = mon->cstack;
+	mon->cstack = c;
+}
+
+void monitor_select_client(struct monitor *mon, struct client *c)
+{
+	c->mon->sel = c;
+}

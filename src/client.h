@@ -25,6 +25,7 @@ struct client {
 	struct monitor *mon;
 
 	struct client *next;
+	struct client *snext;
 };
 
 struct client *client_create(Window, XWindowAttributes *);
