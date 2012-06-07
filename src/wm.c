@@ -79,6 +79,7 @@ void wm_create_client(struct wm *wm, Window win, XWindowAttributes *wa)
 	/* TODO: fix size & wm hints */
 
 	client_select_input(c, wm->dpy);
+	client_grab_buttons(c, wm->dpy);
 
 	client_raise(c, wm->dpy);
 

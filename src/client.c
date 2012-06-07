@@ -1,5 +1,7 @@
 #include "client.h"
 
+#define CLIENT_BUTTON_MASK (ButtonPressMask | ButtonReleaseMask)
+
 #define CLIENT_EVENT_MASK EnterWindowMask | FocusChangeMask | \
 	PropertyChangeMask | StructureNotifyMask
 
@@ -19,6 +21,13 @@ struct client *client_create(Window win, XWindowAttributes *wa)
 	c->win = win;
 
 	return c;
+}
+
+void client_grab_buttons(struct client *c, Display *dpy)
+{
+	XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
+			CLIENT_BUTTON_MASK, GrabModeAsync, GrabModeSync, None,
+			None);
 }
 
 void client_raise(struct client *c, Display *dpy)
