@@ -35,6 +35,8 @@ struct client {
 
 struct client *client_create(Window, XWindowAttributes *);
 
+void client_free(struct client *);
+
 void client_grab_buttons(struct client *, Display *);
 
 void client_raise(struct client *, Display *);

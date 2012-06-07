@@ -32,6 +32,11 @@ struct client *client_create(Window win, XWindowAttributes *wa)
 	return c;
 }
 
+void client_free(struct client *c)
+{
+	free(c);
+}
+
 void client_grab_buttons(struct client *c, Display *dpy)
 {
 	XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
@@ -59,7 +64,6 @@ void client_set_border(struct client *c, Display *dpy, int bsize)
 	wc.border_width = c->bsize;
 	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc);
 	XSetWindowBorder(dpy, c->win, colors[COL_NORM].border);
-	/* TODO: fix border color */
 }
 
 void client_set_name(struct client *c, const char *str)
