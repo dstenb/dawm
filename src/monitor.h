@@ -34,6 +34,8 @@ struct monitor *monitor_create(struct config *, int, int);
 
 void monitor_focus(struct monitor *, struct client *);
 
+void monitor_remove_client(struct monitor *, struct client *);
+
 /* select the given client, assumes that the client is valid */
 void monitor_select_client(struct monitor *, struct client *);
 

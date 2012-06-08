@@ -22,6 +22,7 @@ struct client {
 	int fullscreen; /* non-zero if fullscreen */
 
 	int bsize; /* border size */
+	int old_bsize;
 
 	Window win;
 
@@ -46,6 +47,10 @@ void client_select_input(struct client *, Display *);
 void client_set_border(struct client *, Display *, int);
 
 void client_set_name(struct client *, const char *);
+
+void client_set_state(struct client *, Display *, long);
+
+void client_unmap(struct client *, Display *);
 
 void client_update_title(struct client *, Display *);
 

@@ -8,6 +8,8 @@
 #define COL_NORM 0
 #define COL_SEL 1
 
+static int xerror_dummy(Display *, XErrorEvent *);
+
 static struct {
 	unsigned long fg;
 	unsigned long bg;
@@ -72,11 +74,40 @@ void client_set_name(struct client *c, const char *str)
 	error("%s: %s\n", __func__, c->name);
 }
 
+void client_set_state(struct client *c, Display *dpy, long state)
+{
+	Atom atom = XInternAtom(dpy, "WM_STATE", False);
+	long data[] = { state, None };
+
+	XChangeProperty(dpy, c->win, atom, atom, 32, PropModeReplace,
+			(unsigned char *)data, 2);
+}
+
+void client_unmap(struct client *c, Display *dpy)
+{
+	int (*xerror) (Display *, XErrorEvent *);
+	XWindowChanges wc;
+
+	error("%s\n", __func__);
+
+	wc.border_width = c->old_bsize;
+	XGrabServer(dpy);
+	xerror = XSetErrorHandler(xerror_dummy);
+	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc); /* restore border */
+	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
+
+	client_set_state(c, dpy, WithdrawnState);
+
+	XSync(dpy, False);
+	XSetErrorHandler(xerror);
+	XUngrabServer(dpy);
+}
+
 void client_update_title(struct client *c, Display *dpy)
 {
 	Atom prop = XInternAtom(dpy, "WM_NAME", False);
-
 	get_text_prop(dpy, c->win, prop, c->name, CLIENT_NAME_SIZE);
+	error("c->name: %s\n", c->name);
 }
 
 void clients_init_colors(struct config *cfg, Display *dpy, int screen)
@@ -88,6 +119,12 @@ void clients_init_colors(struct config *cfg, Display *dpy, int screen)
 	colors[COL_SEL].fg = get_color(dpy, screen, cfg->col_selfg);
 	colors[COL_SEL].bg = get_color(dpy, screen, cfg->col_selbg);
 	colors[COL_SEL].border = get_color(dpy, screen, cfg->col_selborder);
+}
 
-
+int xerror_dummy(Display *dpy, XErrorEvent *ev)
+{
+	(void)dpy;
+	(void)ev;
+	error("dummy!\n");
+	return 0;
 }

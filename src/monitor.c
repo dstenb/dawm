@@ -25,6 +25,7 @@ struct monitor *monitor_append(struct monitor *mons, struct monitor *new)
 
 void monitor_arrange(struct monitor *mon)
 {
+	(void)mon;
 	/* TODO */
 }
 
@@ -32,6 +33,7 @@ struct monitor *monitor_create(struct config *cfg, int width, int height)
 {
 	struct monitor *mon = xcalloc(1, sizeof(struct monitor));
 
+	(void)cfg;
 	/*m->bar = bar_create(cfg);*/
 	mon->clients = NULL;
 	mon->cstack = NULL;
@@ -48,6 +50,27 @@ struct monitor *monitor_create(struct config *cfg, int width, int height)
 void monitor_focus(struct monitor *mon, struct client *c)
 {
 	/* TODO */
+}
+
+void monitor_remove_client(struct monitor *mon, struct client *c)
+{
+	struct client *trav;
+
+	if (c == mon->clients) {
+		mon->clients = mon->clients->next;
+	} else {
+		for (trav = mon->clients; trav->next && trav->next != c;
+				trav = trav->next);
+		trav->next = trav->next->next;
+	}
+
+	if (c == mon->cstack) {
+		mon->cstack = mon->cstack->next;
+	} else {
+		for (trav = mon->cstack; trav->next && trav->next != c;
+				trav = trav->next);
+		trav->next = trav->next->next;
+	}
 }
 
 void monitor_select_client(struct monitor *mon, struct client *c)

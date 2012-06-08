@@ -10,6 +10,7 @@ static void wm_create_monitors(struct wm *);
 static void wm_grab_keys(struct wm *);
 static void wm_keypress(struct wm *, struct key *);
 static void wm_quit(struct wm *, const char *);
+static void wm_remove_client(struct wm *, struct client *, int);
 static void wm_restart(struct wm *);
 static int wm_xerror_checkotherwm(Display *, XErrorEvent *);
 static int wm_xerror(Display *, XErrorEvent *);
@@ -189,8 +190,6 @@ void wm_handler_buttonpress(struct wm *wm, XEvent *ev)
 	(void)wm;
 	(void)ev;
 	error("%s\n", __func__);
-
-	
 }
 
 void wm_handler_clientmessage(struct wm *wm, XEvent *ev)
@@ -216,9 +215,12 @@ void wm_handler_configurenotify(struct wm *wm, XEvent *ev)
 
 void wm_handler_destroynotify(struct wm *wm, XEvent *ev)
 {
-	(void)wm;
-	(void)ev;
-	error("%s\n", __func__);
+	struct client *c;
+	Window win;
+
+	win = ev->xdestroywindow.window;
+	if ((c = find_client_by_window(wm->mons, win)))
+		wm_remove_client(wm, c, 1);
 }
 
 void wm_handler_enternotify(struct wm *wm, XEvent *ev)
@@ -296,8 +298,16 @@ void wm_handler_propertynotify(struct wm *wm, XEvent *ev)
 
 void wm_handler_unmapnotify(struct wm *wm, XEvent *ev)
 {
-	(void)wm;
-	(void)ev;
+	struct client *c;
+	XUnmapEvent *uev = &ev->xunmap;
+
+	if((c = find_client_by_window(wm->mons, uev->window))) {
+		if(uev->send_event)
+			client_set_state(c, wm->dpy, WithdrawnState);
+		else
+			wm_remove_client(wm, c, 0);
+	}
+
 	error("%s\n", __func__);
 }
 
@@ -328,6 +338,21 @@ void wm_quit(struct wm *wm, const char *reason)
 	if (reason)
 		die("quitting (%s)\n", reason);
 	die("quitting\n");
+}
+
+void wm_remove_client(struct wm *wm, struct client *c, int destroyed)
+{
+	struct monitor *mon = c->mon;
+
+	monitor_remove_client(mon, c);
+
+	if (!destroyed)
+		client_unmap(c, wm->dpy);
+
+	client_free(c);
+
+	monitor_arrange(mon);
+	/* TODO: focus, fix client list */
 }
 
 void wm_restart(struct wm *wm)
