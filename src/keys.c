@@ -2,9 +2,9 @@
 
 /* default keys */
 static struct key default_keys[] = {
-	{ MOD_SUPER,      XK_q,      QuitAction,    NULL,    NULL },
-	{ MOD_CTRL_SUPER, XK_r,      RestartAction, NULL,    NULL },
-	{ MOD_SUPER,      XK_Return, SpawnAction,   "urxvt", NULL }
+	{ MOD_SHIFT_SUPER, XK_q,      QuitAction,    NULL,    NULL },
+	{ MOD_CTRL_SUPER,  XK_r,      RestartAction, NULL,    NULL },
+	{ MOD_SUPER,       XK_Return, SpawnAction,   "urxvt", NULL }
 };
 
 /* strings corresponding to KeyAction values */
@@ -49,6 +49,7 @@ struct key *key_create(unsigned int mod, KeySym keysym, KeyAction action,
 		char *args, struct key *next)
 {
 	struct key *key = xmalloc(sizeof(struct key));
+
 	key->mod =  mod;
 	key->keysym = keysym;
 	key->action = action;
@@ -60,8 +61,7 @@ struct key *key_create(unsigned int mod, KeySym keysym, KeyAction action,
 
 struct key *key_default_keys(void)
 {
-	struct key *head = NULL;
-	struct key *tmp;
+	struct key *tmp, *head = NULL;
 	int i;
 
 	for (i = 0; i < ARRSIZE(default_keys); i++) {

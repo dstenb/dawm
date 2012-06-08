@@ -11,12 +11,13 @@
 
 /* TODO: fix conflicts */
 
-#define MOD_ALT Mod1Mask
-#define MOD_CTRL ControlMask
+#define MOD_ALT   Mod1Mask
+#define MOD_CTRL  ControlMask
 #define MOD_SHIFT ShiftMask
 #define MOD_SUPER Mod4Mask
 
-#define MOD_CTRL_SUPER (MOD_CTRL | MOD_SUPER)
+#define MOD_CTRL_SUPER  (MOD_CTRL | MOD_SUPER)
+#define MOD_SHIFT_SUPER (MOD_SHIFT | MOD_SUPER)
 
 typedef enum {
 	KillAction,

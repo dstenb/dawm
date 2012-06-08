@@ -32,5 +32,4 @@ int wm_eventloop(struct wm *);
 
 int wm_destroy(struct wm *);
 
-
 #endif
