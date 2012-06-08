@@ -130,8 +130,9 @@ struct client *find_client_by_window(struct monitor *mon, Window win)
 
 	for ( ; mon; mon = mon->next) {
 		for (c = mon->clients; c; c = c->next) {
-			if (c->win == win)
+			if (c->win == win) {
 				return c;
+			}
 		}
 	}
 

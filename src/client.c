@@ -29,6 +29,7 @@ struct client *client_create(Window win, XWindowAttributes *wa)
 	c->floating = 0;
 	c->fullscreen = 0;
 	c->next = NULL;
+	c->snext = NULL;
 	c->win = win;
 
 	return c;
@@ -65,6 +66,12 @@ int client_is_visible(struct client *c)
 	return 1;
 }
 
+void client_move_resize(struct client *c, Display *dpy,
+		int x, int y, int w, int h)
+{
+	XMoveResizeWindow(dpy, c->win, x, y, w, h);
+}
+
 void client_raise(struct client *c, Display *dpy)
 {
 	if (c->floating)
@@ -98,6 +105,7 @@ void client_set_state(struct client *c, Display *dpy, long state)
 	Atom atom = XInternAtom(dpy, "WM_STATE", False);
 	long data[] = { state, None };
 
+	error("%s\n", __func__);
 	XChangeProperty(dpy, c->win, atom, atom, 32, PropModeReplace,
 			(unsigned char *)data, 2);
 }

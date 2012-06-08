@@ -44,6 +44,8 @@ void client_grab_buttons(struct client *, Display *);
 
 int client_is_visible(struct client *);
 
+void client_move_resize(struct client *, Display *, int, int, int, int);
+
 void client_raise(struct client *, Display *);
 
 void client_select_input(struct client *, Display *);

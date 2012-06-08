@@ -1,8 +1,9 @@
 #include "wm.h"
 
 #define WM_EVENT_MASK SubstructureRedirectMask | SubstructureNotifyMask \
-	| ButtonPressMask | PointerMotionMask | EnterWindowMask \
-	| LeaveWindowMask | StructureNotifyMask | PropertyChangeMask
+	| ButtonPressMask | ButtonReleaseMask | PointerMotionMask | \
+	EnterWindowMask | LeaveWindowMask | StructureNotifyMask | \
+	PropertyChangeMask
 
 static void wm_checkotherwm(struct wm *);
 static void wm_create_client(struct wm *, Window, XWindowAttributes *);
@@ -17,6 +18,7 @@ static int wm_xerror(Display *, XErrorEvent *);
 
 /* X handlers */
 static void wm_handler_buttonpress(struct wm *, XEvent *);
+static void wm_handler_buttonrelease(struct wm *, XEvent *);
 static void wm_handler_clientmessage(struct wm *, XEvent *);
 static void wm_handler_configurerequest(struct wm *, XEvent *);
 static void wm_handler_configurenotify(struct wm *, XEvent *);
@@ -34,6 +36,7 @@ static void wm_handler_unmapnotify(struct wm *, XEvent *);
 static int (*xerrxlib) (Display *, XErrorEvent *);
 static void (*handler[LASTEvent]) (struct wm *, XEvent *) = {
 	[ButtonPress] = wm_handler_buttonpress,
+	[ButtonRelease] = wm_handler_buttonrelease,
 	[ClientMessage] = wm_handler_clientmessage,
 	[ConfigureRequest] = wm_handler_configurerequest,
 	[ConfigureNotify] = wm_handler_configurenotify,
@@ -48,6 +51,10 @@ static void (*handler[LASTEvent]) (struct wm *, XEvent *) = {
 	[PropertyNotify] = wm_handler_propertynotify,
 	[UnmapNotify] = wm_handler_unmapnotify
 };
+
+/* TODO: test code, to be removed */
+static XButtonEvent start;
+static XWindowAttributes move_res_attr;
 
 void wm_checkotherwm(struct wm *wm)
 {
@@ -85,6 +92,10 @@ void wm_create_client(struct wm *wm, Window win, XWindowAttributes *wa)
 	monitor_select_client(c->mon, c);
 
 	XMapWindow(wm->dpy, c->win);
+
+	/*
+	client_move_resize(c, wm->dpy, 800, 100, 200, 200);
+	*/
 
 	monitor_arrange(c->mon);
 	monitor_focus(c->mon, c, wm->dpy, wm->root);
@@ -184,6 +195,19 @@ void wm_handler_buttonpress(struct wm *wm, XEvent *ev)
 	(void)wm;
 	(void)ev;
 	error("%s\n", __func__);
+
+	/* TODO: test code, to be removed */
+	XGrabPointer(wm->dpy, ev->xbutton.subwindow, True,
+			PointerMotionMask|ButtonReleaseMask, GrabModeAsync,
+			GrabModeAsync, None, None, CurrentTime);
+	XGetWindowAttributes(wm->dpy, ev->xbutton.subwindow, &move_res_attr);
+	start = ev->xbutton;
+}
+
+void wm_handler_buttonrelease(struct wm *wm, XEvent *ev)
+{
+	error("%s\n", __func__);
+            XUngrabPointer(wm->dpy, CurrentTime);
 }
 
 void wm_handler_clientmessage(struct wm *wm, XEvent *ev)
@@ -236,8 +260,8 @@ void wm_handler_focusin(struct wm *wm, XEvent *ev)
 	XFocusChangeEvent *fcev = &ev->xfocus;
 
 	/* reacquire focus from a broken client */
-	if(wm->selmon->sel && fcev->window != wm->selmon->sel->win)
-		monitor_focus(wm->selmon, wm->selmon->sel, wm->dpy, wm->root);
+	/*if(wm->selmon->sel && fcev->window != wm->selmon->sel->win)
+		monitor_focus(wm->selmon, wm->selmon->sel, wm->dpy, wm->root);*/
 	
 	error("%s\n", __func__);
 }
@@ -285,6 +309,16 @@ void wm_handler_motionnotify(struct wm *wm, XEvent *ev)
 	(void)wm;
 	(void)ev;
 	error("%s\n", __func__);
+
+	int xdiff, ydiff;
+	while(XCheckTypedEvent(wm->dpy, MotionNotify, ev));
+	xdiff = ev->xbutton.x_root - start.x_root;
+	ydiff = ev->xbutton.y_root - start.y_root;
+	XMoveResizeWindow(wm->dpy, ev->xmotion.window,
+			move_res_attr.x + (start.button==1 ? xdiff : 0),
+			move_res_attr.y + (start.button==1 ? ydiff : 0),
+			MAX(1, move_res_attr.width + (start.button==3 ? xdiff : 0)),
+			MAX(1, move_res_attr.height + (start.button==3 ? ydiff : 0)));
 }
 
 void wm_handler_propertynotify(struct wm *wm, XEvent *ev)
@@ -302,6 +336,8 @@ void wm_handler_unmapnotify(struct wm *wm, XEvent *ev)
 {
 	struct client *c;
 	XUnmapEvent *uev = &ev->xunmap;
+	
+	error("%s\n", __func__);
 
 	if((c = find_client_by_window(wm->mons, uev->window))) {
 		if(uev->send_event)
@@ -309,8 +345,6 @@ void wm_handler_unmapnotify(struct wm *wm, XEvent *ev)
 		else
 			wm_remove_client(wm, c, 0);
 	}
-
-	error("%s\n", __func__);
 }
 
 void wm_keypress(struct wm *wm, struct key *key)

@@ -13,6 +13,8 @@
 
 #define ARRSIZE(x) (int)(sizeof(x) / sizeof(*x))
 
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
 /* prints an error message and exits */
 void die(const char *, ...);
 
