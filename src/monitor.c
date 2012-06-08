@@ -101,6 +101,7 @@ void monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
 	if (c) {
 		/* TODO: fix support for multiple monitors */
 
+		/* move the window to the front of the client stack */
 		remove_from_stack(mon, c);
 		add_to_stack(mon, c);
 

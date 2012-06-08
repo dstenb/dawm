@@ -233,8 +233,12 @@ void wm_handler_expose(struct wm *wm, XEvent *ev)
 
 void wm_handler_focusin(struct wm *wm, XEvent *ev)
 {
-	(void)wm;
-	(void)ev;
+	XFocusChangeEvent *fcev = &ev->xfocus;
+
+	/* reacquire focus from a broken client */
+	if(wm->selmon->sel && fcev->window != wm->selmon->sel->win)
+		monitor_focus(wm->selmon, wm->selmon->sel, wm->dpy, wm->root);
+	
 	error("%s\n", __func__);
 }
 
@@ -288,6 +292,10 @@ void wm_handler_propertynotify(struct wm *wm, XEvent *ev)
 	(void)wm;
 	(void)ev;
 	error("%s\n", __func__);
+
+	/* TODO: check for XA_WM_NAME property change */
+
+	/* TODO: check for client property change */
 }
 
 void wm_handler_unmapnotify(struct wm *wm, XEvent *ev)
