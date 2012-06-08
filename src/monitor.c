@@ -1,13 +1,48 @@
 #include "monitor.h"
 
-void monitor_add_client(struct monitor *mon, struct client *c)
+static void add_to_clients(struct monitor *mon, struct client *c)
 {
 	c->mon = mon;
 	c->next = mon->clients;
 	mon->clients = c;
+}
 
+static void add_to_stack(struct monitor *mon, struct client *c)
+{
 	c->snext = mon->cstack;
 	mon->cstack = c;
+}
+
+static void remove_from_clients(struct monitor *mon, struct client *c)
+{
+	struct client *trav;
+
+	if (c == mon->clients) {
+		mon->clients = mon->clients->next;
+	} else {
+		for (trav = mon->clients; trav->next && trav->next != c;
+				trav = trav->next);
+		trav->next = trav->next->next;
+	}
+}
+
+static void remove_from_stack(struct monitor *mon, struct client *c)
+{
+	struct client *trav;
+
+	if (c == mon->cstack) {
+		mon->cstack = mon->cstack->next;
+	} else {
+		for (trav = mon->cstack; trav->next && trav->next != c;
+				trav = trav->next);
+		trav->next = trav->next->next;
+	}
+}
+
+void monitor_add_client(struct monitor *mon, struct client *c)
+{
+	add_to_clients(mon, c);
+	add_to_stack(mon, c);
 }
 
 struct monitor *monitor_append(struct monitor *mons, struct monitor *new)
@@ -47,35 +82,45 @@ struct monitor *monitor_create(struct config *cfg, int width, int height)
 	return mon;
 }
 
-void monitor_focus(struct monitor *mon, struct client *c)
+void monitor_unfocus_selected(struct monitor *mon, Display *dpy, Window root)
 {
-	/* TODO */
+	error("%s(%p, %p)\n", __func__, (void *)mon, (void *)mon->sel);
+
+	if (mon->sel)
+		client_unfocus(mon->sel, dpy, root);
+}
+
+void monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
+		Window root)
+{
+	error("%s(%p, %p)\n", __func__, (void *)mon, (void *)c);
+	if (!c || !client_is_visible(c))
+		for (c = mon->cstack; c && !client_is_visible(c); c = c->next);
+	if (mon->sel && mon->sel != c)
+		monitor_unfocus_selected(mon, dpy, root);
+	if (c) {
+		/* TODO: fix support for multiple monitors */
+
+		remove_from_stack(mon, c);
+		add_to_stack(mon, c);
+
+		client_focus(c, dpy, root);
+	}
+
+	mon->sel = c;
+
+	/* TODO draw bar */
 }
 
 void monitor_remove_client(struct monitor *mon, struct client *c)
 {
-	struct client *trav;
-
-	if (c == mon->clients) {
-		mon->clients = mon->clients->next;
-	} else {
-		for (trav = mon->clients; trav->next && trav->next != c;
-				trav = trav->next);
-		trav->next = trav->next->next;
-	}
-
-	if (c == mon->cstack) {
-		mon->cstack = mon->cstack->next;
-	} else {
-		for (trav = mon->cstack; trav->next && trav->next != c;
-				trav = trav->next);
-		trav->next = trav->next->next;
-	}
+	remove_from_clients(mon, c);
+	remove_from_stack(mon, c);
 }
 
 void monitor_select_client(struct monitor *mon, struct client *c)
 {
-	c->mon->sel = c;
+	mon->sel = c;
 }
 
 struct client *find_client_by_window(struct monitor *mon, Window win)

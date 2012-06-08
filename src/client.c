@@ -34,6 +34,19 @@ struct client *client_create(Window win, XWindowAttributes *wa)
 	return c;
 }
 
+void client_focus(struct client *c, Display *dpy, Window root)
+{
+	Atom atom = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
+
+	XSetWindowBorder(dpy, c->win, colors[COL_SEL].border);
+
+	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
+	XChangeProperty(dpy, root, atom, XA_WINDOW, 32, PropModeReplace,
+			(unsigned char *) &(c->win), 1);
+
+	/* TODO: send WM_TAKE_FOCUS event */
+}
+
 void client_free(struct client *c)
 {
 	free(c);
@@ -44,6 +57,12 @@ void client_grab_buttons(struct client *c, Display *dpy)
 	XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
 			CLIENT_BUTTON_MASK, GrabModeAsync, GrabModeSync, None,
 			None);
+}
+
+int client_is_visible(struct client *c)
+{
+	/* TODO */
+	return 1;
 }
 
 void client_raise(struct client *c, Display *dpy)
@@ -81,6 +100,13 @@ void client_set_state(struct client *c, Display *dpy, long state)
 
 	XChangeProperty(dpy, c->win, atom, atom, 32, PropModeReplace,
 			(unsigned char *)data, 2);
+}
+
+void client_unfocus(struct client *c, Display *dpy, Window root)
+{
+	XSetWindowBorder(dpy, c->win, colors[COL_NORM].border);
+
+	/* TODO */
 }
 
 void client_unmap(struct client *c, Display *dpy)

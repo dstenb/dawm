@@ -69,14 +69,11 @@ void wm_create_client(struct wm *wm, Window win, XWindowAttributes *wa)
 
 	/* TODO: fix client rules (rule.h) */
 
-	/* TODO: fix border color */
+	c->old_bsize = wa->border_width;
 	client_set_border(c, wm->dpy, wm->cfg->bsize);
 
 	/* TODO: configureevent */
-
-	/* TODO: check for fullscreen and dialog */
 	/*client_fix_window_type(c);*/
-
 	/* TODO: fix size & wm hints */
 
 	client_select_input(c, wm->dpy);
@@ -89,11 +86,8 @@ void wm_create_client(struct wm *wm, Window win, XWindowAttributes *wa)
 
 	XMapWindow(wm->dpy, c->win);
 
-	/* TODO */
 	monitor_arrange(c->mon);
-
-	/* TODO */
-	monitor_focus(c->mon, c);
+	monitor_focus(c->mon, c, wm->dpy, wm->root);
 }
 
 /* TODO: fix Xinerama */

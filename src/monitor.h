@@ -32,7 +32,7 @@ void monitor_arrange(struct monitor *);
 /* creates a monitor */
 struct monitor *monitor_create(struct config *, int, int);
 
-void monitor_focus(struct monitor *, struct client *);
+void monitor_focus(struct monitor *, struct client *, Display *, Window);
 
 void monitor_remove_client(struct monitor *, struct client *);
 
