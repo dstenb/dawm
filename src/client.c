@@ -2,8 +2,8 @@
 
 #define CLIENT_BUTTON_MASK (ButtonPressMask | ButtonReleaseMask)
 
-#define CLIENT_EVENT_MASK EnterWindowMask | FocusChangeMask | \
-	PropertyChangeMask | StructureNotifyMask
+#define CLIENT_EVENT_MASK (EnterWindowMask | FocusChangeMask | \
+	PropertyChangeMask | StructureNotifyMask)
 
 #define COL_NORM 0
 #define COL_SEL 1
@@ -94,12 +94,6 @@ void client_set_border(struct client *c, Display *dpy, int bsize)
 	XSetWindowBorder(dpy, c->win, colors[COL_NORM].border);
 }
 
-void client_set_name(struct client *c, const char *str)
-{
-	strncpy(c->name, str, CLIENT_NAME_SIZE);
-	error("%s: %s\n", __func__, c->name);
-}
-
 void client_set_state(struct client *c, Display *dpy, long state)
 {
 	Atom atom = XInternAtom(dpy, "WM_STATE", False);
@@ -113,7 +107,6 @@ void client_set_state(struct client *c, Display *dpy, long state)
 void client_unfocus(struct client *c, Display *dpy, Window root)
 {
 	XSetWindowBorder(dpy, c->win, colors[COL_NORM].border);
-
 	/* TODO */
 }
 
@@ -121,8 +114,6 @@ void client_unmap(struct client *c, Display *dpy)
 {
 	int (*xerror) (Display *, XErrorEvent *);
 	XWindowChanges wc;
-
-	error("%s\n", __func__);
 
 	wc.border_width = c->old_bsize;
 	XGrabServer(dpy);
@@ -159,6 +150,5 @@ int xerror_dummy(Display *dpy, XErrorEvent *ev)
 {
 	(void)dpy;
 	(void)ev;
-	error("dummy!\n");
 	return 0;
 }
