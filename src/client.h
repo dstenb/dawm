@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <X11/Xlib.h>
 
+#include "atoms.h"
 #include "common.h"
 #include "config.h"
 #include "utils.h"

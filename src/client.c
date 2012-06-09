@@ -37,13 +37,11 @@ struct client *client_create(Window win, XWindowAttributes *wa)
 
 void client_focus(struct client *c, Display *dpy, Window root)
 {
-	Atom atom = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
-
 	XSetWindowBorder(dpy, c->win, colors[COL_SEL].border);
 
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
-	XChangeProperty(dpy, root, atom, XA_WINDOW, 32, PropModeReplace,
-			(unsigned char *) &(c->win), 1);
+	XChangeProperty(dpy, root, atom(NetActiveWindowAtom), XA_WINDOW, 32,
+			PropModeReplace, (unsigned char *) &(c->win), 1);
 
 	/* TODO: send WM_TAKE_FOCUS event */
 }
@@ -96,12 +94,11 @@ void client_set_border(struct client *c, Display *dpy, int bsize)
 
 void client_set_state(struct client *c, Display *dpy, long state)
 {
-	Atom atom = XInternAtom(dpy, "WM_STATE", False);
 	long data[] = { state, None };
 
 	error("%s\n", __func__);
-	XChangeProperty(dpy, c->win, atom, atom, 32, PropModeReplace,
-			(unsigned char *)data, 2);
+	XChangeProperty(dpy, c->win, atom(WMStateAtom), atom(WMStateAtom), 32,
+			PropModeReplace, (unsigned char *)data, 2);
 }
 
 void client_unfocus(struct client *c, Display *dpy, Window root)
@@ -130,8 +127,9 @@ void client_unmap(struct client *c, Display *dpy)
 
 void client_update_title(struct client *c, Display *dpy)
 {
-	Atom prop = XInternAtom(dpy, "WM_NAME", False);
-	get_text_prop(dpy, c->win, prop, c->name, CLIENT_NAME_SIZE);
+	if (!(get_text_prop(dpy, c->win, atom(WMNameAtom), c->name,
+					CLIENT_NAME_SIZE)))
+		snprintf(c->name, CLIENT_NAME_SIZE, "unnamed window");
 	error("c->name: %s\n", c->name);
 }
 

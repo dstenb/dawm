@@ -149,6 +149,8 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 
 	clients_init_colors(wm->cfg, wm->dpy, wm->screen);
 
+	atoms_init(wm->dpy);
+
 	return wm;
 }
 

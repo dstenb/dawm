@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <X11/Xlib.h>
 
+#include "atoms.h"
 #include "config.h"
 #include "keys.h"
 #include "monitor.h"
