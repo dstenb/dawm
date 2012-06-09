@@ -22,7 +22,7 @@ static void remove_from_clients(struct monitor *mon, struct client *c)
 	} else {
 		for (trav = mon->clients; trav->next && trav->next != c;
 				trav = trav->next);
-		trav->next = trav->next->next;
+		trav->next = trav->next ? trav->next->next : NULL;
 	}
 }
 
@@ -35,7 +35,7 @@ static void remove_from_stack(struct monitor *mon, struct client *c)
 	} else {
 		for (trav = mon->cstack; trav->next && trav->next != c;
 				trav = trav->next);
-		trav->next = trav->next->next;
+		trav->next = trav->next ? trav->next->next : NULL;
 	}
 }
 
