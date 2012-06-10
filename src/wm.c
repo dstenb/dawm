@@ -192,11 +192,11 @@ void wm_handler_buttonpress(struct wm *wm, XEvent *ev)
 	XButtonPressedEvent *bpev = &ev->xbutton;
 	struct client *c;
 
-	c = find_client_by_window(wm->mons, bpev->window);
-
-	(void)wm;
-	(void)ev;
 	error("%s\n", __func__);
+
+	if (!(c = find_client_by_window(wm->mons, bpev->window)))
+		return;
+
 
 	/* TODO: test code, to be removed */
 	XGrabPointer(wm->dpy, ev->xbutton.subwindow, True,
@@ -260,9 +260,16 @@ void wm_handler_destroynotify(struct wm *wm, XEvent *ev)
 
 void wm_handler_enternotify(struct wm *wm, XEvent *ev)
 {
-	(void)wm;
-	(void)ev;
 	error("%s\n", __func__);
+	XCrossingEvent *cev = &ev->xcrossing;
+	struct client *c;
+
+	if (!(c = find_client_by_window(wm->mons, cev->window)))
+		return;
+
+	printf("%s: %p\n", __func__, (void *)c);
+
+	monitor_focus(c->mon, c, wm->dpy, wm->root);
 }
 
 void wm_handler_expose(struct wm *wm, XEvent *ev)
@@ -277,9 +284,9 @@ void wm_handler_focusin(struct wm *wm, XEvent *ev)
 	XFocusChangeEvent *fcev = &ev->xfocus;
 
 	/* reacquire focus from a broken client */
-	/*if(wm->selmon->sel && fcev->window != wm->selmon->sel->win)
-		monitor_focus(wm->selmon, wm->selmon->sel, wm->dpy, wm->root);*/
-	
+	if(wm->selmon->sel && fcev->window != wm->selmon->sel->win)
+		monitor_focus(wm->selmon, wm->selmon->sel, wm->dpy, wm->root);
+
 	error("%s\n", __func__);
 }
 
@@ -325,7 +332,7 @@ void wm_handler_motionnotify(struct wm *wm, XEvent *ev)
 {
 	(void)wm;
 	(void)ev;
-	error("%s\n", __func__);
+	/*error("%s\n", __func__);*/
 
 	int xdiff, ydiff;
 	while(XCheckTypedEvent(wm->dpy, MotionNotify, ev));
