@@ -10,6 +10,7 @@
 
 typedef enum {
 	WMNameAtom,
+	WMProtocolsAtom,
 	WMStateAtom,
 	WMTakeFocusAtom,
 	NetActiveWindowAtom,
@@ -21,5 +22,7 @@ Atom atom(AtomID);
 
 /* initializes all atoms */
 void atoms_init(Display *);
+
+int has_wm_protocol(Display *, Window, Atom);
 
 #endif

@@ -10,7 +10,7 @@ unsigned long get_color(Display *dpy, int screen, const char *str)
 	return color.pixel;
 }
 
-int get_text_prop(Display *dpy, Window win, Atom atom, char *str, unsigned int size)
+int get_text_prop(Display *dpy, Window win, Atom prop, char *str, unsigned int size)
 {
 	char **list = NULL;
 	int n;
@@ -19,7 +19,7 @@ int get_text_prop(Display *dpy, Window win, Atom atom, char *str, unsigned int s
 	if(!str || size == 0)
 		return 0;
 	str[0] = '\0';
-	XGetTextProperty(dpy, win, &name, atom);
+	XGetTextProperty(dpy, win, &name, prop);
 	if(!name.nitems)
 		return 0;
 	if(name.encoding == XA_STRING)
@@ -35,4 +35,24 @@ int get_text_prop(Display *dpy, Window win, Atom atom, char *str, unsigned int s
 	XFree(name.value);
 	return 1;
 
+}
+
+int send_event(Display *dpy, Window win, Atom proto)
+{
+	XEvent ev;
+
+	if (has_wm_protocol(dpy, win, proto)) {
+		ev.type = ClientMessage;
+		ev.xclient.window = win;
+		ev.xclient.message_type = atom(WMProtocolsAtom);
+		ev.xclient.format = 32;
+		ev.xclient.data.l[0] = proto;
+		ev.xclient.data.l[1] = CurrentTime;
+
+		XSendEvent(dpy, win, False, NoEventMask, &ev);
+
+		return 1;
+	} else {
+		return 0;
+	}
 }
