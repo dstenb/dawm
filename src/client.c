@@ -1,8 +1,8 @@
 #include "client.h"
 
-#define CLIENT_BUTTON_MASK (ButtonPressMask | ButtonReleaseMask)
+#define BUTTON_MASK (ButtonPressMask | ButtonReleaseMask)
 
-#define CLIENT_EVENT_MASK (EnterWindowMask | FocusChangeMask | \
+#define EVENT_MASK (EnterWindowMask | FocusChangeMask | \
 	PropertyChangeMask | StructureNotifyMask)
 
 #define COL_NORM 0
@@ -53,9 +53,8 @@ void client_free(struct client *c)
 
 void client_grab_buttons(struct client *c, Display *dpy)
 {
-	XGrabButton(dpy, AnyButton, AnyModifier, c->win, False,
-			CLIENT_BUTTON_MASK, GrabModeAsync, GrabModeSync, None,
-			None);
+	XGrabButton(dpy, AnyButton, AnyModifier, c->win, False, BUTTON_MASK,
+			GrabModeAsync, GrabModeSync, None, None);
 }
 
 int client_is_visible(struct client *c)
@@ -67,7 +66,7 @@ int client_is_visible(struct client *c)
 void client_move_resize(struct client *c, Display *dpy,
 		int x, int y, int w, int h)
 {
-	XMoveResizeWindow(dpy, c->win, x, y, w, h);
+	XMoveResizeWindow(dpy, c->win, x, y, MAX(1, w), MAX(1, h));
 }
 
 void client_raise(struct client *c, Display *dpy)
@@ -78,7 +77,7 @@ void client_raise(struct client *c, Display *dpy)
 
 void client_select_input(struct client *c, Display *dpy)
 {
-	XSelectInput(dpy, c->win, CLIENT_EVENT_MASK);
+	XSelectInput(dpy, c->win, EVENT_MASK);
 }
 
 void client_set_border(struct client *c, Display *dpy, int bsize)
