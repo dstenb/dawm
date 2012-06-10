@@ -9,6 +9,7 @@
 #include "utils.h"
 
 typedef enum {
+	WMChangeStateAtom,
 	WMNameAtom,
 	WMProtocolsAtom,
 	WMStateAtom,

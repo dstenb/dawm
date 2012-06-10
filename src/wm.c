@@ -214,8 +214,23 @@ void wm_handler_buttonrelease(struct wm *wm, XEvent *ev)
 
 void wm_handler_clientmessage(struct wm *wm, XEvent *ev)
 {
-	(void)wm;
-	(void)ev;
+	XClientMessageEvent *cme = &ev->xclient;
+	struct client *c;
+
+	if (!(c = find_client_by_window(wm->mons, cme->window)))
+		return;
+
+	if (cme->message_type == atom(WMStateAtom)) {
+		error("%s: WMState", __func__);
+	} else if (cme->message_type == atom(NetActiveWindowAtom)) {
+		error("%s: NetActiveWindow", __func__);
+	} else if (cme->message_type == atom(WMChangeStateAtom)) {
+		if (cme->format == 32 && cme->data.l[0] == IconicState) {
+			error("%s: minimize window\n", __func__);
+			/* TODO: fix minimizing */
+		}
+	}
+
 	error("%s\n", __func__);
 }
 
