@@ -43,7 +43,7 @@ void client_focus(struct client *c, Display *dpy, Window root)
 	XChangeProperty(dpy, root, atom(NetActiveWindowAtom), XA_WINDOW, 32,
 			PropModeReplace, (unsigned char *) &(c->win), 1);
 
-	/* TODO: send WM_TAKE_FOCUS event */
+	send_event(dpy, c->win, atom(WMTakeFocusAtom));
 }
 
 void client_free(struct client *c)
