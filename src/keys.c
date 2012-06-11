@@ -87,6 +87,15 @@ struct key *key_free_all(struct key *key)
 	return NULL;
 }
 
+void key_grab_all(struct key *key, Display *dpy, Window root)
+{
+	for ( ; key; key = key->next) {
+		XGrabKey(dpy, XKeysymToKeycode(dpy, key->keysym), key->mod,
+				root, True, GrabModeAsync, GrabModeAsync);
+	}
+
+}
+
 int str_to_modifier(const char *str)
 {
 	if (strcasecmp(str, "alt") == 0)

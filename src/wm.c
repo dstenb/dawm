@@ -8,7 +8,6 @@
 static void wm_checkotherwm(struct wm *);
 static void wm_create_client(struct wm *, Window, XWindowAttributes *);
 static void wm_create_monitors(struct wm *);
-static void wm_grab_keys(struct wm *);
 static void wm_keypress(struct wm *, struct key *);
 static void wm_quit(struct wm *, const char *);
 static void wm_remove_client(struct wm *, struct client *, int);
@@ -139,7 +138,7 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 	printf("wm->height: %i\n", wm->height);
 
 	/* grab the manager's key bindings */
-	wm_grab_keys(wm);
+	key_grab_all(wm->keys, wm->dpy, wm->root);
 
 	/* TODO: to be removed */
 	XGrabButton(wm->dpy, 1, Mod1Mask, wm->root, True, ButtonPressMask, GrabModeAsync,
@@ -174,17 +173,6 @@ int wm_destroy(struct wm *wm)
 	XCloseDisplay(wm->dpy);
 	free(wm);
 	return 0;
-}
-
-void wm_grab_keys(struct wm *wm)
-{
-	struct key *key;
-
-	for (key = wm->keys; key; key = key->next) {
-		XGrabKey(wm->dpy, XKeysymToKeycode(wm->dpy, key->keysym),
-				key->mod, wm->root, True, GrabModeAsync,
-				GrabModeAsync);
-	}
 }
 
 void wm_handler_buttonpress(struct wm *wm, XEvent *ev)

@@ -54,6 +54,9 @@ struct key *key_default_keys(void);
 /* recursively frees a key list. returns a NULL pointer for convenience */
 struct key *key_free_all(struct key *);
 
+/* grab all keys */
+void key_grab_all(struct key *, Display *, Window);
+
 /* returns non-zero if the string describes a modifier */
 int str_to_modifier(const char *);
 
