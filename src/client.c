@@ -63,6 +63,11 @@ int client_is_visible(struct client *c)
 	return 1;
 }
 
+void client_map_window(struct client *c, Display *dpy)
+{
+	XMapWindow(dpy, c->win);
+}
+
 void client_move_resize(struct client *c, Display *dpy,
 		int x, int y, int w, int h)
 {
@@ -98,6 +103,27 @@ void client_set_state(struct client *c, Display *dpy, long state)
 	error("%s\n", __func__);
 	XChangeProperty(dpy, c->win, atom(WMStateAtom), atom(WMStateAtom), 32,
 			PropModeReplace, (unsigned char *)data, 2);
+}
+
+void client_setup(struct client *c, struct config *cfg, struct monitor *mon,
+		Display *dpy, XWindowAttributes *wa)
+{
+	c->mon = mon;
+
+	client_update_title(c, dpy);
+
+	/* TODO: fix client rules (rule.h) */
+
+	c->old_bsize = wa->border_width;
+	client_set_border(c, dpy, cfg->bsize);
+
+	/* TODO: configureevent */
+	/*client_fix_window_type(c);*/
+	/* TODO: fix size & wm hints */
+
+	client_select_input(c, dpy);
+	client_grab_buttons(c, dpy);
+	client_raise(c, dpy);
 }
 
 void client_unfocus(struct client *c, Display *dpy, Window root)

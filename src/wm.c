@@ -69,32 +69,12 @@ void wm_create_client(struct wm *wm, Window win, XWindowAttributes *wa)
 {
 	struct client *c = client_create(win, wa);
 
-	c->mon = wm->selmon;
-
-	client_update_title(c, wm->dpy);
-
-	/* TODO: fix client rules (rule.h) */
-
-	c->old_bsize = wa->border_width;
-	client_set_border(c, wm->dpy, wm->cfg->bsize);
-
-	/* TODO: configureevent */
-	/*client_fix_window_type(c);*/
-	/* TODO: fix size & wm hints */
-
-	client_select_input(c, wm->dpy);
-	client_grab_buttons(c, wm->dpy);
-
-	client_raise(c, wm->dpy);
+	client_setup(c, wm->cfg, wm->selmon, wm->dpy, wa);
 
 	monitor_add_client(c->mon, c);
 	monitor_select_client(c->mon, c);
 
-	XMapWindow(wm->dpy, c->win);
-
-	/*
-	client_move_resize(c, wm->dpy, 800, 100, 200, 200);
-	*/
+	client_map_window(c, wm->dpy);
 
 	monitor_arrange(c->mon);
 	monitor_focus(c->mon, c, wm->dpy, wm->root);

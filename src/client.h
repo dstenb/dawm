@@ -54,6 +54,8 @@ void client_grab_buttons(struct client *, Display *);
 /* returns non-zero if the window is visible */
 int client_is_visible(struct client *);
 
+void client_map_window(struct client *, Display *);
+
 /* move and resize the client */
 void client_move_resize(struct client *, Display *, int, int, int, int);
 
@@ -68,6 +70,9 @@ void client_set_border(struct client *, Display *, int);
 
 /* set the WM_STATE */
 void client_set_state(struct client *, Display *, long);
+
+void client_setup(struct client *, struct config *, struct monitor *,
+		Display *, XWindowAttributes *);
 
 /* remove focus from client */
 void client_unfocus(struct client *, Display *, Window);
