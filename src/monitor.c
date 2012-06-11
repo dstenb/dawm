@@ -1,5 +1,20 @@
 #include "monitor.h"
 
+static void monitor_dbg_print(struct monitor *m, const char *str)
+{
+	struct client *c;
+	error("monitor_dbg_print (%s)\n", str);
+	error("m->sel: %p\n", (void *)m->sel);
+
+	error("m->clients:\n");
+	for (c = m->clients; c; c = c->next)
+		error("-> %p\n", c);
+	error("m->cstack:\n");
+	for (c = m->cstack; c; c = c->next)
+		error("-> %p\n", c);
+	error("\n");
+}
+
 static void add_to_clients(struct monitor *mon, struct client *c)
 {
 	c->mon = mon;
@@ -94,6 +109,7 @@ void monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
 		Window root)
 {
 	error("%s(%p, %p)\n", __func__, (void *)mon, (void *)c);
+
 	if (!c || !client_is_visible(c))
 		for (c = mon->cstack; c && !client_is_visible(c); c = c->next);
 	if (mon->sel && mon->sel != c)
