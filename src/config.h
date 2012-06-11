@@ -9,6 +9,14 @@
 #include "keys.h"
 #include "utils.h"
 
+#define SIZE_COL_ARR 3
+
+typedef enum {
+	FG,
+	BG,
+	BORDER
+} ConfigColorID;
+
 struct config {
 	int topbar;
 	int showbar;
@@ -16,14 +24,9 @@ struct config {
 	struct key *keys;
 
 	/* normal window colors */
-	char *col_normfg;
-	char *col_normbg;
-	char *col_normborder;
-
+	char *col_win_norm[3];
 	/* selected window colors */
-	char *col_selfg;
-	char *col_selbg;
-	char *col_selborder;
+	char *col_win_sel[3];
 };
 
 /* init a config struct, will set all the settings to the default values */

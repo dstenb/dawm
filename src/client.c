@@ -134,13 +134,13 @@ void client_update_title(struct client *c, Display *dpy)
 
 void clients_init_colors(struct config *cfg, Display *dpy, int screen)
 {
-	colors[COL_NORM].fg = get_color(dpy, screen, cfg->col_normfg);
-	colors[COL_NORM].bg = get_color(dpy, screen, cfg->col_normbg);
-	colors[COL_NORM].border = get_color(dpy, screen, cfg->col_normborder);
+	colors[COL_NORM].fg = get_color(dpy, screen, cfg->col_win_norm[FG]);
+	colors[COL_NORM].bg = get_color(dpy, screen, cfg->col_win_norm[BG]);
+	colors[COL_NORM].border = get_color(dpy, screen, cfg->col_win_norm[BORDER]);
 
-	colors[COL_SEL].fg = get_color(dpy, screen, cfg->col_selfg);
-	colors[COL_SEL].bg = get_color(dpy, screen, cfg->col_selbg);
-	colors[COL_SEL].border = get_color(dpy, screen, cfg->col_selborder);
+	colors[COL_SEL].fg = get_color(dpy, screen, cfg->col_win_sel[FG]);
+	colors[COL_SEL].bg = get_color(dpy, screen, cfg->col_win_sel[BG]);
+	colors[COL_SEL].border = get_color(dpy, screen, cfg->col_win_sel[BORDER]);
 }
 
 int xerror_dummy(Display *dpy, XErrorEvent *ev)
