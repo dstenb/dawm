@@ -10,7 +10,7 @@ void monitor_dbg_print(struct monitor *m, const char *str)
 	for (c = m->clients; c; c = c->next)
 		error("-> %p\n", c);
 	error("m->cstack:\n");
-	for (c = m->cstack; c; c = c->next)
+	for (c = m->cstack; c; c = c->snext)
 		error("-> %p\n", c);
 	error("\n");
 }
