@@ -3,16 +3,17 @@
 void monitor_dbg_print(struct monitor *m, const char *str)
 {
 	struct client *c;
-	error("monitor_dbg_print (%s)\n", str);
-	error("m->sel: %p\n", (void *)m->sel);
+	DBG("monitor_dbg_print (%s)\n", str);
+	DBG("monitor_dbg_print (%s)\n", str);
+	DBG("m->sel: %p\n", (void *)m->sel);
 
-	error("m->clients:\n");
+	DBG("m->clients:\n");
 	for (c = m->clients; c; c = c->next)
-		error("-> %p\n", c);
-	error("m->cstack:\n");
+		DBG("-> %p\n", c);
+	DBG("m->cstack:\n");
 	for (c = m->cstack; c; c = c->snext)
-		error("-> %p\n", c);
-	error("\n");
+		DBG("-> %p\n", c);
+	DBG("\n");
 }
 
 static void add_to_clients(struct monitor *mon, struct client *c)
@@ -99,7 +100,7 @@ struct monitor *monitor_create(struct config *cfg, int width, int height)
 
 void monitor_unfocus_selected(struct monitor *mon, Display *dpy, Window root)
 {
-	error("%s(%p, %p)\n", __func__, (void *)mon, (void *)mon->sel);
+	DBG("%s(%p, %p)\n", __func__, (void *)mon, (void *)mon->sel);
 
 	if (mon->sel)
 		client_unfocus(mon->sel, dpy, root);
@@ -108,7 +109,7 @@ void monitor_unfocus_selected(struct monitor *mon, Display *dpy, Window root)
 void monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
 		Window root)
 {
-	error("%s(%p, %p)\n", __func__, (void *)mon, (void *)c);
+	DBG("%s(%p, %p)\n", __func__, (void *)mon, (void *)c);
 
 	if (!c || !client_is_visible(c))
 		for (c = mon->cstack; c && !client_is_visible(c); c = c->snext);

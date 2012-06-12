@@ -158,7 +158,7 @@ int wm_destroy(struct wm *wm)
 
 static void dbg_print(struct wm *wm, const char *str)
 {
-	error("::: dbg %s\n", str);
+	DBG(":::: dbg_print(%s)\n", str);
 
 	monitor_dbg_print(wm->selmon, "");
 }
@@ -209,13 +209,13 @@ void wm_handler_clientmessage(struct wm *wm, XEvent *ev)
 			return;
 
 		if (cmev->message_type == atom(WMStateAtom)) {
-			error("%s: WMState", __func__);
+			DBG("%s: WMState", __func__);
 		} else if (cmev->message_type == atom(NetActiveWindowAtom)) {
-			error("%s: NetActiveWindow", __func__);
+			DBG("%s: NetActiveWindow", __func__);
 		} else if (cmev->message_type == atom(WMChangeStateAtom)) {
 			if (cmev->data.l[0] == IconicState &&
 					cmev->format == 32) {
-				error("%s: minimize window\n", __func__);
+				DBG("%s: minimize window\n", __func__);
 				/* TODO: fix minimizing */
 			}
 		}
@@ -321,7 +321,6 @@ void wm_handler_motionnotify(struct wm *wm, XEvent *ev)
 {
 	(void)wm;
 	(void)ev;
-	/*error("%s\n", __func__);*/
 
 	int xdiff, ydiff;
 	while(XCheckTypedEvent(wm->dpy, MotionNotify, ev));
@@ -363,8 +362,6 @@ void wm_handler_unmapnotify(struct wm *wm, XEvent *ev)
 
 void wm_keypress(struct wm *wm, struct key *key)
 {
-	error("%s\n", __func__);
-
 	switch(key->action) {
 		case SpawnAction:
 			spawn(key->args);
@@ -376,7 +373,7 @@ void wm_keypress(struct wm *wm, struct key *key)
 			wm_restart(wm);
 			break;
 		default:
-			error("unhandled key action (%d), fix this!\n",
+			die("unhandled key action (%d), fix this!\n",
 					key->action);
 			break;
 	}

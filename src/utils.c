@@ -19,7 +19,6 @@ void dbg(const char *file, int line, const char *fmt, ...)
 	va_start(val, fmt);
 	vfprintf(stderr, fmt, val);
 	va_end(val);
-	fprintf(stderr, "\n");
 }
 
 void error(const char *fmt, ...)
