@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <X11/Xatom.h>
 #include <X11/Xlib.h>
 
 #include "utils.h"
@@ -15,6 +16,7 @@ typedef enum {
 	WMStateAtom,
 	WMTakeFocusAtom,
 	NetActiveWindowAtom,
+	NetClientList,
 	LASTAtom
 } AtomID;
 
@@ -25,5 +27,9 @@ Atom atom(AtomID);
 void atoms_init(Display *);
 
 int has_wm_protocol(Display *, Window, Atom);
+
+void net_client_list_add(Display *, Window, Window);
+
+void net_client_list_del(Display *, Window);
 
 #endif

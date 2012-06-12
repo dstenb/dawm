@@ -12,6 +12,7 @@ static void wm_keypress(struct wm *, struct key *);
 static void wm_quit(struct wm *, const char *);
 static void wm_remove_client(struct wm *, struct client *, int);
 static void wm_restart(struct wm *);
+static void wm_update_net_client_list(struct wm *);
 static int wm_xerror_checkotherwm(Display *, XErrorEvent *);
 static int wm_xerror(Display *, XErrorEvent *);
 
@@ -69,7 +70,7 @@ void wm_create_client(struct wm *wm, Window win, XWindowAttributes *wa)
 {
 	struct client *c = client_create(win, wa);
 
-	client_setup(c, wm->cfg, wm->selmon, wm->dpy, wa);
+	client_setup(c, wm->cfg, wm->selmon, wm->dpy, wm->root, wa);
 
 	monitor_add_client(c->mon, c);
 	monitor_select_client(c->mon, c);
@@ -399,7 +400,10 @@ void wm_remove_client(struct wm *wm, struct client *c, int destroyed)
 	client_free(c);
 
 	monitor_arrange(mon);
-	/* TODO: focus, fix client list */
+
+	wm_update_net_client_list(wm);
+
+	/* TODO: focus */
 }
 
 void wm_restart(struct wm *wm)
@@ -409,8 +413,21 @@ void wm_restart(struct wm *wm)
 		execlp("/bin/sh", "sh" , "-c", wm->cmd, NULL);
 }
 
+void wm_update_net_client_list(struct wm *wm)
+{
+	struct monitor *mon;
+	struct client *c;
+
+	net_client_list_del(wm->dpy, wm->root);
+
+	for (mon = wm->mons; mon; mon = mon->next)
+		for (c = mon->clients; c; c = c->next)
+			net_client_list_add(wm->dpy, wm->root, c->win);
+}
+
 int wm_xerror(Display *dpy, XErrorEvent *ee)
 {
+	return 0;
 	error("fatal error: request code=%d, error code=%d\n",
 			ee->request_code, ee->error_code);
 	return xerrxlib(dpy, ee); /* may call exit */

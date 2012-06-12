@@ -72,7 +72,7 @@ void client_set_border(struct client *, Display *, int);
 void client_set_state(struct client *, Display *, long);
 
 void client_setup(struct client *, struct config *, struct monitor *,
-		Display *, XWindowAttributes *);
+		Display *, Window, XWindowAttributes *);
 
 /* remove focus from client */
 void client_unfocus(struct client *, Display *, Window);

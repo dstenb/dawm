@@ -106,7 +106,7 @@ void client_set_state(struct client *c, Display *dpy, long state)
 }
 
 void client_setup(struct client *c, struct config *cfg, struct monitor *mon,
-		Display *dpy, XWindowAttributes *wa)
+		Display *dpy, Window root, XWindowAttributes *wa)
 {
 	c->mon = mon;
 
@@ -124,6 +124,9 @@ void client_setup(struct client *c, struct config *cfg, struct monitor *mon,
 	client_select_input(c, dpy);
 	client_grab_buttons(c, dpy);
 	client_raise(c, dpy);
+
+	/* add the client to the NetClientList */
+	net_client_list_add(dpy, root, c->win);
 }
 
 void client_unfocus(struct client *c, Display *dpy, Window root)
