@@ -46,11 +46,11 @@ static void remove_from_stack(struct monitor *mon, struct client *c)
 	struct client *trav;
 
 	if (c == mon->cstack) {
-		mon->cstack = mon->cstack->next;
+		mon->cstack = mon->cstack->snext;
 	} else {
-		for (trav = mon->cstack; trav->next && trav->next != c;
-				trav = trav->next);
-		trav->next = trav->next ? trav->next->next : NULL;
+		for (trav = mon->cstack; trav->snext && trav->snext != c;
+				trav = trav->snext);
+		trav->snext = trav->snext ? trav->snext->snext : NULL;
 	}
 }
 
@@ -111,7 +111,7 @@ void monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
 	error("%s(%p, %p)\n", __func__, (void *)mon, (void *)c);
 
 	if (!c || !client_is_visible(c))
-		for (c = mon->cstack; c && !client_is_visible(c); c = c->next);
+		for (c = mon->cstack; c && !client_is_visible(c); c = c->snext);
 	if (mon->sel && mon->sel != c)
 		monitor_unfocus_selected(mon, dpy, root);
 	if (c) {
