@@ -11,6 +11,17 @@ void die(const char *fmt, ...)
 	exit(EXIT_FAILURE);
 }
 
+void dbg(const char *file, int line, const char *fmt, ...)
+{
+	va_list val;
+
+	fprintf(stderr, "%s:%i:  ", file, line);
+	va_start(val, fmt);
+	vfprintf(stderr, fmt, val);
+	va_end(val);
+	fprintf(stderr, "\n");
+}
+
 void error(const char *fmt, ...)
 {
 	va_list val;

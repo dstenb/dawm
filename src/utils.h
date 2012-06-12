@@ -9,14 +9,23 @@
 
 #include "common.h"
 
+#define ARRSIZE(x) (int)(sizeof(x) / sizeof(*x))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define STREQ(s1, s2) (strcmp(s1, s2) == 0)
 
-#define ARRSIZE(x) (int)(sizeof(x) / sizeof(*x))
+#define DEBUG 1
 
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#if DEBUG
+#define DBG(...) dbg(__FILE__, __LINE__, __VA_ARGS__)
+#else
+#define DBG(...) 
+#endif
 
 /* prints an error message and exits */
 void die(const char *, ...);
+
+/* prints a debug message (used by DBG) */
+void dbg(const char *, int, const char *, ...);
 
 /* prints an error message */
 void error(const char *, ...);
