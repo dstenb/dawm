@@ -139,8 +139,9 @@ int wm_eventloop(struct wm *wm)
 
 	for (;;) {
 		XNextEvent(wm->dpy, &ev);
-		if (handler[ev.type])
+		if (handler[ev.type]) {
 			handler[ev.type](wm, &ev);
+		}
 	}
 	return 0;
 }
@@ -155,15 +156,24 @@ int wm_destroy(struct wm *wm)
 	return 0;
 }
 
+static void dbg_print(struct wm *wm, const char *str)
+{
+	error("::: dbg %s\n", str);
+
+	monitor_dbg_print(wm->selmon, "");
+}
+
 void wm_handler_buttonpress(struct wm *wm, XEvent *ev)
 {
 	XButtonPressedEvent *bpev = &ev->xbutton;
 	struct client *c;
 
-	error("%s\n", __func__);
+	dbg_print(wm, __func__);
 
+	/*
 	if (!(c = find_client_by_window(wm->mons, bpev->window)))
 		return;
+		*/
 
 
 	/* TODO: test code, to be removed */
@@ -176,50 +186,62 @@ void wm_handler_buttonpress(struct wm *wm, XEvent *ev)
 
 void wm_handler_buttonrelease(struct wm *wm, XEvent *ev)
 {
-	error("%s\n", __func__);
-            XUngrabPointer(wm->dpy, CurrentTime);
+	dbg_print(wm, __func__);
+
+	XUngrabPointer(wm->dpy, CurrentTime);
 }
 
 void wm_handler_clientmessage(struct wm *wm, XEvent *ev)
 {
-	XClientMessageEvent *cme = &ev->xclient;
-	struct client *c;
+	XClientMessageEvent *cmev = &ev->xclient;
 
-	if (!(c = find_client_by_window(wm->mons, cme->window)))
-		return;
+	dbg_print(wm, __func__);
 
-	if (cme->message_type == atom(WMStateAtom)) {
-		error("%s: WMState", __func__);
-	} else if (cme->message_type == atom(NetActiveWindowAtom)) {
-		error("%s: NetActiveWindow", __func__);
-	} else if (cme->message_type == atom(WMChangeStateAtom)) {
-		if (cme->format == 32 && cme->data.l[0] == IconicState) {
-			error("%s: minimize window\n", __func__);
-			/* TODO: fix minimizing */
+	if (cmev->window == wm->root) {
+		if (cmev->format == 32) {
+			/* TODO: Maybe handle
+			 * net_current_desktop & net_number_of_desktops */
+		}
+	} else {
+		struct client *c;
+
+		if (!(c = find_client_by_window(wm->mons, cmev->window)))
+			return;
+
+		if (cmev->message_type == atom(WMStateAtom)) {
+			error("%s: WMState", __func__);
+		} else if (cmev->message_type == atom(NetActiveWindowAtom)) {
+			error("%s: NetActiveWindow", __func__);
+		} else if (cmev->message_type == atom(WMChangeStateAtom)) {
+			if (cmev->data.l[0] == IconicState &&
+					cmev->format == 32) {
+				error("%s: minimize window\n", __func__);
+				/* TODO: fix minimizing */
+			}
 		}
 	}
-
-	error("%s\n", __func__);
 }
 
 void wm_handler_configurerequest(struct wm *wm, XEvent *ev)
 {
 	(void)wm;
 	(void)ev;
-	error("%s\n", __func__);
+	dbg_print(wm, __func__);
 }
 
 void wm_handler_configurenotify(struct wm *wm, XEvent *ev)
 {
 	(void)wm;
 	(void)ev;
-	error("%s\n", __func__);
+	dbg_print(wm, __func__);
 }
 
 void wm_handler_destroynotify(struct wm *wm, XEvent *ev)
 {
 	struct client *c;
 	Window win;
+
+	dbg_print(wm, __func__);
 
 	win = ev->xdestroywindow.window;
 	if ((c = find_client_by_window(wm->mons, win)))
@@ -228,14 +250,13 @@ void wm_handler_destroynotify(struct wm *wm, XEvent *ev)
 
 void wm_handler_enternotify(struct wm *wm, XEvent *ev)
 {
-	error("%s\n", __func__);
 	XCrossingEvent *cev = &ev->xcrossing;
 	struct client *c;
 
+	dbg_print(wm, __func__);
+
 	if (!(c = find_client_by_window(wm->mons, cev->window)))
 		return;
-
-	printf("%s: %p\n", __func__, (void *)c);
 
 	monitor_focus(c->mon, c, wm->dpy, wm->root);
 }
@@ -244,18 +265,18 @@ void wm_handler_expose(struct wm *wm, XEvent *ev)
 {
 	(void)wm;
 	(void)ev;
-	error("%s\n", __func__);
+	dbg_print(wm, __func__);
 }
 
 void wm_handler_focusin(struct wm *wm, XEvent *ev)
 {
 	XFocusChangeEvent *fcev = &ev->xfocus;
 
+	dbg_print(wm, __func__);
+
 	/* reacquire focus from a broken client */
 	if(wm->selmon->sel && fcev->window != wm->selmon->sel->win)
 		monitor_focus(wm->selmon, wm->selmon->sel, wm->dpy, wm->root);
-
-	error("%s\n", __func__);
 }
 
 /* TODO cleanup */
@@ -264,27 +285,29 @@ void wm_handler_keypress(struct wm *wm, XEvent *ev)
 	XKeyEvent *kev;
 	struct key *key;
 
+	dbg_print(wm, __func__);
+
 	kev = &ev->xkey;
 	for (key = wm->keys; key; key = key->next) {
 		if (XKeysymToKeycode(wm->dpy, key->keysym) == kev->keycode
 				&& (kev->state & key->mod))
 			wm_keypress(wm, key);
 	}
-
-	error("%s\n", __func__);
 }
 
 void wm_handler_mappingnotify(struct wm *wm, XEvent *ev)
 {
 	(void)wm;
 	(void)ev;
-	error("%s\n", __func__);
+	dbg_print(wm, __func__);
 }
 
 void wm_handler_maprequest(struct wm *wm, XEvent *ev)
 {
 	static XWindowAttributes wa;
 	XMapRequestEvent *mrev = &ev->xmaprequest;
+	
+	dbg_print(wm, __func__);
 
 	if(!XGetWindowAttributes(wm->dpy, mrev->window, &wa))
 		return;
@@ -292,8 +315,6 @@ void wm_handler_maprequest(struct wm *wm, XEvent *ev)
 		return;
 	if(!find_client_by_window(wm->mons, mrev->window))
 		wm_create_client(wm, mrev->window, &wa);
-
-	error("%s\n", __func__);
 }
 
 void wm_handler_motionnotify(struct wm *wm, XEvent *ev)
@@ -317,7 +338,8 @@ void wm_handler_propertynotify(struct wm *wm, XEvent *ev)
 {
 	(void)wm;
 	(void)ev;
-	error("%s\n", __func__);
+
+	dbg_print(wm, __func__);
 
 	/* TODO: check for XA_WM_NAME property change */
 
@@ -329,7 +351,7 @@ void wm_handler_unmapnotify(struct wm *wm, XEvent *ev)
 	struct client *c;
 	XUnmapEvent *uev = &ev->xunmap;
 	
-	error("%s\n", __func__);
+	dbg_print(wm, __func__);
 
 	if((c = find_client_by_window(wm->mons, uev->window))) {
 		if(uev->send_event)

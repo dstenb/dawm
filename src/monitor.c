@@ -1,6 +1,6 @@
 #include "monitor.h"
 
-static void monitor_dbg_print(struct monitor *m, const char *str)
+void monitor_dbg_print(struct monitor *m, const char *str)
 {
 	struct client *c;
 	error("monitor_dbg_print (%s)\n", str);
