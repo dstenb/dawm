@@ -8,6 +8,7 @@
 static void wm_checkotherwm(struct wm *);
 static void wm_create_client(struct wm *, Window, XWindowAttributes *);
 static void wm_create_monitors(struct wm *);
+static void wm_get_windows(struct wm *);
 static void wm_keypress(struct wm *, struct key *);
 static void wm_quit(struct wm *, const char *);
 static void wm_remove_client(struct wm *, struct client *, int);
@@ -131,6 +132,9 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 
 	atoms_init(wm->dpy);
 
+	/* manage all windows that already exists */
+	wm_get_windows(wm);
+
 	return wm;
 }
 
@@ -155,6 +159,29 @@ int wm_destroy(struct wm *wm)
 	XCloseDisplay(wm->dpy);
 	free(wm);
 	return 0;
+}
+
+void wm_get_windows(struct wm *wm)
+{
+	XWindowAttributes wa;
+	Window d1, d2;
+	Window *wins;
+	unsigned int n;
+	int i;
+
+	if (XQueryTree(wm->dpy, wm->root, &d1, &d2, &wins, &n)) {
+		for (i = 0; i < n; i++) {
+			if(!XGetWindowAttributes(wm->dpy, wins[i], &wa) ||
+					wa.override_redirect)
+				continue;
+
+			/* TODO: fix hints */
+			wm_create_client(wm, wins[i], &wa);
+		}
+
+		if (wins)
+			XFree(wins);
+	}
 }
 
 static void dbg_print(struct wm *wm, const char *str)
@@ -310,9 +337,8 @@ void wm_handler_maprequest(struct wm *wm, XEvent *ev)
 	
 	dbg_print(wm, __func__);
 
-	if(!XGetWindowAttributes(wm->dpy, mrev->window, &wa))
-		return;
-	if(wa.override_redirect)
+	if(!XGetWindowAttributes(wm->dpy, mrev->window, &wa) ||
+			wa.override_redirect)
 		return;
 	if(!find_client_by_window(wm->mons, mrev->window))
 		wm_create_client(wm, mrev->window, &wa);
