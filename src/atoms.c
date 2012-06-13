@@ -9,6 +9,7 @@ static char *atom_names[LASTAtom] = {
 
 	"_NET_ACTIVE_WINDOW",
 	"_NET_CLIENT_LIST",
+	"_NET_SUPPORTED",
 	"_NET_WM_NAME",
 	"_NET_WM_WINDOW_TYPE"
 };
@@ -51,4 +52,16 @@ void net_client_list_add(Display *dpy, Window root, Window win)
 void net_client_list_clear(Display *dpy, Window root)
 {
 	XDeleteProperty(dpy, root, atom(NetClientList));
+}
+
+void net_set_supported(Display *dpy, Window root)
+{
+	Atom netatoms[] = {
+		atom(NetClientList),
+		atom(NetSupported),
+	};
+
+	XChangeProperty(dpy, root, atom(NetSupported), XA_ATOM, 32,
+			PropModeReplace, (unsigned char *) netatoms,
+			ARRSIZE(netatoms));
 }

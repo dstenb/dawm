@@ -165,11 +165,12 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 	clients_init_colors(wm->cfg, wm->dpy, wm->screen);
 
 	atoms_init(wm->dpy);
+	net_set_supported(wm->dpy, wm->root);
 
 	/* manage all windows that already exists */
 	wm_get_windows(wm);
 
-	/* TODO: set wm name */
+	set_text_prop(wm->dpy, wm->root, atom(NetWMName), WMNAME);
 
 	return wm;
 }
@@ -408,8 +409,8 @@ void wm_handler_propertynotify_root(struct wm *wm, XPropertyEvent *ev)
 	(void)wm;
 
 	if (ev->atom == XA_WM_NAME) {
-		/* TODO */
 		DBG("wm name");
+		set_text_prop(wm->dpy, wm->root, atom(NetWMName), WMNAME);
 	}
 }
 
@@ -417,7 +418,7 @@ void wm_handler_unmapnotify(struct wm *wm, XEvent *ev)
 {
 	struct client *c;
 	XUnmapEvent *uev = &ev->xunmap;
-	
+
 	dbg_print(wm, __func__);
 
 	if((c = find_client_by_window(wm->mons, uev->window))) {
