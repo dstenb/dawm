@@ -74,10 +74,32 @@ struct monitor *monitor_append(struct monitor *mons, struct monitor *new)
 	}
 }
 
-void monitor_arrange(struct monitor *mon)
+void monitor_arrange(struct monitor *mon, Display *dpy)
 {
 	(void)mon;
 	/* TODO */
+	struct client *c;
+	int i = 0;
+	int n = 0;
+
+	for (c = mon->clients; c; c = c->next)
+		if (c != mon->sel)
+			n++;
+
+	for (c = mon->clients; c; c = c->next) {
+		if (c == mon->sel) {
+			client_move_resize(c, dpy, 0, 0,
+					mon->width / 2, mon->height);
+		} else {
+			int sw = mon->height / (float) n;
+			printf("sw: %i\n", sw);
+			client_move_resize(c, dpy, mon->width / 2,
+					i * sw,
+					mon->width / 2, sw);
+			i++;
+		}
+	}
+
 }
 
 struct monitor *monitor_create(struct config *cfg, int width, int height)

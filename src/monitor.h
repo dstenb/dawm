@@ -27,7 +27,7 @@ void monitor_add_client(struct monitor *, struct client *);
 /* append a monitor to another monitor list */
 struct monitor *monitor_append(struct monitor *, struct monitor *);
 
-void monitor_arrange(struct monitor *);
+void monitor_arrange(struct monitor *, Display *);
 
 /* creates a monitor */
 struct monitor *monitor_create(struct config *, int, int);

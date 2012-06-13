@@ -85,7 +85,7 @@ void wm_create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 
 	client_map_window(c, wm->dpy);
 
-	monitor_arrange(c->mon);
+	monitor_arrange(c->mon, wm->dpy);
 	monitor_focus(c->mon, c, wm->dpy, wm->root);
 }
 
@@ -197,7 +197,7 @@ void wm_handler_buttonpress(struct wm *wm, XEvent *ev)
 
 	dbg_print(wm, __func__);
 
-	if (!(c = find_client_by_window(wm->mons, bpev->window)))
+	if (!(c = find_client_by_window(wm->mons, bpev->subwindow)))
 		return;
 
 	/* TODO: test code, to be removed */
@@ -424,7 +424,7 @@ void wm_remove_client(struct wm *wm, struct client *c, int destroyed)
 
 	client_free(c);
 
-	monitor_arrange(mon);
+	monitor_arrange(mon, wm->dpy);
 
 	wm_update_net_client_list(wm);
 
