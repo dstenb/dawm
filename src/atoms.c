@@ -46,7 +46,7 @@ void net_client_list_add(Display *dpy, Window root, Window win)
 			PropModeAppend, (unsigned char *) &(win), 1);
 }
 
-void net_client_list_del(Display *dpy, Window root)
+void net_client_list_clear(Display *dpy, Window root)
 {
 	XDeleteProperty(dpy, root, atom(NetClientList));
 }

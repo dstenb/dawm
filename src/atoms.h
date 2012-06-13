@@ -30,6 +30,6 @@ int has_wm_protocol(Display *, Window, Atom);
 
 void net_client_list_add(Display *, Window, Window);
 
-void net_client_list_del(Display *, Window);
+void net_client_list_clear(Display *, Window);
 
 #endif

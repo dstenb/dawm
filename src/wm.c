@@ -57,6 +57,13 @@ static void (*handler[LASTEvent]) (struct wm *, XEvent *) = {
 static XButtonEvent start;
 static XWindowAttributes move_res_attr;
 
+static void dbg_print(struct wm *wm, const char *str)
+{
+	DBG(":::: dbg_print(%s)\n", str);
+
+	monitor_dbg_print(wm->selmon, "");
+}
+
 void wm_checkotherwm(struct wm *wm)
 {
 	xerrxlib = XSetErrorHandler(wm_xerror_checkotherwm);
@@ -67,11 +74,11 @@ void wm_checkotherwm(struct wm *wm)
 	XSync(wm->dpy, False);
 }
 
-void wm_create_client(struct wm *wm, Window win, XWindowAttributes *wa)
+void wm_create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 {
-	struct client *c = client_create(win, wa);
+	struct client *c = client_create(win, attr);
 
-	client_setup(c, wm->cfg, wm->selmon, wm->dpy, wm->root, wa);
+	client_setup(c, wm->cfg, wm->selmon, wm->dpy, wm->root, attr);
 
 	monitor_add_client(c->mon, c);
 	monitor_select_client(c->mon, c);
@@ -87,6 +94,28 @@ void wm_create_monitors(struct wm *wm)
 {
 	wm->mons = monitor_create(wm->cfg, wm->width, wm->height);
 	wm->selmon = wm->mons;
+}
+
+int wm_destroy(struct wm *wm)
+{
+	config_free(wm->cfg);
+
+	XUngrabKey(wm->dpy, AnyKey, AnyModifier, wm->root);
+	XCloseDisplay(wm->dpy);
+	free(wm);
+	return 0;
+}
+
+int wm_eventloop(struct wm *wm)
+{
+	XEvent ev;
+
+	for (;;) {
+		XNextEvent(wm->dpy, &ev);
+		if (handler[ev.type])
+			handler[ev.type](wm, &ev);
+	}
+	return 0;
 }
 
 struct wm *wm_init(struct config *cfg, const char *cmd)
@@ -113,11 +142,12 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 
 	wm_create_monitors(wm);
 
+	/* select events to handle */
 	attr.event_mask = WM_EVENT_MASK;
 	XChangeWindowAttributes(wm->dpy, wm->root, CWEventMask, &attr);
 
-	printf("wm->width: %i\n", wm->width);
-	printf("wm->height: %i\n", wm->height);
+	DBG("wm->width: %i\n", wm->width);
+	DBG("wm->height: %i\n", wm->height);
 
 	/* grab the manager's key bindings */
 	key_grab_all(wm->keys, wm->dpy, wm->root);
@@ -138,57 +168,26 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 	return wm;
 }
 
-int wm_eventloop(struct wm *wm)
-{
-	XEvent ev;
-
-	for (;;) {
-		XNextEvent(wm->dpy, &ev);
-		if (handler[ev.type]) {
-			handler[ev.type](wm, &ev);
-		}
-	}
-	return 0;
-}
-
-int wm_destroy(struct wm *wm)
-{
-	config_free(wm->cfg);
-
-	XUngrabKey(wm->dpy, AnyKey, AnyModifier, wm->root);
-	XCloseDisplay(wm->dpy);
-	free(wm);
-	return 0;
-}
-
 void wm_get_windows(struct wm *wm)
 {
-	XWindowAttributes wa;
+	XWindowAttributes attr;
 	Window d1, d2;
 	Window *wins;
-	unsigned int n;
-	int i;
+	unsigned int i, n;
 
 	if (XQueryTree(wm->dpy, wm->root, &d1, &d2, &wins, &n)) {
 		for (i = 0; i < n; i++) {
-			if(!XGetWindowAttributes(wm->dpy, wins[i], &wa) ||
-					wa.override_redirect)
+			if(!XGetWindowAttributes(wm->dpy, wins[i], &attr) ||
+					attr.override_redirect)
 				continue;
 
 			/* TODO: fix hints */
-			wm_create_client(wm, wins[i], &wa);
+			wm_create_client(wm, wins[i], &attr);
 		}
 
 		if (wins)
 			XFree(wins);
 	}
-}
-
-static void dbg_print(struct wm *wm, const char *str)
-{
-	DBG(":::: dbg_print(%s)\n", str);
-
-	monitor_dbg_print(wm->selmon, "");
 }
 
 void wm_handler_buttonpress(struct wm *wm, XEvent *ev)
@@ -198,11 +197,8 @@ void wm_handler_buttonpress(struct wm *wm, XEvent *ev)
 
 	dbg_print(wm, __func__);
 
-	/*
 	if (!(c = find_client_by_window(wm->mons, bpev->window)))
 		return;
-		*/
-
 
 	/* TODO: test code, to be removed */
 	XGrabPointer(wm->dpy, ev->xbutton.subwindow, True,
@@ -214,6 +210,8 @@ void wm_handler_buttonpress(struct wm *wm, XEvent *ev)
 
 void wm_handler_buttonrelease(struct wm *wm, XEvent *ev)
 {
+	(void)ev;
+
 	dbg_print(wm, __func__);
 
 	XUngrabPointer(wm->dpy, CurrentTime);
@@ -307,7 +305,7 @@ void wm_handler_focusin(struct wm *wm, XEvent *ev)
 		monitor_focus(wm->selmon, wm->selmon->sel, wm->dpy, wm->root);
 }
 
-/* TODO cleanup */
+/* TODO: handle keys without a modifier mask */
 void wm_handler_keypress(struct wm *wm, XEvent *ev)
 {
 	XKeyEvent *kev;
@@ -332,16 +330,16 @@ void wm_handler_mappingnotify(struct wm *wm, XEvent *ev)
 
 void wm_handler_maprequest(struct wm *wm, XEvent *ev)
 {
-	static XWindowAttributes wa;
+	static XWindowAttributes attr;
 	XMapRequestEvent *mrev = &ev->xmaprequest;
 	
 	dbg_print(wm, __func__);
 
-	if(!XGetWindowAttributes(wm->dpy, mrev->window, &wa) ||
-			wa.override_redirect)
+	if(!XGetWindowAttributes(wm->dpy, mrev->window, &attr) ||
+			attr.override_redirect)
 		return;
 	if(!find_client_by_window(wm->mons, mrev->window))
-		wm_create_client(wm, mrev->window, &wa);
+		wm_create_client(wm, mrev->window, &attr);
 }
 
 void wm_handler_motionnotify(struct wm *wm, XEvent *ev)
@@ -349,6 +347,7 @@ void wm_handler_motionnotify(struct wm *wm, XEvent *ev)
 	(void)wm;
 	(void)ev;
 
+	/* TODO: test code, to be removed */
 	int xdiff, ydiff;
 	while(XCheckTypedEvent(wm->dpy, MotionNotify, ev));
 	xdiff = ev->xbutton.x_root - start.x_root;
@@ -434,7 +433,7 @@ void wm_remove_client(struct wm *wm, struct client *c, int destroyed)
 
 void wm_restart(struct wm *wm)
 {
-	printf("%s. restarting!\n", __func__);
+	DBG("%s. restarting!\n", __func__);
 	if (wm->cmd)
 		execlp("/bin/sh", "sh" , "-c", wm->cmd, NULL);
 }
@@ -444,7 +443,7 @@ void wm_update_net_client_list(struct wm *wm)
 	struct monitor *mon;
 	struct client *c;
 
-	net_client_list_del(wm->dpy, wm->root);
+	net_client_list_clear(wm->dpy, wm->root);
 
 	for (mon = wm->mons; mon; mon = mon->next)
 		for (c = mon->clients; c; c = c->next)
@@ -453,9 +452,9 @@ void wm_update_net_client_list(struct wm *wm)
 
 int wm_xerror(Display *dpy, XErrorEvent *ee)
 {
-	return 0;
 	error("fatal error: request code=%d, error code=%d\n",
 			ee->request_code, ee->error_code);
+	return 0; /* FIXME: handle/ignore errors in a proper way */
 	return xerrxlib(dpy, ee); /* may call exit */
 }
 
