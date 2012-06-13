@@ -17,6 +17,8 @@ typedef enum {
 	WMTakeFocusAtom,
 	NetActiveWindowAtom,
 	NetClientList,
+	NetWMName,
+	NetWMWindowType,
 	LASTAtom
 } AtomID;
 

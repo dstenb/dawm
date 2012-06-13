@@ -9,6 +9,8 @@ static void wm_checkotherwm(struct wm *);
 static void wm_create_client(struct wm *, Window, XWindowAttributes *);
 static void wm_create_monitors(struct wm *);
 static void wm_get_windows(struct wm *);
+static void wm_handler_propertynotify_client(struct wm *, XPropertyEvent *);
+static void wm_handler_propertynotify_root(struct wm *, XPropertyEvent *);
 static void wm_keypress(struct wm *, struct key *);
 static void wm_quit(struct wm *, const char *);
 static void wm_remove_client(struct wm *, struct client *, int);
@@ -166,6 +168,8 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 
 	/* manage all windows that already exists */
 	wm_get_windows(wm);
+
+	/* TODO: set wm name */
 
 	return wm;
 }
@@ -363,14 +367,50 @@ void wm_handler_motionnotify(struct wm *wm, XEvent *ev)
 
 void wm_handler_propertynotify(struct wm *wm, XEvent *ev)
 {
-	(void)wm;
-	(void)ev;
+	XPropertyEvent *pev = &ev->xproperty;
 
 	dbg_print(wm, __func__);
 
-	/* TODO: check for XA_WM_NAME property change */
+	if (pev->window == wm->root)
+		wm_handler_propertynotify_root(wm, pev);
+	else
+		wm_handler_propertynotify_client(wm, pev);
 
-	/* TODO: check for client property change */
+}
+
+void wm_handler_propertynotify_client(struct wm *wm, XPropertyEvent *ev)
+{
+	struct client *c;
+
+	if (!(c = find_client_by_window(wm->mons, ev->window)))
+		return;
+
+	if (ev->atom == XA_WM_NAME || ev->atom == atom(NetWMName)) {
+		/* TODO */
+		DBG("wm name\n");
+	} else if (ev->atom == XA_WM_TRANSIENT_FOR) {
+		/* TODO */
+		DBG("transient\n");
+	} else if (ev->atom == XA_WM_NORMAL_HINTS) {
+		/* TODO */
+		DBG("normal hints\n");
+	} else if (ev->atom == XA_WM_HINTS) {
+		/* TODO */
+		DBG("hints\n");
+	} else if (ev->atom == atom(NetWMWindowType)) {
+		/* TODO */
+		DBG("window type\n");
+	}
+}
+
+void wm_handler_propertynotify_root(struct wm *wm, XPropertyEvent *ev)
+{
+	(void)wm;
+
+	if (ev->atom == XA_WM_NAME) {
+		/* TODO */
+		DBG("wm name");
+	}
 }
 
 void wm_handler_unmapnotify(struct wm *wm, XEvent *ev)

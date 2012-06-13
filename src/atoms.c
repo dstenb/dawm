@@ -8,7 +8,9 @@ static char *atom_names[LASTAtom] = {
 	"WM_TAKE_FOCUS",
 
 	"_NET_ACTIVE_WINDOW",
-	"_NET_CLIENT_LIST"
+	"_NET_CLIENT_LIST",
+	"_NET_WM_NAME",
+	"_NET_WM_WINDOW_TYPE"
 };
 
 static Atom atoms[LASTAtom];
