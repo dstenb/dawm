@@ -81,6 +81,8 @@ void wm_create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 	client_setup(c, wm->cfg, wm->selmon, wm->dpy, wm->root, attr);
 
 	monitor_add_client(c->mon, c);
+
+	monitor_unfocus_selected(c->mon, wm->dpy, wm->root);
 	monitor_select_client(c->mon, c);
 
 	client_map_window(c, wm->dpy);
@@ -424,6 +426,7 @@ void wm_remove_client(struct wm *wm, struct client *c, int destroyed)
 
 	client_free(c);
 
+	monitor_focus(mon, NULL, wm->dpy, wm->root);
 	monitor_arrange(mon, wm->dpy);
 
 	wm_update_net_client_list(wm);
