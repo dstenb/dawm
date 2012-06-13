@@ -44,7 +44,7 @@ int send_event(Display *dpy, Window win, Atom proto)
 	if (has_wm_protocol(dpy, win, proto)) {
 		ev.type = ClientMessage;
 		ev.xclient.window = win;
-		ev.xclient.message_type = atom(WMProtocolsAtom);
+		ev.xclient.message_type = atom(WMProtocols);
 		ev.xclient.format = 32;
 		ev.xclient.data.l[0] = proto;
 		ev.xclient.data.l[1] = CurrentTime;

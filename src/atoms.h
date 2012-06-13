@@ -10,12 +10,12 @@
 #include "utils.h"
 
 typedef enum {
-	WMChangeStateAtom,
-	WMNameAtom,
-	WMProtocolsAtom,
-	WMStateAtom,
-	WMTakeFocusAtom,
-	NetActiveWindowAtom,
+	WMChangeState,
+	WMName,
+	WMProtocols,
+	WMState,
+	WMTakeFocus,
+	NetActiveWindow,
 	NetClientList,
 	NetSupported,
 	NetWMName,

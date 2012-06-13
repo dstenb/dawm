@@ -40,10 +40,10 @@ void client_focus(struct client *c, Display *dpy, Window root)
 	XSetWindowBorder(dpy, c->win, colors[COL_SEL].border);
 
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
-	XChangeProperty(dpy, root, atom(NetActiveWindowAtom), XA_WINDOW, 32,
+	XChangeProperty(dpy, root, atom(NetActiveWindow), XA_WINDOW, 32,
 			PropModeReplace, (unsigned char *) &(c->win), 1);
 
-	send_event(dpy, c->win, atom(WMTakeFocusAtom));
+	send_event(dpy, c->win, atom(WMTakeFocus));
 }
 
 void client_free(struct client *c)
@@ -101,7 +101,7 @@ void client_set_state(struct client *c, Display *dpy, long state)
 	long data[] = { state, None };
 
 	error("%s\n", __func__);
-	XChangeProperty(dpy, c->win, atom(WMStateAtom), atom(WMStateAtom), 32,
+	XChangeProperty(dpy, c->win, atom(WMState), atom(WMState), 32,
 			PropModeReplace, (unsigned char *)data, 2);
 }
 
@@ -155,7 +155,7 @@ void client_unmap(struct client *c, Display *dpy)
 
 void client_update_title(struct client *c, Display *dpy)
 {
-	if (!(get_text_prop(dpy, c->win, atom(WMNameAtom), c->name,
+	if (!(get_text_prop(dpy, c->win, atom(WMName), c->name,
 					CLIENT_NAME_SIZE)))
 		snprintf(c->name, CLIENT_NAME_SIZE, "unnamed window");
 	error("c->name: %s\n", c->name);

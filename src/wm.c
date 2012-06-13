@@ -241,11 +241,11 @@ void wm_handler_clientmessage(struct wm *wm, XEvent *ev)
 		if (!(c = find_client_by_window(wm->mons, cmev->window)))
 			return;
 
-		if (cmev->message_type == atom(WMStateAtom)) {
+		if (cmev->message_type == atom(WMState)) {
 			DBG("%s: WMState", __func__);
-		} else if (cmev->message_type == atom(NetActiveWindowAtom)) {
+		} else if (cmev->message_type == atom(NetActiveWindow)) {
 			DBG("%s: NetActiveWindow", __func__);
-		} else if (cmev->message_type == atom(WMChangeStateAtom)) {
+		} else if (cmev->message_type == atom(WMChangeState)) {
 			if (cmev->data.l[0] == IconicState &&
 					cmev->format == 32) {
 				DBG("%s: minimize window\n", __func__);
