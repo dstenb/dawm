@@ -56,3 +56,9 @@ int send_event(Display *dpy, Window win, Atom proto)
 		return 0;
 	}
 }
+
+void set_text_prop(Display *dpy, Window win, Atom prop, char *str)
+{
+	XChangeProperty(dpy, win, prop, XA_STRING, 8, PropModeReplace,
+			(unsigned char *)str, strlen(str));
+}

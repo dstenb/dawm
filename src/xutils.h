@@ -18,4 +18,6 @@ int get_text_prop(Display *, Window, Atom, char *, unsigned int);
 
 int send_event(Display *, Window, Atom);
 
+void set_text_prop(Display *, Window, Atom, char *);
+
 #endif
