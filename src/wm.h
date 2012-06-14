@@ -8,6 +8,7 @@
 
 #include "atoms.h"
 #include "config.h"
+#include "cursors.h"
 #include "keys.h"
 #include "monitor.h"
 #include "utils.h"

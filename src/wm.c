@@ -102,9 +102,12 @@ void wm_create_monitors(struct wm *wm)
 
 int wm_destroy(struct wm *wm)
 {
+	/* TODO */
+
 	config_free(wm->cfg);
 
 	XUngrabKey(wm->dpy, AnyKey, AnyModifier, wm->root);
+	cursors_free(wm->dpy);
 	XCloseDisplay(wm->dpy);
 	free(wm);
 	return 0;
@@ -152,6 +155,11 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 
 	DBG("wm->width: %i\n", wm->width);
 	DBG("wm->height: %i\n", wm->height);
+
+	/* setup cursors */
+	cursors_init(wm->dpy);
+	attr.cursor = cursor(NormalCursor);
+	XChangeWindowAttributes(wm->dpy, wm->root, CWCursor, &attr);
 
 	/* grab the manager's key bindings */
 	key_grab_all(wm->keys, wm->dpy, wm->root);
