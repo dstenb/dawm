@@ -82,20 +82,31 @@ void monitor_arrange(struct monitor *mon, Display *dpy)
 	int i = 0;
 	int n = 0;
 
+	/* only one window */
+	if (mon->sel && mon->cstack->next == NULL) {
+		c = mon->sel;
+		client_move_resize(c, dpy, c->bsize, c->bsize,
+				mon->width - (c->bsize * 2),
+				mon->height - (c->bsize * 2));
+		return;
+	}
+
 	for (c = mon->clients; c; c = c->next)
 		if (c != mon->sel)
 			n++;
 
 	for (c = mon->clients; c; c = c->next) {
 		if (c == mon->sel) {
-			client_move_resize(c, dpy, 0, 0,
-					mon->width / 2, mon->height);
+			client_move_resize(c, dpy, c->bsize, c->bsize,
+					mon->width / 2 - (c->bsize * 2),
+					mon->height - (c->bsize * 2));
 		} else {
 			int sw = mon->height / (float) n;
 			printf("sw: %i\n", sw);
-			client_move_resize(c, dpy, mon->width / 2,
-					i * sw,
-					mon->width / 2, sw);
+			client_move_resize(c, dpy, mon->width / 2 + c->bsize,
+					i * (sw + c->bsize),
+					mon->width / 2 - (c->bsize * 2),
+					sw - (c->bsize * 2));
 			i++;
 		}
 	}
