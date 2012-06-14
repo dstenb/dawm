@@ -260,9 +260,26 @@ void wm_handler_clientmessage(struct wm *wm, XEvent *ev)
 
 void wm_handler_configurerequest(struct wm *wm, XEvent *ev)
 {
-	(void)wm;
-	(void)ev;
+	XConfigureRequestEvent *crev = &ev->xconfigurerequest;
+	struct client *c;
+
 	dbg_print(wm, __func__);
+
+	if ((c = find_client_by_window(wm->mons, crev->window))) {
+		if (crev->value_mask & CWBorderWidth) {
+			/* TODO: set border size (crev->border_width) */
+			DBG("%s: set window border\n", __func__);
+		} else {
+			/* TODO: set window size if the client is floating or
+			 * non-arranged */
+			DBG("%s: set window size\n", __func__);
+		}
+	} else {
+		/* TODO: send XConfigureWindow to window */
+		DBG("%s: send XConfigureWindow\n");
+	}
+
+	XSync(wm->dpy, False);
 }
 
 void wm_handler_configurenotify(struct wm *wm, XEvent *ev)
