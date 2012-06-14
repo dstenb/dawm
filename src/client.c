@@ -7,6 +7,8 @@
 #define EVENT_MASK (EnterWindowMask | FocusChangeMask | \
 	PropertyChangeMask | StructureNotifyMask)
 
+#define MOVE_RESIZE_MASK (CWX | CWY | CWWidth | CWHeight)
+
 #define COL_NORM 0
 #define COL_SEL 1
 
@@ -96,7 +98,20 @@ void client_map_window(struct client *c, Display *dpy)
 void client_move_resize(struct client *c, Display *dpy,
 		int x, int y, int w, int h)
 {
-	XMoveResizeWindow(dpy, c->win, x, y, MAX(1, w), MAX(1, h));
+	XWindowChanges wc;
+
+	c->old_r.x = c->cur_r.x;
+	c->old_r.y = c->cur_r.y;
+	c->old_r.w = c->cur_r.w;
+	c->old_r.h = c->cur_r.h;
+
+	c->cur_r.x = wc.x = x;
+	c->cur_r.y = wc.y = y;
+	c->cur_r.w = wc.width = MAX(1, w);
+	c->cur_r.h = wc.height = MAX(1, h);
+
+	XConfigureWindow(dpy, c->win, MOVE_RESIZE_MASK, &wc);
+	XSync(dpy, False);
 }
 
 void client_raise(struct client *c, Display *dpy)
