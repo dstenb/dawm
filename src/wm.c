@@ -451,6 +451,9 @@ void wm_handler_unmapnotify(struct wm *wm, XEvent *ev)
 void wm_keypress(struct wm *wm, struct key *key)
 {
 	switch(key->action) {
+		case KillAction:
+			client_kill(wm->selmon->sel, wm->dpy);
+			break;
 		case SpawnAction:
 			spawn(key->args);
 			break;

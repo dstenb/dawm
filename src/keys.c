@@ -4,6 +4,7 @@
 
 /* default keys */
 static struct key default_keys[] = {
+	{ MOD_SUPER,       XK_x,      KillAction,    NULL,    NULL },
 	{ MOD_SHIFT_SUPER, XK_q,      QuitAction,    NULL,    NULL },
 	{ MOD_CTRL_SUPER,  XK_r,      RestartAction, NULL,    NULL },
 	{ MOD_SUPER,       XK_Return, SpawnAction,   "urxvt", NULL }
