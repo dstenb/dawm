@@ -389,8 +389,8 @@ void wm_handler_propertynotify_client(struct wm *wm, XPropertyEvent *ev)
 		return;
 
 	if (ev->atom == XA_WM_NAME || ev->atom == atom(NetWMName)) {
-		/* TODO */
-		DBG("wm name\n");
+		client_update_title(c, wm->dpy);
+		/* TODO: redraw the bar */
 	} else if (ev->atom == XA_WM_TRANSIENT_FOR) {
 		/* TODO */
 		DBG("transient\n");
