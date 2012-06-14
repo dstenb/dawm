@@ -162,6 +162,7 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 	XChangeWindowAttributes(wm->dpy, wm->root, CWCursor, &attr);
 
 	/* grab the manager's key bindings */
+	update_num_lock(wm->dpy);
 	key_grab_all(wm->keys, wm->dpy, wm->root);
 
 	clients_init_colors(wm->cfg, wm->dpy, wm->screen);
@@ -324,8 +325,7 @@ void wm_handler_keypress(struct wm *wm, XEvent *ev)
 
 	kev = &ev->xkey;
 	for (key = wm->keys; key; key = key->next) {
-		if (XKeysymToKeycode(wm->dpy, key->keysym) == kev->keycode
-				&& (kev->state & key->mod))
+		if (key_pressed(key, wm->dpy, kev->keycode, kev->state))
 			wm_keypress(wm, key);
 	}
 }

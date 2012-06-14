@@ -1,5 +1,7 @@
 #include "keys.h"
 
+#define CLEANMASK(mask) (mask & ~(num_lock | LockMask))
+
 /* default keys */
 static struct key default_keys[] = {
 	{ MOD_SHIFT_SUPER, XK_q,      QuitAction,    NULL,    NULL },
@@ -14,6 +16,8 @@ static char *action_str[LASTAction] = {
 	[RestartAction] = "restart",
 	[SpawnAction] = "spawn"
 };
+
+static unsigned int num_lock = 0;
 
 KeyAction key_action_from_str(const char *str)
 {
@@ -89,11 +93,23 @@ struct key *key_free_all(struct key *key)
 
 void key_grab_all(struct key *key, Display *dpy, Window root)
 {
-	for ( ; key; key = key->next) {
-		XGrabKey(dpy, XKeysymToKeycode(dpy, key->keysym), key->mod,
-				root, True, GrabModeAsync, GrabModeAsync);
-	}
+	int i;
+	unsigned int mod[] = { 0, LockMask, num_lock, num_lock | LockMask };
 
+	for ( ; key; key = key->next) {
+		for (i = 0; i < ARRSIZE(mod); i++) {
+			XGrabKey(dpy, XKeysymToKeycode(dpy, key->keysym),
+					key->mod | mod[i], root, True,
+					GrabModeAsync, GrabModeAsync);
+		}
+	}
+}
+
+int key_pressed(struct key *key, Display *dpy, KeyCode code,
+		unsigned int state)
+{
+	return ((XKeysymToKeycode(dpy, key->keysym) == code) &&
+			CLEANMASK(state) == key->mod);
 }
 
 int str_to_modifier(const char *str)
@@ -107,4 +123,21 @@ int str_to_modifier(const char *str)
 	else if (strcasecmp(str, "super") == 0)
 		return MOD_SUPER;
 	return -1;
+}
+
+void update_num_lock(Display *dpy)
+{
+	unsigned int i, j;
+	XModifierKeymap *modmap;
+
+	num_lock = 0;
+	modmap = XGetModifierMapping(dpy);
+
+	for (i = 0; i < 8; i++)
+		for (j = 0; j < (unsigned) modmap->max_keypermod; j++)
+			if (modmap->modifiermap[i * modmap->max_keypermod + j]
+					== XKeysymToKeycode(dpy, XK_Num_Lock))
+				num_lock = (1 << i);
+
+	XFreeModifiermap(modmap);
 }
