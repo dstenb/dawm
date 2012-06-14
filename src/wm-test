@@ -5,4 +5,10 @@
 
 nitrogen --restore &
 
+xterm -T "1" -n "1" &
+xterm -T "2" -n "2" &
+xterm -T "3" -n "3" &
+
+setxkbmap se
+
 valgrind ./wm -c config
