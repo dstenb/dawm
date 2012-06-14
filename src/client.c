@@ -67,6 +67,27 @@ int client_is_visible(struct client *c)
 	return 1;
 }
 
+void client_kill(struct client *c, Display *dpy)
+{
+	int (*xerror) (Display *, XErrorEvent *);
+
+	if (c) {
+		if (!send_event(dpy, c->win, atom(WMDelete))) {
+			XGrabServer(dpy);
+
+			xerror = XSetErrorHandler(xerror_dummy);
+
+			XSetCloseDownMode(dpy, DestroyAll);
+			XKillClient(dpy, c->win);
+			XSync(dpy, False);
+
+			XSetErrorHandler(xerror);
+
+			XUngrabServer(dpy);
+		}
+	}
+}
+
 void client_map_window(struct client *c, Display *dpy)
 {
 	XMapWindow(dpy, c->win);

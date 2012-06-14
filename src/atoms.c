@@ -2,6 +2,7 @@
 
 static char *atom_names[LASTAtom] = {
 	"WM_CHANGE_STATE",
+	"WM_DELETE_WINDOW",
 	"WM_NAME",
 	"WM_PROTOCOLS",
 	"WM_STATE",

@@ -54,6 +54,9 @@ void client_grab_buttons(struct client *, Display *);
 /* returns non-zero if the window is visible */
 int client_is_visible(struct client *);
 
+/* kill the client. the removal will be handled in wm_handler_destroynotify */
+void client_kill(struct client *, Display *);
+
 void client_map_window(struct client *, Display *);
 
 /* move and resize the client */

@@ -11,6 +11,7 @@
 
 typedef enum {
 	WMChangeState,
+	WMDelete,
 	WMName,
 	WMProtocols,
 	WMState,
