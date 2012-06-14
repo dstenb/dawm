@@ -55,10 +55,6 @@ static void (*handler[LASTEvent]) (struct wm *, XEvent *) = {
 	[UnmapNotify] = wm_handler_unmapnotify
 };
 
-/* TODO: test code, to be removed */
-static XButtonEvent start;
-static XWindowAttributes move_res_attr;
-
 static void dbg_print(struct wm *wm, const char *str)
 {
 	DBG(":::: dbg_print(%s)\n", str);
@@ -146,6 +142,7 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 	wm->cmd = cmd;
 	wm->keys = cfg->keys;
 	wm->cfg = cfg;
+	wm->motion.type = NoMotion;
 
 	wm_create_monitors(wm);
 
@@ -207,15 +204,22 @@ void wm_handler_buttonpress(struct wm *wm, XEvent *ev)
 
 	dbg_print(wm, __func__);
 
-	if (!(c = find_client_by_window(wm->mons, bpev->subwindow)))
+	if (!(c = find_client_by_window(wm->mons, bpev->window)))
 		return;
 
-	/* TODO: test code, to be removed */
-	XGrabPointer(wm->dpy, ev->xbutton.subwindow, True,
-			PointerMotionMask|ButtonReleaseMask, GrabModeAsync,
+	XGrabPointer(wm->dpy, ev->xbutton.window, True,
+			PointerMotionMask | ButtonReleaseMask, GrabModeAsync,
 			GrabModeAsync, None, None, CurrentTime);
-	XGetWindowAttributes(wm->dpy, ev->xbutton.subwindow, &move_res_attr);
-	start = ev->xbutton;
+
+	/* set start motion data */
+	XGetWindowAttributes(wm->dpy, ev->xbutton.window, &wm->motion.attr);
+	wm->motion.start = ev->xbutton;
+
+	/* set the motion type */
+	if (wm->motion.start.button == 1)
+		wm->motion.type = MovementMotion;
+	else if (wm->motion.start.button == 3)
+		wm->motion.type = ResizeMotion;
 }
 
 void wm_handler_buttonrelease(struct wm *wm, XEvent *ev)
@@ -224,6 +228,7 @@ void wm_handler_buttonrelease(struct wm *wm, XEvent *ev)
 
 	dbg_print(wm, __func__);
 
+	wm->motion.type = NoMotion;
 	XUngrabPointer(wm->dpy, CurrentTime);
 }
 
@@ -370,19 +375,50 @@ void wm_handler_maprequest(struct wm *wm, XEvent *ev)
 
 void wm_handler_motionnotify(struct wm *wm, XEvent *ev)
 {
-	(void)wm;
-	(void)ev;
+	XMotionEvent *mev = &ev->xmotion;
+	struct client *c;
 
-	/* TODO: test code, to be removed */
+	int was_floating = 0;
 	int xdiff, ydiff;
+	int x, y, w, h;
+
+	if (!(c = find_client_by_window(wm->mons, mev->window)))
+		return;
+
+	x = c->cur_r.x;
+	y = c->cur_r.y;
+	w = c->cur_r.w;
+	h = c->cur_r.h;
+
 	while(XCheckTypedEvent(wm->dpy, MotionNotify, ev));
-	xdiff = ev->xbutton.x_root - start.x_root;
-	ydiff = ev->xbutton.y_root - start.y_root;
-	XMoveResizeWindow(wm->dpy, ev->xmotion.window,
-			move_res_attr.x + (start.button==1 ? xdiff : 0),
-			move_res_attr.y + (start.button==1 ? ydiff : 0),
-			MAX(1, move_res_attr.width + (start.button==3 ? xdiff : 0)),
-			MAX(1, move_res_attr.height + (start.button==3 ? ydiff : 0)));
+
+	xdiff = mev->x_root - wm->motion.start.x_root;
+	ydiff = mev->y_root - wm->motion.start.y_root;
+
+	if (wm->motion.type == ResizeMotion) {
+		if (!c->floating) { /* TODO: check if the monitor is arranged */
+			w = c->old_r.w;
+			h = c->old_r.h;
+		} else {
+			w = wm->motion.attr.width + xdiff;
+			h = wm->motion.attr.height + ydiff;
+		}
+	} else if (wm->motion.type == MovementMotion) {
+		x = wm->motion.attr.x + xdiff;
+		y = wm->motion.attr.y + ydiff;
+	}
+
+	/* TODO: check if the monitor is arranged. */
+	was_floating = c->floating;
+	c->floating = 1;
+	client_raise(c, wm->dpy);
+
+	client_move_resize(c, wm->dpy, x, y, w, h);
+
+	/* re-arrange the monitor's client if the selected client
+	 * wasn't floating before */
+	if (!was_floating)
+		monitor_arrange(c->mon, wm->dpy);
 }
 
 void wm_handler_propertynotify(struct wm *wm, XEvent *ev)

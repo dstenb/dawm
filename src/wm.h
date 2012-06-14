@@ -13,6 +13,12 @@
 #include "monitor.h"
 #include "utils.h"
 
+typedef enum {
+	NoMotion,
+	ResizeMotion,
+	MovementMotion
+} MotionID;
+
 struct wm {
 	Display *dpy;
 	Window root;
@@ -26,6 +32,12 @@ struct wm {
 	struct key *keys;
 	struct config *cfg;
 	const char *cmd;
+
+	struct {
+		int type;
+		XButtonEvent start;
+		XWindowAttributes attr;
+	} motion;
 };
 
 struct wm *wm_init(struct config *, const char *);

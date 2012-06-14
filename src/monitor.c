@@ -85,17 +85,23 @@ void monitor_arrange(struct monitor *mon, Display *dpy)
 	/* only one window */
 	if (mon->sel && mon->cstack->next == NULL) {
 		c = mon->sel;
-		client_move_resize(c, dpy, c->bsize, c->bsize,
-				mon->width - (c->bsize * 2),
-				mon->height - (c->bsize * 2));
+
+		if (!c->floating)
+			client_move_resize(c, dpy, c->bsize, c->bsize,
+					mon->width - (c->bsize * 2),
+					mon->height - (c->bsize * 2));
 		return;
 	}
 
+	/* TODO: this is buggy and dirty, but works OK for testing */
+
 	for (c = mon->clients; c; c = c->next)
-		if (c != mon->sel)
+		if (c != mon->sel && !c->floating)
 			n++;
 
 	for (c = mon->clients; c; c = c->next) {
+		if (c->floating)
+			continue;
 		if (c == mon->sel) {
 			client_move_resize(c, dpy, c->bsize, c->bsize,
 					mon->width / 2 - (c->bsize * 2),
