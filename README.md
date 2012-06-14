@@ -5,7 +5,7 @@ DAWM is a tiling window manager written in C, that is partially based on dwm.
 
 The long-term goals of DAWM are:
 
-* Have as few dependencies as possible (Only standard C library and Xlib)
+* To have as few dependencies as possible (Only standard C library and Xlib)
 * EWMH (NetWM) compliance
 * Xinerama support
 
@@ -15,14 +15,14 @@ DAWM requires Xlib development headers.
 
 The software can be installed with the following command:
 
-    make install
+    cd src/ && make install
 
 Configuration
 ------------
-DAWM's configuration file is located in $HOME/.config/dawm/config
+DAWM's configuration file is located in $HOME/.config/dawm/config.
 
-An example configuration file can be found in data/config
+An example configuration file can be found in data/config.
 
 License
 ------------
-See the LICENSE file
+See the LICENSE file.
