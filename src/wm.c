@@ -156,12 +156,6 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 	/* grab the manager's key bindings */
 	key_grab_all(wm->keys, wm->dpy, wm->root);
 
-	/* TODO: to be removed */
-	XGrabButton(wm->dpy, 1, Mod1Mask, wm->root, True, ButtonPressMask, GrabModeAsync,
-			GrabModeAsync, None, None);
-	XGrabButton(wm->dpy, 3, Mod1Mask, wm->root, True, ButtonPressMask, GrabModeAsync,
-			GrabModeAsync, None, None);
-
 	clients_init_colors(wm->cfg, wm->dpy, wm->screen);
 
 	atoms_init(wm->dpy);

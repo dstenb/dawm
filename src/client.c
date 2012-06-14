@@ -2,6 +2,8 @@
 
 #define BUTTON_MASK (ButtonPressMask | ButtonReleaseMask)
 
+#define BUTTON_MOD MOD_SUPER
+
 #define EVENT_MASK (EnterWindowMask | FocusChangeMask | \
 	PropertyChangeMask | StructureNotifyMask)
 
@@ -53,8 +55,10 @@ void client_free(struct client *c)
 
 void client_grab_buttons(struct client *c, Display *dpy)
 {
-	XGrabButton(dpy, AnyButton, AnyModifier, c->win, False, BUTTON_MASK,
-			GrabModeAsync, GrabModeSync, None, None);
+	XGrabButton(dpy, 1, BUTTON_MOD, c->win, True, ButtonPressMask,
+			GrabModeAsync, GrabModeAsync, None, None);
+	XGrabButton(dpy, 3, BUTTON_MOD, c->win, True, ButtonPressMask,
+			GrabModeAsync, GrabModeAsync, None, None);
 }
 
 int client_is_visible(struct client *c)
