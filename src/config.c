@@ -138,7 +138,7 @@ char *config_default_path(void)
 {
 	char buf[PATH_MAX + 1];
 
-	snprintf(buf, sizeof(buf), "%s/.config/wmrc", getenv("HOME"));
+	snprintf(buf, sizeof(buf), "%s/.config/dawm/config", getenv("HOME"));
 
 	return xstrdup(buf);
 }

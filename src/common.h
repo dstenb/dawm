@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define WMNAME "placeholder name"
+#define WMNAME "dawm"
 
 struct rect {
 	int x, y, w, h;
