@@ -34,7 +34,7 @@ struct wm {
 	const char *cmd;
 
 	struct {
-		int type;
+		MotionType type;
 		XButtonEvent start;
 		XWindowAttributes attr;
 	} motion;
