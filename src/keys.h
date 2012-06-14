@@ -57,7 +57,13 @@ struct key *key_free_all(struct key *);
 /* grab all keys */
 void key_grab_all(struct key *, Display *, Window);
 
+/* returns non-zero if the key is pressed */
+int key_pressed(struct key *, Display *, KeyCode, unsigned int);
+
 /* returns non-zero if the string describes a modifier */
 int str_to_modifier(const char *);
+
+/* update the Num Lock modifier */
+void update_num_lock(Display *);
 
 #endif
