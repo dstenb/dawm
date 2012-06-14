@@ -17,7 +17,7 @@ typedef enum {
 	NoMotion,
 	ResizeMotion,
 	MovementMotion
-} MotionID;
+} MotionType;
 
 struct wm {
 	Display *dpy;
