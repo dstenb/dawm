@@ -337,7 +337,6 @@ void wm_handler_focusin(struct wm *wm, XEvent *ev)
 		monitor_focus(wm->selmon, wm->selmon->sel, wm->dpy, wm->root);
 }
 
-/* TODO: handle keys without a modifier mask */
 void wm_handler_keypress(struct wm *wm, XEvent *ev)
 {
 	XKeyEvent *kev;
@@ -451,7 +450,7 @@ void wm_handler_propertynotify_client(struct wm *wm, XPropertyEvent *ev)
 		/* TODO */
 		DBG("normal hints\n");
 	} else if (ev->atom == XA_WM_HINTS) {
-		/* TODO */
+		/* TODO: check for fullscreen and floating */
 		DBG("hints\n");
 	} else if (ev->atom == atom(NetWMWindowType)) {
 		/* TODO */
@@ -529,8 +528,6 @@ void wm_remove_client(struct wm *wm, struct client *c, int destroyed)
 	monitor_arrange(mon, wm->dpy);
 
 	wm_update_net_client_list(wm);
-
-	/* TODO: focus */
 }
 
 void wm_restart(struct wm *wm)
