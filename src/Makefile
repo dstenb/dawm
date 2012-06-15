@@ -8,7 +8,7 @@ OBJFILES := $(patsubst %.c,%.o,$(wildcard *.c))
 
 PREFIX=/usr/local
 
-all: wm
+all: clean version.h wm
 
 wm : $(OBJFILES)
 	$(CC) -o wm $(OBJFILES) -lX11
@@ -36,3 +36,4 @@ version.h:
 test:
 	@xinit ./wm-test -- :1
 
+.PHONY: clean
