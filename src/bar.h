@@ -5,23 +5,24 @@
 #include <stdio.h>
 #include <X11/Xlib.h>
 
+#include "cursors.h"
+#include "utils.h"
+
 struct bar {
 	/* TODO font */
 	Drawable drawable;
 	GC gc;
+	Window win;
 
 	int topbar;
 	int showbar;
-	int height;
 
-	char cmdbuf[1024];
-	char timefmt[64];
+	int width;
+	int height;
 };
 
-struct bar *bar_init(void);
+struct bar *bar_create(int, int, int, int, Display *, Window, int);
 
-void bar_show(struct bar *, int);
-
-void bar_update(struct bar *);
+void bar_draw(struct bar *, Display *);
 
 #endif

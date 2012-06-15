@@ -31,7 +31,8 @@ struct monitor *monitor_append(struct monitor *, struct monitor *);
 void monitor_arrange(struct monitor *, Display *);
 
 /* creates a monitor */
-struct monitor *monitor_create(struct config *, int, int);
+struct monitor *monitor_create(struct config *, int, int,
+		Display *, Window, int);
 
 /* focus on the given client. If no client given, the first available
  * client will be focused */

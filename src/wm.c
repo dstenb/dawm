@@ -92,7 +92,8 @@ void wm_create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 /* TODO: fix Xinerama */
 void wm_create_monitors(struct wm *wm)
 {
-	wm->mons = monitor_create(wm->cfg, wm->width, wm->height);
+	wm->mons = monitor_create(wm->cfg, wm->width, wm->height, wm->dpy,
+			wm->root, wm->screen);
 	wm->selmon = wm->mons;
 }
 
