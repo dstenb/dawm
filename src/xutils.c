@@ -1,15 +1,5 @@
 #include "xutils.h"
 
-unsigned long get_color(Display *dpy, int screen, const char *str)
-{
-	Colormap cmap = DefaultColormap(dpy, screen);
-	XColor color;
-
-	if(!XAllocNamedColor(dpy, cmap, str, &color, &color))
-		die("error, cannot allocate color '%s'\n", str);
-	return color.pixel;
-}
-
 int get_text_prop(Display *dpy, Window win, Atom prop, char *str, unsigned int size)
 {
 	char **list = NULL;

@@ -86,7 +86,4 @@ void client_unmap(struct client *, Display *);
 /* update the client title */
 void client_update_title(struct client *, Display *);
 
-/* initializes the colors that are used by all clients */
-void clients_init_colors(struct config *, Display *, int);
-
 #endif

@@ -7,6 +7,7 @@
 #include <X11/Xlib.h>
 
 #include "atoms.h"
+#include "colors.h"
 #include "config.h"
 #include "cursors.h"
 #include "keys.h"

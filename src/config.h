@@ -5,17 +5,12 @@
 #include <stdio.h>
 #include <limits.h>
 
+#include "colors.h"
 #include "errno.h"
 #include "keys.h"
 #include "utils.h"
 
 #define SIZE_COL_ARR 3
-
-typedef enum {
-	FG,
-	BG,
-	BORDER
-} ConfigColorID;
 
 struct config {
 	int topbar;
@@ -23,10 +18,7 @@ struct config {
 	int bsize;
 	struct key *keys;
 
-	/* normal window colors */
-	char *col_win_norm[3];
-	/* selected window colors */
-	char *col_win_sel[3];
+	char *colors[LASTColor];
 };
 
 /* init a config struct, will set all the settings to the default values */

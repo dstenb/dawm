@@ -163,7 +163,7 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 	update_num_lock(wm->dpy);
 	key_grab_all(wm->keys, wm->dpy, wm->root);
 
-	clients_init_colors(wm->cfg, wm->dpy, wm->screen);
+	colors_init(cfg->colors, wm->dpy, wm->screen);
 
 	atoms_init(wm->dpy);
 	net_set_supported(wm->dpy, wm->root);

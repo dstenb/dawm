@@ -9,16 +9,7 @@
 
 #define MOVE_RESIZE_MASK (CWX | CWY | CWWidth | CWHeight)
 
-#define COL_NORM 0
-#define COL_SEL 1
-
 static int xerror_dummy(Display *, XErrorEvent *);
-
-static struct {
-	unsigned long fg;
-	unsigned long bg;
-	unsigned long border;
-} colors[2];
 
 struct client *client_create(Window win, XWindowAttributes *wa)
 {
@@ -41,7 +32,7 @@ struct client *client_create(Window win, XWindowAttributes *wa)
 
 void client_focus(struct client *c, Display *dpy, Window root)
 {
-	XSetWindowBorder(dpy, c->win, colors[COL_SEL].border);
+	XSetWindowBorder(dpy, c->win, color(WinSelBorder));
 
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	XChangeProperty(dpy, root, atom(NetActiveWindow), XA_WINDOW, 32,
@@ -133,7 +124,7 @@ void client_set_border(struct client *c, Display *dpy, int bsize)
 
 	wc.border_width = c->bsize;
 	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc);
-	XSetWindowBorder(dpy, c->win, colors[COL_NORM].border);
+	XSetWindowBorder(dpy, c->win, color(WinNormBorder));
 }
 
 void client_set_state(struct client *c, Display *dpy, long state)
@@ -171,7 +162,7 @@ void client_setup(struct client *c, struct config *cfg, struct monitor *mon,
 
 void client_unfocus(struct client *c, Display *dpy, Window root)
 {
-	XSetWindowBorder(dpy, c->win, colors[COL_NORM].border);
+	XSetWindowBorder(dpy, c->win, color(WinNormBorder));
 	/* TODO */
 }
 
@@ -199,17 +190,6 @@ void client_update_title(struct client *c, Display *dpy)
 					CLIENT_NAME_SIZE)))
 		snprintf(c->name, CLIENT_NAME_SIZE, "unnamed window");
 	error("c->name: %s\n", c->name);
-}
-
-void clients_init_colors(struct config *cfg, Display *dpy, int screen)
-{
-	colors[COL_NORM].fg = get_color(dpy, screen, cfg->col_win_norm[FG]);
-	colors[COL_NORM].bg = get_color(dpy, screen, cfg->col_win_norm[BG]);
-	colors[COL_NORM].border = get_color(dpy, screen, cfg->col_win_norm[BORDER]);
-
-	colors[COL_SEL].fg = get_color(dpy, screen, cfg->col_win_sel[FG]);
-	colors[COL_SEL].bg = get_color(dpy, screen, cfg->col_win_sel[BG]);
-	colors[COL_SEL].border = get_color(dpy, screen, cfg->col_win_sel[BORDER]);
 }
 
 int xerror_dummy(Display *dpy, XErrorEvent *ev)

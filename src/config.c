@@ -5,16 +5,14 @@ static void parse_color(struct config *, const char *, int, char *, char *);
 static void replace_str(char **, char *);
 static int valid_color_value(const char *);
 
-static const char *default_win_norm_colors[SIZE_COL_ARR] = {
-	[FG] = "#FFFFFF",
-	[BG] = "#000000",
-	[BORDER] = "#FF0000"
-};
-
-static const char *default_win_sel_colors[SIZE_COL_ARR] = {
-	[FG] = "#FFFFFF",
-	[BG] = "#000000",
-	[BORDER] = "#000000"
+static const char *default_colors[LASTColor] = {
+	[BarBorder] = "#FF0000",
+	[BarNormFG] = "#DDDDDD",
+	[BarNormBG] = "#000000",
+	[BarSelFG] = "#000000",
+	[BarSelBG] = "#0000FF",
+	[WinNormBorder] = "#000000",
+	[WinSelBorder] = "#FF0000"
 };
 
 struct config *config_init(void)
@@ -27,10 +25,8 @@ struct config *config_init(void)
 	cfg->showbar = 1;
 	cfg->bsize = 1;
 
-	for (i = 0; i < SIZE_COL_ARR; i++) {
-		cfg->col_win_norm[i] = xstrdup(default_win_norm_colors[i]);
-		cfg->col_win_sel[i] = xstrdup(default_win_sel_colors[i]);
-	}
+	for (i = 0; i < LASTColor; i++)
+		cfg->colors[i] = xstrdup(default_colors[i]);
 
 	return cfg;
 }
@@ -73,23 +69,12 @@ void parse_color(struct config *cfg, const char *path, int line,
 		die("%s:%i, missing color id\n", path, line);
 	if (!cvalue)
 		die("%s:%i, missing color value\n", path, line);
+	if (str_to_color_id(cid) == InvalidColor)
+		die("%s:%i, invalid color id: '%s'\n", path, line, cid);
 	if (!valid_color_value(cvalue))
 		die("%s:%i, invalid color value: '%s'\n", path, line, cvalue);
 
-	if (STREQ(cid, "win_fg_norm"))
-		replace_str(&cfg->col_win_norm[FG], xstrdup(cvalue));
-	else if (STREQ(cid, "win_bg_norm"))
-		replace_str(&cfg->col_win_norm[BG], xstrdup(cvalue));
-	else if (STREQ(cid, "win_border_norm"))
-		replace_str(&cfg->col_win_norm[BORDER], xstrdup(cvalue));
-	else if (STREQ(cid, "win_fg_sel"))
-		replace_str(&cfg->col_win_sel[FG], xstrdup(cvalue));
-	else if (STREQ(cid, "win_bg_sel"))
-		replace_str(&cfg->col_win_sel[BG], xstrdup(cvalue));
-	else if (STREQ(cid, "win_border_sel"))
-		replace_str(&cfg->col_win_sel[BORDER], xstrdup(cvalue));
-	else
-		die("%s:%i, invalid color id: %s\n", path, line, cid);
+	replace_str(&cfg->colors[str_to_color_id(cid)], xstrdup(cvalue));
 }
 
 int config_load(struct config *cfg, const char *path)
@@ -147,10 +132,8 @@ void config_free(struct config *cfg)
 {
 	int i;
 
-	for (i = 0; i < SIZE_COL_ARR; i++) {
-		free(cfg->col_win_norm[i]);
-		free(cfg->col_win_sel[i]);
-	}
+	for (i = 0; i < LASTColor; i++)
+		free(cfg->colors[i]);
 
 	key_free_all(cfg->keys);
 	free(cfg);
