@@ -2,7 +2,7 @@
 
 #define EVENT_MASK (CWOverrideRedirect | CWBackPixmap | CWEventMask)
 
-struct bar *bar_create(int topbar, int showbar, int width, int height,
+struct bar *bar_create(int topbar, int showbar, int x, int y, int w, int h,
 		Display *dpy, Window root, int screen)
 {
 	struct bar *bar;
@@ -15,19 +15,22 @@ struct bar *bar_create(int topbar, int showbar, int width, int height,
 	bar = xcalloc(1, sizeof(struct bar));
 
 	/* TODO */
-	return bar;
 
 	bar->topbar = topbar;
 	bar->showbar = showbar;
-	bar->width = width;
-	bar->height = height;
+	bar->x = x;
+	bar->y = y;
+	bar->w = w;
+	bar->h = h;
 
-	bar->drawable = XCreatePixmap(dpy, root, width, height,
+	return bar;
+
+	bar->drawable = XCreatePixmap(dpy, root, bar->w, bar->h,
 			DefaultDepth(dpy, screen));
 
 	bar->gc =XCreateGC(dpy, root, 0, NULL);
 
-	bar->win = XCreateWindow(dpy, root, 0, 0, width, height, 0,
+	bar->win = XCreateWindow(dpy, root, bar->x, bar->y, bar->w, bar->h, 0,
 			DefaultDepth(dpy, screen), CopyFromParent,
 			DefaultVisual(dpy, screen),
 			EVENT_MASK, &attr);

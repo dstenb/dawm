@@ -11,8 +11,8 @@
 struct monitor {
 	struct bar *bar;
 
-	int width;
-	int height;
+	int mx, my, mw, mh;
+	int wx, wy, ww, wh;
 
 	struct client *clients;
 	struct client *cstack;
@@ -31,7 +31,7 @@ struct monitor *monitor_append(struct monitor *, struct monitor *);
 void monitor_arrange(struct monitor *, Display *);
 
 /* creates a monitor */
-struct monitor *monitor_create(struct config *, int, int,
+struct monitor *monitor_create(struct config *, int, int, int, int,
 		Display *, Window, int);
 
 /* focus on the given client. If no client given, the first available

@@ -76,11 +76,11 @@ struct monitor *monitor_append(struct monitor *mons, struct monitor *new)
 
 void monitor_arrange(struct monitor *mon, Display *dpy)
 {
-	(void)mon;
-	/* TODO */
 	struct client *c;
 	int i = 0;
 	int n = 0;
+
+	/* TODO: handle multiple monitors  */
 
 	/* only one window */
 	if (mon->sel && mon->cstack->next == NULL) {
@@ -88,8 +88,8 @@ void monitor_arrange(struct monitor *mon, Display *dpy)
 
 		if (!c->floating)
 			client_move_resize(c, dpy, c->bsize, c->bsize,
-					mon->width - (c->bsize * 2),
-					mon->height - (c->bsize * 2));
+					mon->ww - (c->bsize * 2),
+					mon->wh - (c->bsize * 2));
 		return;
 	}
 
@@ -104,14 +104,14 @@ void monitor_arrange(struct monitor *mon, Display *dpy)
 			continue;
 		if (c == mon->sel) {
 			client_move_resize(c, dpy, c->bsize, c->bsize,
-					mon->width / 2 - (c->bsize * 2),
-					mon->height - (c->bsize * 2));
+					mon->ww / 2 - (c->bsize * 2),
+					mon->wh - (c->bsize * 2));
 		} else {
-			int sw = mon->height / (float) n;
+			int sw = mon->wh / (float) n;
 			printf("sw: %i\n", sw);
-			client_move_resize(c, dpy, mon->width / 2 + c->bsize,
+			client_move_resize(c, dpy, mon->ww / 2 + c->bsize,
 					i * (sw + c->bsize),
-					mon->width / 2 - (c->bsize * 2),
+					mon->ww / 2 - (c->bsize * 2),
 					sw - (c->bsize * 2));
 			i++;
 		}
@@ -119,21 +119,38 @@ void monitor_arrange(struct monitor *mon, Display *dpy)
 
 }
 
-struct monitor *monitor_create(struct config *cfg, int width, int height,
+void monitor_update_window_size(struct monitor *mon)
+{
+	mon->wy = mon->my;
+	mon->wh = mon->mh;
+
+	if (mon->bar->showbar) {
+		mon->wh -= mon->bar->h;
+		mon->bar->y = mon->bar->topbar ? mon->wy : mon->wy + mon->wh;
+		mon->wy = mon->bar->topbar ? mon->wy + mon->bar->h : mon->wy;
+	} else {
+		mon->bar->y = -mon->bar->h;
+	}
+}
+
+struct monitor *monitor_create(struct config *cfg, int x, int y, int w, int h,
 		Display *dpy, Window root, int screen)
 {
 	struct monitor *mon = xcalloc(1, sizeof(struct monitor));
 
-	(void)cfg;
-	mon->bar = bar_create(1, 1, width, 20, dpy, root, screen);
+	mon->bar = bar_create(1, 1, x, y, w, 20, dpy, root, screen);
 	mon->clients = NULL;
 	mon->cstack = NULL;
 	mon->sel = NULL;
 
 	mon->next = NULL;
 
-	mon->width = width;
-	mon->height = height;
+	mon->mx = mon->wx = x;
+	mon->my = mon->wy = y;
+	mon->mw = mon->ww = w;
+	mon->mh = mon->wh = h;
+
+	monitor_update_window_size(mon);
 
 	return mon;
 }

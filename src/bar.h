@@ -17,11 +17,10 @@ struct bar {
 	int topbar;
 	int showbar;
 
-	int width;
-	int height;
+	int x, y, w, h;
 };
 
-struct bar *bar_create(int, int, int, int, Display *, Window, int);
+struct bar *bar_create(int, int, int, int, int, int, Display *, Window, int);
 
 void bar_draw(struct bar *, Display *);
 

@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define XINERAMA
+
 #define WMNAME "dawm"
 
 struct rect {
