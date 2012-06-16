@@ -96,9 +96,9 @@ void wm_create_monitors(struct wm *wm)
 
 	wm->mons = monitor_create(wm->cfg, 0, 0, wm->width / 2, wm->height, wm->dpy,
 			wm->root, wm->screen);
-	wm->mons->next = monitor_create(wm->cfg, wm->width / 2, 0,
+	/*wm->mons->next = monitor_create(wm->cfg, wm->width / 2, 0,
 			wm->width/2, wm->height, wm->dpy,
-			wm->root, wm->screen);
+			wm->root, wm->screen);*/
 	wm->selmon = wm->mons;
 }
 
@@ -150,6 +150,8 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 	wm->cfg = cfg;
 	wm->motion.type = NoMotion;
 
+	colors_init(cfg->colors, wm->dpy, wm->screen);
+
 	wm_create_monitors(wm);
 
 	/* select events to handle */
@@ -167,8 +169,6 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 	/* grab the manager's key bindings */
 	update_num_lock(wm->dpy);
 	key_grab_all(wm->keys, wm->dpy, wm->root);
-
-	colors_init(cfg->colors, wm->dpy, wm->screen);
 
 	atoms_init(wm->dpy);
 	net_set_supported(wm->dpy, wm->root);

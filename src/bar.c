@@ -2,6 +2,13 @@
 
 #define EVENT_MASK (CWOverrideRedirect | CWBackPixmap | CWEventMask)
 
+static struct {
+	Drawable drawable;
+	GC gc;
+} dc;
+
+static int initialized = 0;
+
 struct bar *bar_create(int topbar, int showbar, int x, int y, int w, int h,
 		Display *dpy, Window root, int screen)
 {
@@ -14,7 +21,9 @@ struct bar *bar_create(int topbar, int showbar, int x, int y, int w, int h,
 
 	bar = xcalloc(1, sizeof(struct bar));
 
-	/* TODO */
+	/* TODO: move this to a better place */
+	if (!initialized)
+		bars_init_dc(dpy, root, screen, h);
 
 	bar->topbar = topbar;
 	bar->showbar = showbar;
@@ -22,13 +31,6 @@ struct bar *bar_create(int topbar, int showbar, int x, int y, int w, int h,
 	bar->y = y;
 	bar->w = w;
 	bar->h = h;
-
-	return bar;
-
-	bar->drawable = XCreatePixmap(dpy, root, bar->w, bar->h,
-			DefaultDepth(dpy, screen));
-
-	bar->gc =XCreateGC(dpy, root, 0, NULL);
 
 	bar->win = XCreateWindow(dpy, root, bar->x, bar->y, bar->w, bar->h, 0,
 			DefaultDepth(dpy, screen), CopyFromParent,
@@ -43,5 +45,19 @@ struct bar *bar_create(int topbar, int showbar, int x, int y, int w, int h,
 
 void bar_draw(struct bar *bar, Display *dpy)
 {
+	XSetForeground(dpy, dc.gc, color(BarNormBG));
+	XFillRectangle(dpy, dc.drawable, dc.gc, 0, 0, bar->w, bar->h);
+	XCopyArea(dpy, dc.drawable, bar->win, dc.gc, 0, 0, bar->w, bar->h, 0, 0);
+	XSync(dpy, False);
+}
 
+void bars_init_dc(Display *dpy, Window root, int screen, int h)
+{
+	if (!initialized) {
+		dc.drawable = XCreatePixmap(dpy, root,
+				DisplayWidth(dpy, screen), h,
+				DefaultDepth(dpy, screen));
+		dc.gc = XCreateGC(dpy, root, 0, NULL);
+		initialized = 1;
+	}
 }
