@@ -205,6 +205,13 @@ struct client *find_client_by_window(struct monitor *mon, Window win)
 	return NULL;
 }
 
+struct monitor *find_monitor_by_pos(struct monitor *mon, int x, int y)
+{
+	for ( ; mon && !INSIDE(x, y, mon->mx, mon->my, mon->mw, mon->mh);
+			mon = mon->next) ;
+	return mon;
+}
+
 void monitor_show_bar(struct monitor *mon, Display *dpy, int show)
 {
 	mon->bar->showbar = show ? 1 : 0;

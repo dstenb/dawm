@@ -96,9 +96,9 @@ void wm_create_monitors(struct wm *wm)
 
 	wm->mons = monitor_create(wm->cfg, 0, 0, wm->width / 2, wm->height, wm->dpy,
 			wm->root, wm->screen);
-	/*wm->mons->next = monitor_create(wm->cfg, wm->width / 2, 0,
+	wm->mons->next = monitor_create(wm->cfg, wm->width / 2, 0,
 			wm->width/2, wm->height, wm->dpy,
-			wm->root, wm->screen);*/
+			wm->root, wm->screen);
 	wm->selmon = wm->mons;
 }
 
@@ -409,37 +409,46 @@ void wm_handler_motionnotify(struct wm *wm, XEvent *ev)
 	XMotionEvent *mev = &ev->xmotion;
 	struct client *c;
 
-	int xdiff, ydiff;
-	int x, y, w, h;
+	if ((c = find_client_by_window(wm->mons, mev->window))) {
+		int xdiff, ydiff;
+		int x, y, w, h;
 
-	if (!(c = find_client_by_window(wm->mons, mev->window)))
-		return;
+		x = c->cur_r.x;
+		y = c->cur_r.y;
+		w = c->cur_r.w;
+		h = c->cur_r.h;
 
-	x = c->cur_r.x;
-	y = c->cur_r.y;
-	w = c->cur_r.w;
-	h = c->cur_r.h;
+		while(XCheckTypedEvent(wm->dpy, MotionNotify, ev));
 
-	while(XCheckTypedEvent(wm->dpy, MotionNotify, ev));
+		xdiff = mev->x_root - wm->motion.start.x_root;
+		ydiff = mev->y_root - wm->motion.start.y_root;
 
-	xdiff = mev->x_root - wm->motion.start.x_root;
-	ydiff = mev->y_root - wm->motion.start.y_root;
-
-	if (wm->motion.type == ResizeMotion) {
-		if (!c->floating) { /* TODO: check if the monitor is arranged */
-			w = c->old_r.w;
-			h = c->old_r.h;
-		} else {
-			w = wm->motion.attr.width + xdiff;
-			h = wm->motion.attr.height + ydiff;
+		if (wm->motion.type == ResizeMotion) {
+			if (!c->floating) { /* TODO: check if the monitor is arranged */
+				w = c->old_r.w;
+				h = c->old_r.h;
+			} else {
+				w = wm->motion.attr.width + xdiff;
+				h = wm->motion.attr.height + ydiff;
+			}
+		} else if (wm->motion.type == MovementMotion) {
+			x = wm->motion.attr.x + xdiff;
+			y = wm->motion.attr.y + ydiff;
 		}
-	} else if (wm->motion.type == MovementMotion) {
-		x = wm->motion.attr.x + xdiff;
-		y = wm->motion.attr.y + ydiff;
-	}
 
-	client_move_resize(c, wm->dpy, x, y, w, h);
-	wm_set_sel_float(wm, 1);
+		client_move_resize(c, wm->dpy, x, y, w, h);
+		wm_set_sel_float(wm, 1);
+	} else {
+		struct monitor *mon = find_monitor_by_pos(wm->mons,
+				mev->x_root, mev->y_root);
+
+		if (wm->selmon != mon) {
+			wm->selmon = mon;
+			monitor_focus(mon, mon->sel, wm->dpy, wm->root);
+		}
+
+		return;
+	}
 }
 
 void wm_handler_propertynotify(struct wm *wm, XEvent *ev)

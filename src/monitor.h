@@ -47,6 +47,8 @@ void monitor_select_client(struct monitor *, struct client *);
 /* searches through all the monitors for the client responding to the window */
 struct client *find_client_by_window(struct monitor *, Window);
 
+struct monitor *find_monitor_by_pos(struct monitor *, int, int);
+
 /* prints a debug message about the given monitor */
 void monitor_dbg_print(struct monitor *m, const char *str);
 
