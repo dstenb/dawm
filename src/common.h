@@ -8,8 +8,4 @@
 
 #define WMNAME "dawm"
 
-struct rect {
-	int x, y, w, h;
-};
-
 #endif

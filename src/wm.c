@@ -368,7 +368,7 @@ void wm_handler_maprequest(struct wm *wm, XEvent *ev)
 {
 	static XWindowAttributes attr;
 	XMapRequestEvent *mrev = &ev->xmaprequest;
-	
+
 	dbg_print(wm, __func__);
 
 	if(!XGetWindowAttributes(wm->dpy, mrev->window, &attr) ||
@@ -413,10 +413,10 @@ void wm_handler_motionnotify(struct wm *wm, XEvent *ev)
 		int xdiff, ydiff;
 		int x, y, w, h;
 
-		x = c->cur_r.x;
-		y = c->cur_r.y;
-		w = c->cur_r.w;
-		h = c->cur_r.h;
+		x = c->x;
+		y = c->y;
+		w = c->w;
+		h = c->h;
 
 		while(XCheckTypedEvent(wm->dpy, MotionNotify, ev));
 
@@ -425,8 +425,8 @@ void wm_handler_motionnotify(struct wm *wm, XEvent *ev)
 
 		if (wm->motion.type == ResizeMotion) {
 			if (!c->floating) { /* TODO: check if the monitor is arranged */
-				w = c->old_r.w;
-				h = c->old_r.h;
+				w = c->ow;
+				h = c->oh;
 			} else {
 				w = wm->motion.attr.width + xdiff;
 				h = wm->motion.attr.height + ydiff;

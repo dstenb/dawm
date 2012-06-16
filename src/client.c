@@ -15,10 +15,10 @@ struct client *client_create(Window win, XWindowAttributes *wa)
 {
 	struct client *c = xcalloc(1, sizeof(struct client));
 
-	c->cur_r.x = c->old_r.x = wa->x;
-	c->cur_r.y = c->old_r.y = wa->y;
-	c->cur_r.w = c->old_r.w = wa->width;
-	c->cur_r.h = c->old_r.h = wa->height;
+	c->x = c->ox = wa->x;
+	c->y = c->oy = wa->y;
+	c->w = c->ow = wa->width;
+	c->h = c->oh = wa->height;
 
 	c->name[0] = '\0';
 	c->floating = 0;
@@ -91,15 +91,15 @@ void client_move_resize(struct client *c, Display *dpy,
 {
 	XWindowChanges wc;
 
-	c->old_r.x = c->cur_r.x;
-	c->old_r.y = c->cur_r.y;
-	c->old_r.w = c->cur_r.w;
-	c->old_r.h = c->cur_r.h;
+	c->ox = c->x;
+	c->oy = c->y;
+	c->ow = c->w;
+	c->oh = c->h;
 
-	c->cur_r.x = wc.x = x;
-	c->cur_r.y = wc.y = y;
-	c->cur_r.w = wc.width = MAX(1, w);
-	c->cur_r.h = wc.height = MAX(1, h);
+	c->x = wc.x = x;
+	c->y = wc.y = y;
+	c->w = wc.width = MAX(1, w);
+	c->h = wc.height = MAX(1, h);
 
 	XConfigureWindow(dpy, c->win, MOVE_RESIZE_MASK, &wc);
 	XSync(dpy, False);

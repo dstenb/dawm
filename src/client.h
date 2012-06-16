@@ -17,9 +17,9 @@ struct client {
 	char name[CLIENT_NAME_SIZE];
 
 	/* current position and size */
-	struct rect cur_r;
+	int x, y, w, h;
 	/* old position and size */
-	struct rect old_r;
+	int ox, oy, ow, oh;
 
 	/* non-zero if floating */
 	int floating;
