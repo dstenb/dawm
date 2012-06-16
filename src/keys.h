@@ -25,6 +25,7 @@ typedef enum {
 	RestartAction,
 	SpawnAction,
 	ToggleBarAction,
+	ToggleFloatAction,
 	LASTAction,
 	InvalidAction = -1
 } KeyAction;

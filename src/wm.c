@@ -378,12 +378,37 @@ void wm_handler_maprequest(struct wm *wm, XEvent *ev)
 		wm_create_client(wm, mrev->window, &attr);
 }
 
+void wm_set_sel_float(struct wm *wm, int floating)
+{
+	int was_floating;
+
+	if (!wm->selmon->sel)
+		return;
+
+	/* TODO: check if the monitor is arranged. */
+	was_floating = wm->selmon->sel->floating;
+
+	if (floating) {
+		wm->selmon->sel->floating = 1;
+		client_raise(wm->selmon->sel, wm->dpy);
+
+		/* re-arrange the monitor's client if the selected client
+		 * wasn't floating before */
+		if (!was_floating)
+			monitor_arrange(wm->selmon, wm->dpy);
+	} else {
+		wm->selmon->sel->floating = 0;
+
+		if (was_floating)
+			monitor_arrange(wm->selmon, wm->dpy);
+	}
+}
+
 void wm_handler_motionnotify(struct wm *wm, XEvent *ev)
 {
 	XMotionEvent *mev = &ev->xmotion;
 	struct client *c;
 
-	int was_floating = 0;
 	int xdiff, ydiff;
 	int x, y, w, h;
 
@@ -413,17 +438,8 @@ void wm_handler_motionnotify(struct wm *wm, XEvent *ev)
 		y = wm->motion.attr.y + ydiff;
 	}
 
-	/* TODO: check if the monitor is arranged. */
-	was_floating = c->floating;
-	c->floating = 1;
-	client_raise(c, wm->dpy);
-
 	client_move_resize(c, wm->dpy, x, y, w, h);
-
-	/* re-arrange the monitor's client if the selected client
-	 * wasn't floating before */
-	if (!was_floating)
-		monitor_arrange(c->mon, wm->dpy);
+	wm_set_sel_float(wm, 1);
 }
 
 void wm_handler_propertynotify(struct wm *wm, XEvent *ev)
@@ -510,6 +526,10 @@ void wm_keypress(struct wm *wm, struct key *key)
 			break;
 		case ToggleBarAction:
 			monitor_toggle_bar(wm->selmon, wm->dpy);
+			break;
+		case ToggleFloatAction:
+			if (wm->selmon->sel)
+				wm_set_sel_float(wm, !wm->selmon->sel->floating);
 			break;
 		default:
 			die("unhandled key action (%d), fix this!\n",
