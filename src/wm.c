@@ -469,8 +469,12 @@ void wm_handler_propertynotify_root(struct wm *wm, XPropertyEvent *ev)
 	(void)wm;
 
 	if (ev->atom == XA_WM_NAME) {
-		DBG("wm name");
-		set_text_prop(wm->dpy, wm->root, atom(NetWMName), WMNAME);
+		/* TODO: Two options:
+		 * 1.) Read the prop and set the status text and redraw all
+		 * bars.
+		 * 2.) Handle this in bar_update_loop() or similar instead,
+		 * where a program is spawned. That would make it easier to use
+		 * the program without fixing a script in .xinitrc etc. */
 	}
 }
 
