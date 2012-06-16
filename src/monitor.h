@@ -53,4 +53,8 @@ void monitor_dbg_print(struct monitor *m, const char *str);
 /* removes focus from the currently selected client */
 void monitor_unfocus_selected(struct monitor *, Display *, Window);
 
+void monitor_show_bar(struct monitor *, Display *, int);
+
+void monitor_toggle_bar(struct monitor *, Display *);
+
 #endif

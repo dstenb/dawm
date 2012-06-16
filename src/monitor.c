@@ -1,5 +1,7 @@
 #include "monitor.h"
 
+static void monitor_update_window_size(struct monitor *);
+
 void monitor_dbg_print(struct monitor *m, const char *str)
 {
 	struct client *c;
@@ -122,20 +124,6 @@ void monitor_arrange(struct monitor *mon, Display *dpy)
 
 }
 
-void monitor_update_window_size(struct monitor *mon)
-{
-	mon->wy = mon->my;
-	mon->wh = mon->mh;
-
-	if (mon->bar->showbar) {
-		mon->wh -= mon->bar->h;
-		mon->bar->y = mon->bar->topbar ? mon->wy : mon->wy + mon->wh;
-		mon->wy = mon->bar->topbar ? mon->wy + mon->bar->h : mon->wy;
-	} else {
-		mon->bar->y = -mon->bar->h;
-	}
-}
-
 struct monitor *monitor_create(struct config *cfg, int x, int y, int w, int h,
 		Display *dpy, Window root, int screen)
 {
@@ -153,12 +141,7 @@ struct monitor *monitor_create(struct config *cfg, int x, int y, int w, int h,
 	mon->mw = mon->ww = w;
 	mon->mh = mon->wh = h;
 
-	monitor_update_window_size(mon);
-	XMoveResizeWindow(dpy, mon->bar->win, mon->wx, mon->bar->y, mon->ww,
-			mon->bar->h);
-
-	/* TODO */
-	bar_draw(mon->bar, dpy);
+	monitor_show_bar(mon, dpy, mon->bar->showbar);
 
 	return mon;
 }
@@ -193,6 +176,7 @@ void monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
 	mon->sel = c;
 
 	/* TODO draw bar */
+	bar_draw(mon->bar, dpy);
 }
 
 void monitor_remove_client(struct monitor *mon, struct client *c)
@@ -219,4 +203,33 @@ struct client *find_client_by_window(struct monitor *mon, Window win)
 	}
 
 	return NULL;
+}
+
+void monitor_show_bar(struct monitor *mon, Display *dpy, int show)
+{
+	mon->bar->showbar = show ? 1 : 0;
+	monitor_update_window_size(mon);
+	XMoveResizeWindow(dpy, mon->bar->win, mon->wx, mon->bar->y,
+			mon->ww, mon->bar->h);
+	monitor_arrange(mon, dpy);
+	bar_draw(mon->bar, dpy);
+}
+
+void monitor_toggle_bar(struct monitor *mon, Display *dpy)
+{
+	monitor_show_bar(mon, dpy, !mon->bar->showbar);
+}
+
+void monitor_update_window_size(struct monitor *mon)
+{
+	mon->wy = mon->my;
+	mon->wh = mon->mh;
+
+	if (mon->bar->showbar) {
+		mon->wh -= mon->bar->h;
+		mon->bar->y = mon->bar->topbar ? mon->wy : mon->wy + mon->wh;
+		mon->wy = mon->bar->topbar ? mon->wy + mon->bar->h : mon->wy;
+	} else {
+		mon->bar->y = -mon->bar->h;
+	}
 }

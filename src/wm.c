@@ -508,6 +508,9 @@ void wm_keypress(struct wm *wm, struct key *key)
 		case RestartAction:
 			wm_restart(wm);
 			break;
+		case ToggleBarAction:
+			monitor_toggle_bar(wm->selmon, wm->dpy);
+			break;
 		default:
 			die("unhandled key action (%d), fix this!\n",
 					key->action);
