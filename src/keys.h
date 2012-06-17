@@ -23,6 +23,7 @@ typedef enum {
 	KillAction,
 	QuitAction,
 	RestartAction,
+	SetTagAction,
 	SpawnAction,
 	ToggleBarAction,
 	ToggleFloatAction,
