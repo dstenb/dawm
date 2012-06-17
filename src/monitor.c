@@ -2,22 +2,6 @@
 
 static void monitor_update_window_size(struct monitor *);
 
-void monitor_dbg_print(struct monitor *m, const char *str)
-{
-	struct client *c;
-	DBG("monitor_dbg_print (%s)\n", str);
-	DBG("monitor_dbg_print (%s)\n", str);
-	DBG("m->sel: %p\n", (void *)m->sel);
-
-	DBG("m->clients:\n");
-	for (c = m->clients; c; c = c->next)
-		DBG("-> %p\n", c);
-	DBG("m->cstack:\n");
-	for (c = m->cstack; c; c = c->snext)
-		DBG("-> %p\n", c);
-	DBG("\n");
-}
-
 static void add_to_clients(struct monitor *mon, struct client *c)
 {
 	c->mon = mon;
@@ -129,7 +113,8 @@ struct monitor *monitor_create(struct config *cfg, int x, int y, int w, int h,
 {
 	struct monitor *mon = xcalloc(1, sizeof(struct monitor));
 
-	mon->bar = bar_create(1, 1, x, y, w, 20, dpy, root, screen);
+	mon->bar = bar_create(cfg->topbar, cfg->showbar, x, y, w, 20,
+			dpy, root, screen);
 	mon->clients = NULL;
 	mon->cstack = NULL;
 	mon->sel = NULL;
@@ -146,12 +131,36 @@ struct monitor *monitor_create(struct config *cfg, int x, int y, int w, int h,
 	return mon;
 }
 
-void monitor_unfocus_selected(struct monitor *mon, Display *dpy, Window root)
+void monitor_dbg_print(struct monitor *m, const char *str)
 {
-	DBG("%s(%p, %p)\n", __func__, (void *)mon, (void *)mon->sel);
+	struct client *c;
+	DBG("monitor_dbg_print (%s)\n", str);
+	DBG("monitor_dbg_print (%s)\n", str);
+	DBG("m->sel: %p\n", (void *)m->sel);
 
-	if (mon->sel)
-		client_unfocus(mon->sel, dpy, root);
+	DBG("m->clients:\n");
+	for (c = m->clients; c; c = c->next)
+		DBG("-> %p\n", c);
+	DBG("m->cstack:\n");
+	for (c = m->cstack; c; c = c->snext)
+		DBG("-> %p\n", c);
+	DBG("\n");
+}
+
+void monitor_float_selected(struct monitor *mon, Display *dpy, int f)
+{
+	int was_floating;
+
+	if (mon->sel) {
+		was_floating = mon->sel->floating ? 1 : 0;
+
+		if ((mon->sel->floating = f ? 1 : 0))
+			client_raise(mon->sel, dpy);
+
+		/* re-arrange if the state have change */
+		if (mon->sel->floating != was_floating)
+			monitor_arrange(mon, dpy);
+	}
 }
 
 void monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
@@ -190,6 +199,43 @@ void monitor_select_client(struct monitor *mon, struct client *c)
 	mon->sel = c;
 }
 
+void monitor_show_bar(struct monitor *mon, Display *dpy, int show)
+{
+	mon->bar->showbar = show ? 1 : 0;
+	monitor_update_window_size(mon);
+	XMoveResizeWindow(dpy, mon->bar->win, mon->wx, mon->bar->y,
+			mon->ww, mon->bar->h);
+	monitor_arrange(mon, dpy);
+	bar_draw(mon->bar, dpy);
+}
+
+void monitor_toggle_bar(struct monitor *mon, Display *dpy)
+{
+	monitor_show_bar(mon, dpy, !mon->bar->showbar);
+}
+
+void monitor_unfocus_selected(struct monitor *mon, Display *dpy, Window root)
+{
+	DBG("%s(%p, %p)\n", __func__, (void *)mon, (void *)mon->sel);
+
+	if (mon->sel)
+		client_unfocus(mon->sel, dpy, root);
+}
+
+void monitor_update_window_size(struct monitor *mon)
+{
+	mon->wy = mon->my;
+	mon->wh = mon->mh;
+
+	if (mon->bar->showbar) {
+		mon->wh -= mon->bar->h;
+		mon->bar->y = mon->bar->topbar ? mon->wy : mon->wy + mon->wh;
+		mon->wy = mon->bar->topbar ? mon->wy + mon->bar->h : mon->wy;
+	} else {
+		mon->bar->y = -mon->bar->h;
+	}
+}
+
 struct client *find_client_by_window(struct monitor *mon, Window win)
 {
 	struct client *c;
@@ -210,49 +256,4 @@ struct monitor *find_monitor_by_pos(struct monitor *mon, int x, int y)
 	for ( ; mon && !INSIDE(x, y, mon->mx, mon->my, mon->mw, mon->mh);
 			mon = mon->next) ;
 	return mon;
-}
-
-void monitor_show_bar(struct monitor *mon, Display *dpy, int show)
-{
-	mon->bar->showbar = show ? 1 : 0;
-	monitor_update_window_size(mon);
-	XMoveResizeWindow(dpy, mon->bar->win, mon->wx, mon->bar->y,
-			mon->ww, mon->bar->h);
-	monitor_arrange(mon, dpy);
-	bar_draw(mon->bar, dpy);
-}
-
-void monitor_toggle_bar(struct monitor *mon, Display *dpy)
-{
-	monitor_show_bar(mon, dpy, !mon->bar->showbar);
-}
-
-void monitor_update_window_size(struct monitor *mon)
-{
-	mon->wy = mon->my;
-	mon->wh = mon->mh;
-
-	if (mon->bar->showbar) {
-		mon->wh -= mon->bar->h;
-		mon->bar->y = mon->bar->topbar ? mon->wy : mon->wy + mon->wh;
-		mon->wy = mon->bar->topbar ? mon->wy + mon->bar->h : mon->wy;
-	} else {
-		mon->bar->y = -mon->bar->h;
-	}
-}
-
-void monitor_float_selected(struct monitor *mon, Display *dpy, int f)
-{
-	int was_floating;
-
-	if (mon->sel) {
-		was_floating = mon->sel->floating ? 1 : 0;
-
-		if ((mon->sel->floating = f ? 1 : 0))
-			client_raise(mon->sel, dpy);
-
-		/* re-arrange if the state have change */
-		if (mon->sel->floating != was_floating)
-			monitor_arrange(mon, dpy);
-	}
 }
