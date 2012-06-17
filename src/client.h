@@ -13,6 +13,9 @@
 
 #define CLIENT_NAME_SIZE 128
 
+#define WIDTH(c)                ((c)->w + 2 * (c)->bsize)
+#define HEIGHT(c)               ((c)->h + 2 * (c)->bsize)
+
 struct client {
 	char name[CLIENT_NAME_SIZE];
 
@@ -76,6 +79,8 @@ void client_set_state(struct client *, Display *, long);
 
 void client_setup(struct client *, struct config *, struct monitor *,
 		Display *, Window, XWindowAttributes *);
+
+void client_show(struct client *, Display *, int);
 
 /* remove focus from client */
 void client_unfocus(struct client *, Display *, Window);

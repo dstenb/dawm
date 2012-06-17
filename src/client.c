@@ -160,6 +160,14 @@ void client_setup(struct client *c, struct config *cfg, struct monitor *mon,
 	net_client_list_add(dpy, root, c->win);
 }
 
+void client_show(struct client *c, Display *dpy, int show)
+{
+	if (show)
+		XMoveWindow(dpy, c->win, c->x, c->y);
+	else
+		XMoveWindow(dpy, c->win, -2 * WIDTH(c), c->y);
+}
+
 void client_unfocus(struct client *c, Display *dpy, Window root)
 {
 	XSetWindowBorder(dpy, c->win, color(WinNormBorder));
