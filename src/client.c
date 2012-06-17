@@ -116,13 +116,13 @@ void client_select_input(struct client *c, Display *dpy)
 	XSelectInput(dpy, c->win, EVENT_MASK);
 }
 
-void client_set_border(struct client *c, Display *dpy, int bsize)
+void client_set_border(struct client *c, Display *dpy, int bw)
 {
 	XWindowChanges wc;
 
-	c->bsize = bsize;
+	c->bw = bw;
 
-	wc.border_width = c->bsize;
+	wc.border_width = c->bw;
 	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc);
 	XSetWindowBorder(dpy, c->win, color(WinNormBorder));
 }
@@ -145,8 +145,8 @@ void client_setup(struct client *c, struct config *cfg, struct monitor *mon,
 
 	/* TODO: fix client rules (rule.h) */
 
-	c->old_bsize = wa->border_width;
-	client_set_border(c, dpy, cfg->bsize);
+	c->obw = wa->border_width;
+	client_set_border(c, dpy, cfg->bw);
 
 	/* TODO: configureevent */
 	/*client_fix_window_type(c);*/
@@ -179,7 +179,7 @@ void client_unmap(struct client *c, Display *dpy)
 	int (*xerror) (Display *, XErrorEvent *);
 	XWindowChanges wc;
 
-	wc.border_width = c->old_bsize;
+	wc.border_width = c->obw;
 	XGrabServer(dpy);
 	xerror = XSetErrorHandler(xerror_dummy);
 	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc); /* restore border */

@@ -15,7 +15,7 @@
 struct config {
 	int topbar;
 	int showbar;
-	int bsize;
+	int bw;
 	struct key *keys;
 
 	char *colors[LASTColor];

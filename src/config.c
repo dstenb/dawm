@@ -23,7 +23,7 @@ struct config *config_init(void)
 	cfg->keys = key_default_keys();
 	cfg->topbar = 1;
 	cfg->showbar = 1;
-	cfg->bsize = 1;
+	cfg->bw = 1;
 
 	for (i = 0; i < LASTColor; i++)
 		cfg->colors[i] = xstrdup(default_colors[i]);

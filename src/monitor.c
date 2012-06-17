@@ -73,10 +73,10 @@ void monitor_arrange(struct monitor *mon, Display *dpy)
 		c = mon->sel;
 
 		if (!c->floating)
-			client_move_resize(c, dpy, mon->wx + c->bsize,
-					mon->wy + c->bsize,
-					mon->ww - (c->bsize * 2),
-					mon->wh - (c->bsize * 2));
+			client_move_resize(c, dpy, mon->wx + c->bw,
+					mon->wy + c->bw,
+					mon->ww - (c->bw * 2),
+					mon->wh - (c->bw * 2));
 		return;
 	}
 
@@ -90,18 +90,18 @@ void monitor_arrange(struct monitor *mon, Display *dpy)
 		if (c->floating)
 			continue;
 		if (c == mon->sel) {
-			client_move_resize(c, dpy, mon->wx + c->bsize,
-					mon->wy + c->bsize,
-					mon->ww / 2 - (c->bsize * 2),
-					mon->wh - (c->bsize * 2));
+			client_move_resize(c, dpy, mon->wx + c->bw,
+					mon->wy + c->bw,
+					mon->ww / 2 - (c->bw * 2),
+					mon->wh - (c->bw * 2));
 		} else {
 			int sw = mon->wh / (float) n;
 			printf("sw: %i\n", sw);
 			client_move_resize(c, dpy,
-					mon->wx + mon->ww / 2 + c->bsize,
-					mon->wy + i * (sw + c->bsize),
-					mon->ww / 2 - (c->bsize * 2),
-					sw - (c->bsize * 2));
+					mon->wx + mon->ww / 2 + c->bw,
+					mon->wy + i * (sw + c->bw),
+					mon->ww / 2 - (c->bw * 2),
+					sw - (c->bw * 2));
 			i++;
 		}
 	}

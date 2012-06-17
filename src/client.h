@@ -13,8 +13,8 @@
 
 #define CLIENT_NAME_SIZE 128
 
-#define WIDTH(c)                ((c)->w + 2 * (c)->bsize)
-#define HEIGHT(c)               ((c)->h + 2 * (c)->bsize)
+#define WIDTH(c)                ((c)->w + 2 * (c)->bw)
+#define HEIGHT(c)               ((c)->h + 2 * (c)->bw)
 
 struct client {
 	char name[CLIENT_NAME_SIZE];
@@ -30,9 +30,10 @@ struct client {
 	int fullscreen;
 
 	/* border size */
-	int bsize;
-	/* old border size (before the WM took control of it) */
-	int old_bsize;
+	int bw;
+
+	/* old border size (before the WM took control of the window) */
+	int obw;
 
 	Window win;
 
