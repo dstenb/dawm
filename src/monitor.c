@@ -1,5 +1,6 @@
 #include "monitor.h"
 
+static void monitor_show_hide(struct monitor *, Display *);
 static void monitor_update_window_size(struct monitor *);
 
 static void add_to_clients(struct monitor *mon, struct client *c)
@@ -41,6 +42,19 @@ static void remove_from_stack(struct monitor *mon, struct client *c)
 	}
 }
 
+static void show_hide(struct client *c, Display *dpy)
+{
+	if (c) {
+		if (ISVISIBLE(c)) {
+			client_show(c, dpy, 1);
+			show_hide(c->snext, dpy);
+		} else {
+			show_hide(c->snext, dpy);
+			client_show(c, dpy, 0);
+		}
+	}
+}
+
 void monitor_add_client(struct monitor *mon, struct client *c)
 {
 	add_to_clients(mon, c);
@@ -66,6 +80,7 @@ void monitor_arrange(struct monitor *mon, Display *dpy)
 	int i = 0;
 	int n = 0;
 
+	return;
 	/* TODO: handle multiple monitors  */
 
 	/* only one window */
@@ -126,6 +141,8 @@ struct monitor *monitor_create(struct config *cfg, int x, int y, int w, int h,
 	mon->mw = mon->ww = w;
 	mon->mh = mon->wh = h;
 
+	mon->seltag = MIN_TAG;
+
 	monitor_show_bar(mon, dpy, mon->bar->showbar);
 
 	return mon;
@@ -168,8 +185,8 @@ void monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
 {
 	DBG("%s(%p, %p)\n", __func__, (void *)mon, (void *)c);
 
-	if (!c || !client_is_visible(c))
-		for (c = mon->cstack; c && !client_is_visible(c); c = c->snext);
+	if (!c || !ISVISIBLE(c))
+		for (c = mon->cstack; c && !ISVISIBLE(c); c = c->snext);
 	if (mon->sel && mon->sel != c)
 		monitor_unfocus_selected(mon, dpy, root);
 	if (c) {
@@ -197,6 +214,16 @@ void monitor_remove_client(struct monitor *mon, struct client *c)
 void monitor_select_client(struct monitor *mon, struct client *c)
 {
 	mon->sel = c;
+}
+
+void monitor_set_tag(struct monitor *mon, Display *dpy, Window root, int tag)
+{
+	assert(tag >= MIN_TAG && tag <= MAX_TAG);
+
+	mon->seltag = tag;
+	monitor_show_hide(mon, dpy);
+	monitor_arrange(mon, dpy);
+	monitor_focus(mon, NULL, dpy, root);
 }
 
 void monitor_show_bar(struct monitor *mon, Display *dpy, int show)
@@ -256,4 +283,9 @@ struct monitor *find_monitor_by_pos(struct monitor *mon, int x, int y)
 	for ( ; mon && !INSIDE(x, y, mon->mx, mon->my, mon->mw, mon->mh);
 			mon = mon->next) ;
 	return mon;
+}
+
+void monitor_show_hide(struct monitor *mon, Display *dpy)
+{
+	show_hide(mon->cstack, dpy);
 }

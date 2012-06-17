@@ -54,12 +54,6 @@ void client_grab_buttons(struct client *c, Display *dpy)
 			GrabModeAsync, GrabModeAsync, None, None);
 }
 
-int client_is_visible(struct client *c)
-{
-	/* TODO */
-	return 1;
-}
-
 void client_kill(struct client *c, Display *dpy)
 {
 	int (*xerror) (Display *, XErrorEvent *);

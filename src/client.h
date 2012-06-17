@@ -13,6 +13,8 @@
 
 #define CLIENT_NAME_SIZE 128
 
+#define ISVISIBLE(c)            (c->tag == c->mon->seltag)
+
 #define WIDTH(c)                ((c)->w + 2 * (c)->bw)
 #define HEIGHT(c)               ((c)->h + 2 * (c)->bw)
 
@@ -35,6 +37,8 @@ struct client {
 	/* old border size (before the WM took control of the window) */
 	int obw;
 
+	int tag;
+
 	Window win;
 
 	struct monitor *mon;
@@ -54,9 +58,6 @@ void client_free(struct client *);
 
 /* grab buttons */
 void client_grab_buttons(struct client *, Display *);
-
-/* returns non-zero if the window is visible */
-int client_is_visible(struct client *);
 
 /* kill the client. the removal will be handled in wm_handler_destroynotify */
 void client_kill(struct client *, Display *);

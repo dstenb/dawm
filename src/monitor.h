@@ -18,6 +18,8 @@ struct monitor {
 	struct client *cstack;
 	struct client *sel;
 
+	int seltag;
+
 	struct monitor *next;
 };
 
@@ -49,6 +51,9 @@ void monitor_remove_client(struct monitor *, struct client *);
 
 /* select the given client, assumes that the client is valid */
 void monitor_select_client(struct monitor *, struct client *);
+
+/* set the current tag */
+void monitor_set_tag(struct monitor *, Display *, Window, int);
 
 /* show/hide the bar */
 void monitor_show_bar(struct monitor *, Display *, int);

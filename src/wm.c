@@ -79,6 +79,7 @@ void wm_create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 	client_setup(c, wm->cfg, wm->selmon, wm->dpy, wm->root, attr);
 
 	monitor_add_client(c->mon, c);
+	c->tag = c->mon->seltag;
 
 	monitor_unfocus_selected(c->mon, wm->dpy, wm->root);
 	monitor_select_client(c->mon, c);
@@ -497,6 +498,15 @@ void wm_keypress(struct wm *wm, struct key *key)
 	switch(key->action) {
 		case KillAction:
 			client_kill(wm->selmon->sel, wm->dpy);
+			break;
+		case SetTagAction:
+			if (key->args) {
+				int tag = atoi(key->args);
+
+				if (tag >= MIN_TAG && tag <= MAX_TAG)
+					monitor_set_tag(wm->selmon, wm->dpy,
+							wm->root, tag);
+			}
 			break;
 		case SpawnAction:
 			spawn(key->args);
