@@ -240,3 +240,19 @@ void monitor_update_window_size(struct monitor *mon)
 		mon->bar->y = -mon->bar->h;
 	}
 }
+
+void monitor_float_selected(struct monitor *mon, Display *dpy, int f)
+{
+	int was_floating;
+
+	if (mon->sel) {
+		was_floating = mon->sel->floating ? 1 : 0;
+
+		if ((mon->sel->floating = f ? 1 : 0))
+			client_raise(mon->sel, dpy);
+
+		/* re-arrange if the state have change */
+		if (mon->sel->floating != was_floating)
+			monitor_arrange(mon, dpy);
+	}
+}

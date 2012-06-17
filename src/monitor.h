@@ -47,6 +47,7 @@ void monitor_select_client(struct monitor *, struct client *);
 /* searches through all the monitors for the client responding to the window */
 struct client *find_client_by_window(struct monitor *, Window);
 
+/* returns the monitor that corresponds to the given position */
 struct monitor *find_monitor_by_pos(struct monitor *, int, int);
 
 /* prints a debug message about the given monitor */
@@ -55,8 +56,13 @@ void monitor_dbg_print(struct monitor *m, const char *str);
 /* removes focus from the currently selected client */
 void monitor_unfocus_selected(struct monitor *, Display *, Window);
 
+/* show/hide the bar */
 void monitor_show_bar(struct monitor *, Display *, int);
 
+/* toggle the bar */
 void monitor_toggle_bar(struct monitor *, Display *);
+
+/* set the floating state for the selected client */
+void monitor_float_selected(struct monitor *, Display *, int);
 
 #endif
