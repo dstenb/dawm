@@ -74,53 +74,48 @@ struct monitor *monitor_append(struct monitor *mons, struct monitor *new)
 	}
 }
 
+/* TODO: move all tiling code */
+static struct client *next_tiled(struct client *c)
+{
+	for ( ; c && (c->floating || !ISVISIBLE(c)); c = c->next) ;
+	return c;
+}
+
+#define N_MASTER 2
+#define M_FACT 0.55
+
 void monitor_arrange(struct monitor *mon, Display *dpy)
 {
 	struct client *c;
-	int i = 0;
-	int n = 0;
+	unsigned int i, n, h, mw, my, ty;
 
-	return;
-	/* TODO: handle multiple monitors  */
+	for (n = 0, c = next_tiled(mon->clients); c;
+			c = next_tiled(c->next), n++);
 
-	/* only one window */
-	if (mon->sel && mon->cstack->next == NULL) {
-		c = mon->sel;
-
-		if (!c->floating)
-			client_move_resize(c, dpy, mon->wx + c->bw,
-					mon->wy + c->bw,
-					mon->ww - (c->bw * 2),
-					mon->wh - (c->bw * 2));
+	if (n == 0)
 		return;
-	}
 
-	/* TODO: this is buggy and dirty, but works OK for testing */
+	if (n > N_MASTER)
+		mw = N_MASTER ? mon->ww * M_FACT : 0;
+	else
+		mw = mon->ww;
 
-	for (c = mon->clients; c; c = c->next)
-		if (c != mon->sel && !c->floating)
-			n++;
-
-	for (c = mon->clients; c; c = c->next) {
-		if (c->floating)
-			continue;
-		if (c == mon->sel) {
-			client_move_resize(c, dpy, mon->wx + c->bw,
-					mon->wy + c->bw,
-					mon->ww / 2 - (c->bw * 2),
-					mon->wh - (c->bw * 2));
-		} else {
-			int sw = mon->wh / (float) n;
-			printf("sw: %i\n", sw);
-			client_move_resize(c, dpy,
-					mon->wx + mon->ww / 2 + c->bw,
-					mon->wy + i * (sw + c->bw),
-					mon->ww / 2 - (c->bw * 2),
-					sw - (c->bw * 2));
-			i++;
+	for(i = my = ty = 0, c = next_tiled(mon->clients); c;
+			c = next_tiled(c->next), i++) {
+		if(i < N_MASTER) {
+			h = (mon->wh - my) / (MIN(n, N_MASTER) - i);
+			client_move_resize(c, dpy, mon->wx, mon->wy + my,
+					mw - (2*c->bw), h - (2*c->bw));
+			my += HEIGHT(c);
+		}
+		else {
+			h = (mon->wh - ty) / (n - i);
+			client_move_resize(c, dpy, mon->wx + mw, mon->wy + ty,
+					mon->ww - mw - (2*c->bw),
+					h - (2*c->bw));
+			ty += HEIGHT(c);
 		}
 	}
-
 }
 
 struct monitor *monitor_create(struct config *cfg, int x, int y, int w, int h,

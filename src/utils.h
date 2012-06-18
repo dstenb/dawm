@@ -10,6 +10,7 @@
 #include "common.h"
 
 #define ARRSIZE(x) (int)(sizeof(x) / sizeof(*x))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define STREQ(s1, s2) (strcmp(s1, s2) == 0)
 #define INSIDE(x, y, bx, by, bw, bh) ((x >= bx) && x <= (bx + bw) && \
