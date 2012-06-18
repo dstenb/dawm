@@ -8,23 +8,23 @@ OBJFILES := $(patsubst %.c,%.o,$(wildcard *.c))
 
 PREFIX=/usr/local
 
-all: clean version.h wm
+all: clean version.h dawm
 
-wm : $(OBJFILES)
-	$(CC) -o wm $(OBJFILES) -lX11
+dawm : $(OBJFILES)
+	$(CC) -o dawm $(OBJFILES) -lX11
 
 %.o: %.c
 	$(CC_COMPILE) -o $@ $<
 
 clean:
 	@echo cleaning directory
-	@rm -f *.o wm
+	@rm -f *.o dawm
 
 install: all
-	@echo installing wm to ${PREFIX}/bin
+	@echo installing dawm to ${PREFIX}/bin
 	@mkdir -p ${PREFIX}/bin
-	@cp -f wm ${PREFIX}/bin
-	@chmod 755 ${PREFIX}/bin/wm
+	@cp -f dawm ${PREFIX}/bin
+	@chmod 755 ${PREFIX}/bin/dawm
 
 version.h:
 	@echo "#ifndef _VERSION_H_" >  version.h
@@ -34,6 +34,6 @@ version.h:
 	@echo "#endif" >> version.h
 
 test:
-	@xinit ./wm-test -- :1
+	@xinit ./dawm-test -- :1
 
 .PHONY: clean

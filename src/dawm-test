@@ -1,0 +1,14 @@
+#! /bin/bash
+
+#urxvt &
+#urxvt &
+
+nitrogen --restore &
+
+xterm -T "1" -n "1" -fg black -bg yellow &
+xterm -T "2" -n "2" -fg black -bg red &
+xterm -T "3" -n "3" -fg black -bg orange &
+
+setxkbmap se
+
+valgrind ./dawm -c config
