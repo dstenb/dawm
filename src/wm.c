@@ -11,7 +11,6 @@ static void wm_create_monitors(struct wm *);
 static void wm_get_windows(struct wm *);
 static void wm_handler_propertynotify_client(struct wm *, XPropertyEvent *);
 static void wm_handler_propertynotify_root(struct wm *, XPropertyEvent *);
-static void wm_keypress(struct wm *, struct key *);
 static void wm_quit(struct wm *, const char *);
 static void wm_remove_client(struct wm *, struct client *, int);
 static void wm_restart(struct wm *);
@@ -36,8 +35,17 @@ static void wm_handler_motionnotify(struct wm *, XEvent *);
 static void wm_handler_propertynotify(struct wm *, XEvent *);
 static void wm_handler_unmapnotify(struct wm *, XEvent *);
 
+/* key action handlers */
+static void wm_key_handler_kill(struct wm *, struct key *);
+static void wm_key_handler_quit(struct wm *, struct key *);
+static void wm_key_handler_restart(struct wm *, struct key *);
+static void wm_key_handler_settag(struct wm *, struct key *);
+static void wm_key_handler_spawn(struct wm *, struct key *);
+static void wm_key_handler_togglebar(struct wm *, struct key *);
+static void wm_key_handler_togglefloat(struct wm *, struct key *);
+
 static int (*xerrxlib) (Display *, XErrorEvent *);
-static void (*handler[LASTEvent]) (struct wm *, XEvent *) = {
+static void (*event_handler[LASTEvent]) (struct wm *, XEvent *) = {
 	[ButtonPress] = wm_handler_buttonpress,
 	[ButtonRelease] = wm_handler_buttonrelease,
 	[ClientMessage] = wm_handler_clientmessage,
@@ -53,6 +61,16 @@ static void (*handler[LASTEvent]) (struct wm *, XEvent *) = {
 	[MotionNotify] = wm_handler_motionnotify,
 	[PropertyNotify] = wm_handler_propertynotify,
 	[UnmapNotify] = wm_handler_unmapnotify
+};
+
+static void (*key_handler[LASTAction]) (struct wm *, struct key *) = {
+	[KillAction] = wm_key_handler_kill,
+	[QuitAction] = wm_key_handler_quit,
+	[RestartAction] = wm_key_handler_restart,
+	[SetTagAction] = wm_key_handler_settag,
+	[SpawnAction] = wm_key_handler_spawn,
+	[ToggleBarAction] = wm_key_handler_togglebar,
+	[ToggleFloatAction] = wm_key_handler_togglefloat
 };
 
 static void dbg_print(struct wm *wm, const char *str)
@@ -122,8 +140,8 @@ int wm_eventloop(struct wm *wm)
 
 	for (;;) {
 		XNextEvent(wm->dpy, &ev);
-		if (handler[ev.type])
-			handler[ev.type](wm, &ev);
+		if (event_handler[ev.type])
+			event_handler[ev.type](wm, &ev);
 	}
 	return 0;
 }
@@ -353,8 +371,15 @@ void wm_handler_keypress(struct wm *wm, XEvent *ev)
 
 	kev = &ev->xkey;
 	for (key = wm->keys; key; key = key->next) {
-		if (key_pressed(key, wm->dpy, kev->keycode, kev->state))
-			wm_keypress(wm, key);
+		if (key_pressed(key, wm->dpy, kev->keycode, kev->state)) {
+			if (key->action >= 0 && key->action < LASTAction &&
+					key_handler[key->action]) {
+				key_handler[key->action](wm, key);
+			} else {
+				die("unhandled key action (%d), fix this!\n",
+						key->action);
+			}
+		}
 	}
 }
 
@@ -493,43 +518,52 @@ void wm_handler_unmapnotify(struct wm *wm, XEvent *ev)
 	}
 }
 
-void wm_keypress(struct wm *wm, struct key *key)
+void wm_key_handler_kill(struct wm *wm, struct key *key)
 {
-	switch(key->action) {
-		case KillAction:
-			client_kill(wm->selmon->sel, wm->dpy);
-			break;
-		case SetTagAction:
-			if (key->args) {
-				int tag = atoi(key->args);
+	(void)key;
+	client_kill(wm->selmon->sel, wm->dpy);
+}
 
-				if (tag >= MIN_TAG && tag <= MAX_TAG)
-					monitor_set_tag(wm->selmon, wm->dpy,
-							wm->root, tag);
-			}
-			break;
-		case SpawnAction:
-			spawn(key->args);
-			break;
-		case QuitAction:
-			wm_quit(wm, "received exit key command");
-			break;
-		case RestartAction:
-			wm_restart(wm);
-			break;
-		case ToggleBarAction:
-			monitor_toggle_bar(wm->selmon, wm->dpy);
-			break;
-		case ToggleFloatAction:
-			if (wm->selmon->sel)
-				monitor_float_selected(wm->selmon, wm->dpy,
-						!wm->selmon->sel->floating);
-			break;
-		default:
-			die("unhandled key action (%d), fix this!\n",
-					key->action);
-			break;
+void wm_key_handler_quit(struct wm *wm, struct key *key)
+{
+	(void)key;
+	wm_quit(wm, "received exit key command");
+}
+void wm_key_handler_restart(struct wm *wm, struct key *key)
+{
+	(void)key;
+	wm_restart(wm);
+}
+
+void wm_key_handler_settag(struct wm *wm, struct key *key)
+{
+	if (key->args) {
+		int tag = atoi(key->args);
+
+		if (tag >= MIN_TAG && tag <= MAX_TAG)
+			monitor_set_tag(wm->selmon, wm->dpy,
+					wm->root, tag);
 	}
+}
+
+void wm_key_handler_spawn(struct wm *wm, struct key *key)
+{
+	(void)wm;
+	spawn(key->args);
+}
+
+void wm_key_handler_togglebar(struct wm *wm, struct key *key)
+{
+	(void)key;
+	monitor_toggle_bar(wm->selmon, wm->dpy);
+}
+
+void wm_key_handler_togglefloat(struct wm *wm, struct key *key)
+{
+	(void)key;
+	if (wm->selmon->sel)
+		monitor_float_selected(wm->selmon, wm->dpy,
+				!wm->selmon->sel->floating);
 }
 
 void wm_quit(struct wm *wm, const char *reason)
