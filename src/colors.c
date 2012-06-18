@@ -4,7 +4,8 @@ static unsigned long get_color(Display *, int, const char *);
 
 static unsigned long colors[LASTColor];
 
-unsigned long get_color(Display *dpy, int screen, const char *str)
+unsigned long
+get_color(Display *dpy, int screen, const char *str)
 {
 	Colormap cmap = DefaultColormap(dpy, screen);
 	XColor c;
@@ -15,14 +16,16 @@ unsigned long get_color(Display *dpy, int screen, const char *str)
 }
 
 /* get cursor with the given id */
-unsigned long color(ColorID id)
+unsigned long
+color(ColorID id)
 {
 	assert(id < LASTColor);
 	return colors[id];
 }
 
 /* initializes the cursors */
-void colors_init(char *colorstr[LASTColor], Display *dpy, int screen)
+void
+colors_init(char *colorstr[LASTColor], Display *dpy, int screen)
 {
 	int i;
 
@@ -30,7 +33,8 @@ void colors_init(char *colorstr[LASTColor], Display *dpy, int screen)
 		colors[i] = get_color(dpy, screen, colorstr[i]);
 }
 
-int str_to_color_id(const char *str)
+int
+str_to_color_id(const char *str)
 {
 	int i;
 

@@ -11,7 +11,8 @@
 
 static int xerror_dummy(Display *, XErrorEvent *);
 
-struct client *client_create(Window win, XWindowAttributes *wa)
+struct client *
+client_create(Window win, XWindowAttributes *wa)
 {
 	struct client *c = xcalloc(1, sizeof(struct client));
 
@@ -30,7 +31,8 @@ struct client *client_create(Window win, XWindowAttributes *wa)
 	return c;
 }
 
-void client_focus(struct client *c, Display *dpy, Window root)
+void
+client_focus(struct client *c, Display *dpy, Window root)
 {
 	XSetWindowBorder(dpy, c->win, color(WinSelBorder));
 
@@ -41,12 +43,14 @@ void client_focus(struct client *c, Display *dpy, Window root)
 	send_event(dpy, c->win, atom(WMTakeFocus));
 }
 
-void client_free(struct client *c)
+void
+client_free(struct client *c)
 {
 	free(c);
 }
 
-void client_grab_buttons(struct client *c, Display *dpy)
+void
+client_grab_buttons(struct client *c, Display *dpy)
 {
 	XGrabButton(dpy, 1, BUTTON_MOD, c->win, True, ButtonPressMask,
 			GrabModeAsync, GrabModeAsync, None, None);
@@ -54,7 +58,8 @@ void client_grab_buttons(struct client *c, Display *dpy)
 			GrabModeAsync, GrabModeAsync, None, None);
 }
 
-void client_kill(struct client *c, Display *dpy)
+void
+client_kill(struct client *c, Display *dpy)
 {
 	int (*xerror) (Display *, XErrorEvent *);
 
@@ -75,12 +80,14 @@ void client_kill(struct client *c, Display *dpy)
 	}
 }
 
-void client_map_window(struct client *c, Display *dpy)
+void
+client_map_window(struct client *c, Display *dpy)
 {
 	XMapWindow(dpy, c->win);
 }
 
-void client_move_resize(struct client *c, Display *dpy,
+void
+client_move_resize(struct client *c, Display *dpy,
 		int x, int y, int w, int h)
 {
 	XWindowChanges wc;
@@ -99,18 +106,21 @@ void client_move_resize(struct client *c, Display *dpy,
 	XSync(dpy, False);
 }
 
-void client_raise(struct client *c, Display *dpy)
+void
+client_raise(struct client *c, Display *dpy)
 {
 	if (c->floating)
 		XRaiseWindow(dpy, c->win);
 }
 
-void client_select_input(struct client *c, Display *dpy)
+void
+client_select_input(struct client *c, Display *dpy)
 {
 	XSelectInput(dpy, c->win, EVENT_MASK);
 }
 
-void client_set_border(struct client *c, Display *dpy, int bw)
+void
+client_set_border(struct client *c, Display *dpy, int bw)
 {
 	XWindowChanges wc;
 
@@ -121,7 +131,8 @@ void client_set_border(struct client *c, Display *dpy, int bw)
 	XSetWindowBorder(dpy, c->win, color(WinNormBorder));
 }
 
-void client_set_state(struct client *c, Display *dpy, long state)
+void
+client_set_state(struct client *c, Display *dpy, long state)
 {
 	long data[] = { state, None };
 
@@ -130,7 +141,8 @@ void client_set_state(struct client *c, Display *dpy, long state)
 			PropModeReplace, (unsigned char *)data, 2);
 }
 
-void client_setup(struct client *c, struct config *cfg, struct monitor *mon,
+void
+client_setup(struct client *c, struct config *cfg, struct monitor *mon,
 		Display *dpy, Window root, XWindowAttributes *wa)
 {
 	c->mon = mon;
@@ -154,7 +166,8 @@ void client_setup(struct client *c, struct config *cfg, struct monitor *mon,
 	net_client_list_add(dpy, root, c->win);
 }
 
-void client_show(struct client *c, Display *dpy, int show)
+void
+client_show(struct client *c, Display *dpy, int show)
 {
 	if (show)
 		XMoveWindow(dpy, c->win, c->x, c->y);
@@ -162,13 +175,15 @@ void client_show(struct client *c, Display *dpy, int show)
 		XMoveWindow(dpy, c->win, -2 * WIDTH(c), c->y);
 }
 
-void client_unfocus(struct client *c, Display *dpy, Window root)
+void
+client_unfocus(struct client *c, Display *dpy, Window root)
 {
 	XSetWindowBorder(dpy, c->win, color(WinNormBorder));
 	/* TODO */
 }
 
-void client_unmap(struct client *c, Display *dpy)
+void
+client_unmap(struct client *c, Display *dpy)
 {
 	int (*xerror) (Display *, XErrorEvent *);
 	XWindowChanges wc;
@@ -186,7 +201,8 @@ void client_unmap(struct client *c, Display *dpy)
 	XUngrabServer(dpy);
 }
 
-void client_update_title(struct client *c, Display *dpy)
+void
+client_update_title(struct client *c, Display *dpy)
 {
 	if (!(get_text_prop(dpy, c->win, atom(WMName), c->name,
 					CLIENT_NAME_SIZE)))
@@ -194,7 +210,8 @@ void client_update_title(struct client *c, Display *dpy)
 	error("c->name: %s\n", c->name);
 }
 
-int xerror_dummy(Display *dpy, XErrorEvent *ev)
+int
+xerror_dummy(Display *dpy, XErrorEvent *ev)
 {
 	(void)dpy;
 	(void)ev;

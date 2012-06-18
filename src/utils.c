@@ -1,6 +1,7 @@
 #include "utils.h"
 
-void die(const char *fmt, ...)
+void
+die(const char *fmt, ...)
 {
 	va_list val;
 
@@ -11,7 +12,8 @@ void die(const char *fmt, ...)
 	exit(EXIT_FAILURE);
 }
 
-void dbg(const char *file, int line, const char *fmt, ...)
+void
+dbg(const char *file, int line, const char *fmt, ...)
 {
 	va_list val;
 
@@ -21,7 +23,8 @@ void dbg(const char *file, int line, const char *fmt, ...)
 	va_end(val);
 }
 
-void error(const char *fmt, ...)
+void
+error(const char *fmt, ...)
 {
 	va_list val;
 
@@ -31,7 +34,8 @@ void error(const char *fmt, ...)
 	va_end(val);
 }
 
-void spawn(const char *cmd)
+void
+spawn(const char *cmd)
 {
 	if (cmd && fork() == 0) {
 		execlp("/bin/sh", "sh" , "-c", cmd, NULL);
@@ -39,7 +43,8 @@ void spawn(const char *cmd)
 	}
 }
 
-char *strfvs(char **v, char c)
+char *
+strfvs(char **v, char c)
 {
 	char *s = NULL;
 	char *p = NULL;
@@ -64,7 +69,8 @@ char *strfvs(char **v, char c)
 	return s;
 }
 
-void *xcalloc(size_t nmemb, size_t size)
+void *
+xcalloc(size_t nmemb, size_t size)
 {
 	void *data;
 
@@ -73,7 +79,8 @@ void *xcalloc(size_t nmemb, size_t size)
 	return data;
 }
 
-void *xmalloc(size_t size)
+void *
+xmalloc(size_t size)
 {
 	void *data;
 
@@ -82,7 +89,8 @@ void *xmalloc(size_t size)
 	return data;
 }
 
-char *xstrdup(const char *str)
+char *
+xstrdup(const char *str)
 {
 	char *cpy;
 

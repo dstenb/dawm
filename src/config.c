@@ -15,7 +15,8 @@ static const char *default_colors[LASTColor] = {
 	[WinSelBorder] = "#FF0000"
 };
 
-struct config *config_init(void)
+struct config *
+config_init(void)
 {
 	struct config *cfg = xcalloc(1, sizeof(struct config));
 	int i;
@@ -31,7 +32,8 @@ struct config *config_init(void)
 	return cfg;
 }
 
-struct key *parse_bind(const char *path, int line, char *keystr,
+struct key *
+parse_bind(const char *path, int line, char *keystr,
 		char *keyaction, char *args)
 {
 	unsigned int modifier = 0;
@@ -62,7 +64,8 @@ struct key *parse_bind(const char *path, int line, char *keystr,
 	return key_create(modifier, keysym, action, args, NULL);
 }
 
-void parse_color(struct config *cfg, const char *path, int line,
+void
+parse_color(struct config *cfg, const char *path, int line,
 		char *cid, char *cvalue)
 {
 	if (!cid)
@@ -77,7 +80,8 @@ void parse_color(struct config *cfg, const char *path, int line,
 	replace_str(&cfg->colors[str_to_color_id(cid)], xstrdup(cvalue));
 }
 
-int config_load(struct config *cfg, const char *path)
+int
+config_load(struct config *cfg, const char *path)
 {
 	FILE *fp;
 	char buf[4096];
@@ -119,7 +123,8 @@ int config_load(struct config *cfg, const char *path)
 	return 0;
 }
 
-char *config_default_path(void)
+char *
+config_default_path(void)
 {
 	char buf[PATH_MAX + 1];
 
@@ -128,7 +133,8 @@ char *config_default_path(void)
 	return xstrdup(buf);
 }
 
-void config_free(struct config *cfg)
+void
+config_free(struct config *cfg)
 {
 	int i;
 
@@ -139,14 +145,16 @@ void config_free(struct config *cfg)
 	free(cfg);
 }
 
-void replace_str(char **p, char *new)
+void
+replace_str(char **p, char *new)
 {
 	if (*p)
 		free(*p);
 	*p = new;
 }
 
-int valid_color_value(const char *str)
+int
+valid_color_value(const char *str)
 {
 	/* TODO */
 	(void)str;

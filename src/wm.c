@@ -73,14 +73,16 @@ static void (*key_handler[LASTAction]) (struct wm *, struct key *) = {
 	[ToggleFloatAction] = wm_key_handler_togglefloat
 };
 
-static void dbg_print(struct wm *wm, const char *str)
+static void
+dbg_print(struct wm *wm, const char *str)
 {
 	DBG(":::: dbg_print(%s)\n", str);
 
 	monitor_dbg_print(wm->selmon, "");
 }
 
-void wm_checkotherwm(struct wm *wm)
+void
+wm_checkotherwm(struct wm *wm)
 {
 	xerrxlib = XSetErrorHandler(wm_xerror_checkotherwm);
 	/* this causes an error if some other window manager is running */
@@ -90,7 +92,8 @@ void wm_checkotherwm(struct wm *wm)
 	XSync(wm->dpy, False);
 }
 
-void wm_create_client(struct wm *wm, Window win, XWindowAttributes *attr)
+void
+wm_create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 {
 	struct client *c = client_create(win, attr);
 
@@ -109,7 +112,8 @@ void wm_create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 }
 
 /* TODO: fix Xinerama */
-void wm_create_monitors(struct wm *wm)
+void
+wm_create_monitors(struct wm *wm)
 {
 	/* TODO: test code, to be removed */
 
@@ -121,7 +125,8 @@ void wm_create_monitors(struct wm *wm)
 	wm->selmon = wm->mons;
 }
 
-int wm_destroy(struct wm *wm)
+int
+wm_destroy(struct wm *wm)
 {
 	/* TODO */
 
@@ -134,7 +139,8 @@ int wm_destroy(struct wm *wm)
 	return 0;
 }
 
-int wm_eventloop(struct wm *wm)
+int
+wm_eventloop(struct wm *wm)
 {
 	XEvent ev;
 
@@ -146,7 +152,8 @@ int wm_eventloop(struct wm *wm)
 	return 0;
 }
 
-struct wm *wm_init(struct config *cfg, const char *cmd)
+struct wm *
+wm_init(struct config *cfg, const char *cmd)
 {
 	XSetWindowAttributes attr;
 	struct wm *wm;
@@ -200,7 +207,8 @@ struct wm *wm_init(struct config *cfg, const char *cmd)
 	return wm;
 }
 
-void wm_get_windows(struct wm *wm)
+void
+wm_get_windows(struct wm *wm)
 {
 	XWindowAttributes attr;
 	Window d1, d2;
@@ -222,7 +230,8 @@ void wm_get_windows(struct wm *wm)
 	}
 }
 
-void wm_handler_buttonpress(struct wm *wm, XEvent *ev)
+void
+wm_handler_buttonpress(struct wm *wm, XEvent *ev)
 {
 	XButtonPressedEvent *bpev = &ev->xbutton;
 	struct client *c;
@@ -247,7 +256,8 @@ void wm_handler_buttonpress(struct wm *wm, XEvent *ev)
 		wm->motion.type = ResizeMotion;
 }
 
-void wm_handler_buttonrelease(struct wm *wm, XEvent *ev)
+void
+wm_handler_buttonrelease(struct wm *wm, XEvent *ev)
 {
 	(void)ev;
 
@@ -257,7 +267,8 @@ void wm_handler_buttonrelease(struct wm *wm, XEvent *ev)
 	XUngrabPointer(wm->dpy, CurrentTime);
 }
 
-void wm_handler_clientmessage(struct wm *wm, XEvent *ev)
+void
+wm_handler_clientmessage(struct wm *wm, XEvent *ev)
 {
 	XClientMessageEvent *cmev = &ev->xclient;
 
@@ -288,7 +299,8 @@ void wm_handler_clientmessage(struct wm *wm, XEvent *ev)
 	}
 }
 
-void wm_handler_configurerequest(struct wm *wm, XEvent *ev)
+void
+wm_handler_configurerequest(struct wm *wm, XEvent *ev)
 {
 	XConfigureRequestEvent *crev = &ev->xconfigurerequest;
 	struct client *c;
@@ -312,14 +324,16 @@ void wm_handler_configurerequest(struct wm *wm, XEvent *ev)
 	XSync(wm->dpy, False);
 }
 
-void wm_handler_configurenotify(struct wm *wm, XEvent *ev)
+void
+wm_handler_configurenotify(struct wm *wm, XEvent *ev)
 {
 	(void)wm;
 	(void)ev;
 	dbg_print(wm, __func__);
 }
 
-void wm_handler_destroynotify(struct wm *wm, XEvent *ev)
+void
+wm_handler_destroynotify(struct wm *wm, XEvent *ev)
 {
 	struct client *c;
 	Window win;
@@ -331,7 +345,8 @@ void wm_handler_destroynotify(struct wm *wm, XEvent *ev)
 		wm_remove_client(wm, c, 1);
 }
 
-void wm_handler_enternotify(struct wm *wm, XEvent *ev)
+void
+wm_handler_enternotify(struct wm *wm, XEvent *ev)
 {
 	XCrossingEvent *cev = &ev->xcrossing;
 	struct client *c;
@@ -344,14 +359,16 @@ void wm_handler_enternotify(struct wm *wm, XEvent *ev)
 	monitor_focus(c->mon, c, wm->dpy, wm->root);
 }
 
-void wm_handler_expose(struct wm *wm, XEvent *ev)
+void
+wm_handler_expose(struct wm *wm, XEvent *ev)
 {
 	(void)wm;
 	(void)ev;
 	dbg_print(wm, __func__);
 }
 
-void wm_handler_focusin(struct wm *wm, XEvent *ev)
+void
+wm_handler_focusin(struct wm *wm, XEvent *ev)
 {
 	XFocusChangeEvent *fcev = &ev->xfocus;
 
@@ -362,7 +379,8 @@ void wm_handler_focusin(struct wm *wm, XEvent *ev)
 		monitor_focus(wm->selmon, wm->selmon->sel, wm->dpy, wm->root);
 }
 
-void wm_handler_keypress(struct wm *wm, XEvent *ev)
+void
+wm_handler_keypress(struct wm *wm, XEvent *ev)
 {
 	XKeyEvent *kev;
 	struct key *key;
@@ -383,14 +401,16 @@ void wm_handler_keypress(struct wm *wm, XEvent *ev)
 	}
 }
 
-void wm_handler_mappingnotify(struct wm *wm, XEvent *ev)
+void
+wm_handler_mappingnotify(struct wm *wm, XEvent *ev)
 {
 	(void)wm;
 	(void)ev;
 	dbg_print(wm, __func__);
 }
 
-void wm_handler_maprequest(struct wm *wm, XEvent *ev)
+void
+wm_handler_maprequest(struct wm *wm, XEvent *ev)
 {
 	static XWindowAttributes attr;
 	XMapRequestEvent *mrev = &ev->xmaprequest;
@@ -404,7 +424,8 @@ void wm_handler_maprequest(struct wm *wm, XEvent *ev)
 		wm_create_client(wm, mrev->window, &attr);
 }
 
-void wm_handler_motionnotify(struct wm *wm, XEvent *ev)
+void
+wm_handler_motionnotify(struct wm *wm, XEvent *ev)
 {
 	XMotionEvent *mev = &ev->xmotion;
 	struct client *c;
@@ -451,7 +472,8 @@ void wm_handler_motionnotify(struct wm *wm, XEvent *ev)
 	}
 }
 
-void wm_handler_propertynotify(struct wm *wm, XEvent *ev)
+void
+wm_handler_propertynotify(struct wm *wm, XEvent *ev)
 {
 	XPropertyEvent *pev = &ev->xproperty;
 
@@ -464,7 +486,8 @@ void wm_handler_propertynotify(struct wm *wm, XEvent *ev)
 
 }
 
-void wm_handler_propertynotify_client(struct wm *wm, XPropertyEvent *ev)
+void
+wm_handler_propertynotify_client(struct wm *wm, XPropertyEvent *ev)
 {
 	struct client *c;
 
@@ -489,7 +512,8 @@ void wm_handler_propertynotify_client(struct wm *wm, XPropertyEvent *ev)
 	}
 }
 
-void wm_handler_propertynotify_root(struct wm *wm, XPropertyEvent *ev)
+void
+wm_handler_propertynotify_root(struct wm *wm, XPropertyEvent *ev)
 {
 	(void)wm;
 
@@ -503,7 +527,8 @@ void wm_handler_propertynotify_root(struct wm *wm, XPropertyEvent *ev)
 	}
 }
 
-void wm_handler_unmapnotify(struct wm *wm, XEvent *ev)
+void
+wm_handler_unmapnotify(struct wm *wm, XEvent *ev)
 {
 	struct client *c;
 	XUnmapEvent *uev = &ev->xunmap;
@@ -518,24 +543,28 @@ void wm_handler_unmapnotify(struct wm *wm, XEvent *ev)
 	}
 }
 
-void wm_key_handler_kill(struct wm *wm, struct key *key)
+void
+wm_key_handler_kill(struct wm *wm, struct key *key)
 {
 	(void)key;
 	client_kill(wm->selmon->sel, wm->dpy);
 }
 
-void wm_key_handler_quit(struct wm *wm, struct key *key)
+void
+wm_key_handler_quit(struct wm *wm, struct key *key)
 {
 	(void)key;
 	wm_quit(wm, "received exit key command");
 }
-void wm_key_handler_restart(struct wm *wm, struct key *key)
+void
+wm_key_handler_restart(struct wm *wm, struct key *key)
 {
 	(void)key;
 	wm_restart(wm);
 }
 
-void wm_key_handler_settag(struct wm *wm, struct key *key)
+void
+wm_key_handler_settag(struct wm *wm, struct key *key)
 {
 	if (key->args) {
 		int tag = atoi(key->args);
@@ -546,19 +575,22 @@ void wm_key_handler_settag(struct wm *wm, struct key *key)
 	}
 }
 
-void wm_key_handler_spawn(struct wm *wm, struct key *key)
+void
+wm_key_handler_spawn(struct wm *wm, struct key *key)
 {
 	(void)wm;
 	spawn(key->args);
 }
 
-void wm_key_handler_togglebar(struct wm *wm, struct key *key)
+void
+wm_key_handler_togglebar(struct wm *wm, struct key *key)
 {
 	(void)key;
 	monitor_toggle_bar(wm->selmon, wm->dpy);
 }
 
-void wm_key_handler_togglefloat(struct wm *wm, struct key *key)
+void
+wm_key_handler_togglefloat(struct wm *wm, struct key *key)
 {
 	(void)key;
 	if (wm->selmon->sel)
@@ -566,7 +598,8 @@ void wm_key_handler_togglefloat(struct wm *wm, struct key *key)
 				!wm->selmon->sel->floating);
 }
 
-void wm_quit(struct wm *wm, const char *reason)
+void
+wm_quit(struct wm *wm, const char *reason)
 {
 	wm_destroy(wm);
 	if (reason)
@@ -574,7 +607,8 @@ void wm_quit(struct wm *wm, const char *reason)
 	die("quitting\n");
 }
 
-void wm_remove_client(struct wm *wm, struct client *c, int destroyed)
+void
+wm_remove_client(struct wm *wm, struct client *c, int destroyed)
 {
 	struct monitor *mon = c->mon;
 
@@ -591,14 +625,16 @@ void wm_remove_client(struct wm *wm, struct client *c, int destroyed)
 	wm_update_net_client_list(wm);
 }
 
-void wm_restart(struct wm *wm)
+void
+wm_restart(struct wm *wm)
 {
 	DBG("%s. restarting!\n", __func__);
 	if (wm->cmd)
 		execlp("/bin/sh", "sh" , "-c", wm->cmd, NULL);
 }
 
-void wm_update_net_client_list(struct wm *wm)
+void
+wm_update_net_client_list(struct wm *wm)
 {
 	struct monitor *mon;
 	struct client *c;
@@ -610,7 +646,8 @@ void wm_update_net_client_list(struct wm *wm)
 			net_client_list_add(wm->dpy, wm->root, c->win);
 }
 
-int wm_xerror(Display *dpy, XErrorEvent *ee)
+int
+wm_xerror(Display *dpy, XErrorEvent *ee)
 {
 	error("fatal error: request code=%d, error code=%d\n",
 			ee->request_code, ee->error_code);
@@ -618,7 +655,8 @@ int wm_xerror(Display *dpy, XErrorEvent *ee)
 	return xerrxlib(dpy, ee); /* may call exit */
 }
 
-int wm_xerror_checkotherwm(Display *dpy, XErrorEvent *ee)
+int
+wm_xerror_checkotherwm(Display *dpy, XErrorEvent *ee)
 {
 	(void)dpy;
 	(void)ee;

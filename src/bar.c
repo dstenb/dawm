@@ -9,7 +9,8 @@ static struct {
 
 static int initialized = 0;
 
-struct bar *bar_create(int topbar, int showbar, int x, int y, int w, int h,
+struct bar *
+bar_create(int topbar, int showbar, int x, int y, int w, int h,
 		Display *dpy, Window root, int screen)
 {
 	struct bar *bar;
@@ -43,7 +44,8 @@ struct bar *bar_create(int topbar, int showbar, int x, int y, int w, int h,
 	return bar;
 }
 
-void bar_draw(struct bar *bar, Display *dpy)
+void
+bar_draw(struct bar *bar, Display *dpy)
 {
 	XSetForeground(dpy, dc.gc, color(BarNormBG));
 	XFillRectangle(dpy, dc.drawable, dc.gc, 0, 0, bar->w, bar->h);
@@ -51,7 +53,8 @@ void bar_draw(struct bar *bar, Display *dpy)
 	XSync(dpy, False);
 }
 
-void bars_init_dc(Display *dpy, Window root, int screen, int h)
+void
+bars_init_dc(Display *dpy, Window root, int screen, int h)
 {
 	if (!initialized) {
 		dc.drawable = XCreatePixmap(dpy, root,

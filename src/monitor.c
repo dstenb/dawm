@@ -3,20 +3,23 @@
 static void monitor_show_hide(struct monitor *, Display *);
 static void monitor_update_window_size(struct monitor *);
 
-static void add_to_clients(struct monitor *mon, struct client *c)
+static void
+add_to_clients(struct monitor *mon, struct client *c)
 {
 	c->mon = mon;
 	c->next = mon->clients;
 	mon->clients = c;
 }
 
-static void add_to_stack(struct monitor *mon, struct client *c)
+static void
+add_to_stack(struct monitor *mon, struct client *c)
 {
 	c->snext = mon->cstack;
 	mon->cstack = c;
 }
 
-static void remove_from_clients(struct monitor *mon, struct client *c)
+static void
+remove_from_clients(struct monitor *mon, struct client *c)
 {
 	struct client *trav;
 
@@ -29,7 +32,8 @@ static void remove_from_clients(struct monitor *mon, struct client *c)
 	}
 }
 
-static void remove_from_stack(struct monitor *mon, struct client *c)
+static void
+remove_from_stack(struct monitor *mon, struct client *c)
 {
 	struct client *trav;
 
@@ -42,7 +46,8 @@ static void remove_from_stack(struct monitor *mon, struct client *c)
 	}
 }
 
-static void show_hide(struct client *c, Display *dpy)
+static void
+show_hide(struct client *c, Display *dpy)
 {
 	if (c) {
 		if (ISVISIBLE(c)) {
@@ -55,13 +60,15 @@ static void show_hide(struct client *c, Display *dpy)
 	}
 }
 
-void monitor_add_client(struct monitor *mon, struct client *c)
+void
+monitor_add_client(struct monitor *mon, struct client *c)
 {
 	add_to_clients(mon, c);
 	add_to_stack(mon, c);
 }
 
-struct monitor *monitor_append(struct monitor *mons, struct monitor *new)
+struct monitor *
+monitor_append(struct monitor *mons, struct monitor *new)
 {
 	struct monitor *trav;
 
@@ -75,7 +82,8 @@ struct monitor *monitor_append(struct monitor *mons, struct monitor *new)
 }
 
 /* TODO: move all tiling code */
-static struct client *next_tiled(struct client *c)
+static struct client *
+next_tiled(struct client *c)
 {
 	for ( ; c && (c->floating || !ISVISIBLE(c)); c = c->next) ;
 	return c;
@@ -84,7 +92,8 @@ static struct client *next_tiled(struct client *c)
 #define N_MASTER 2
 #define M_FACT 0.55
 
-void monitor_arrange(struct monitor *mon, Display *dpy)
+void
+monitor_arrange(struct monitor *mon, Display *dpy)
 {
 	struct client *c;
 	unsigned int i, n, h, mw, my, ty;
@@ -118,7 +127,8 @@ void monitor_arrange(struct monitor *mon, Display *dpy)
 	}
 }
 
-struct monitor *monitor_create(struct config *cfg, int x, int y, int w, int h,
+struct monitor *
+monitor_create(struct config *cfg, int x, int y, int w, int h,
 		Display *dpy, Window root, int screen)
 {
 	struct monitor *mon = xcalloc(1, sizeof(struct monitor));
@@ -143,7 +153,8 @@ struct monitor *monitor_create(struct config *cfg, int x, int y, int w, int h,
 	return mon;
 }
 
-void monitor_dbg_print(struct monitor *m, const char *str)
+void
+monitor_dbg_print(struct monitor *m, const char *str)
 {
 	struct client *c;
 	DBG("monitor_dbg_print (%s)\n", str);
@@ -159,7 +170,8 @@ void monitor_dbg_print(struct monitor *m, const char *str)
 	DBG("\n");
 }
 
-void monitor_float_selected(struct monitor *mon, Display *dpy, int f)
+void
+monitor_float_selected(struct monitor *mon, Display *dpy, int f)
 {
 	int was_floating;
 
@@ -175,7 +187,8 @@ void monitor_float_selected(struct monitor *mon, Display *dpy, int f)
 	}
 }
 
-void monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
+void
+monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
 		Window root)
 {
 	DBG("%s(%p, %p)\n", __func__, (void *)mon, (void *)c);
@@ -200,18 +213,21 @@ void monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
 	bar_draw(mon->bar, dpy);
 }
 
-void monitor_remove_client(struct monitor *mon, struct client *c)
+void
+monitor_remove_client(struct monitor *mon, struct client *c)
 {
 	remove_from_clients(mon, c);
 	remove_from_stack(mon, c);
 }
 
-void monitor_select_client(struct monitor *mon, struct client *c)
+void
+monitor_select_client(struct monitor *mon, struct client *c)
 {
 	mon->sel = c;
 }
 
-void monitor_set_tag(struct monitor *mon, Display *dpy, Window root, int tag)
+void
+monitor_set_tag(struct monitor *mon, Display *dpy, Window root, int tag)
 {
 	assert(tag >= MIN_TAG && tag <= MAX_TAG);
 
@@ -221,7 +237,8 @@ void monitor_set_tag(struct monitor *mon, Display *dpy, Window root, int tag)
 	monitor_focus(mon, NULL, dpy, root);
 }
 
-void monitor_show_bar(struct monitor *mon, Display *dpy, int show)
+void
+monitor_show_bar(struct monitor *mon, Display *dpy, int show)
 {
 	mon->bar->showbar = show ? 1 : 0;
 	monitor_update_window_size(mon);
@@ -231,12 +248,14 @@ void monitor_show_bar(struct monitor *mon, Display *dpy, int show)
 	bar_draw(mon->bar, dpy);
 }
 
-void monitor_toggle_bar(struct monitor *mon, Display *dpy)
+void
+monitor_toggle_bar(struct monitor *mon, Display *dpy)
 {
 	monitor_show_bar(mon, dpy, !mon->bar->showbar);
 }
 
-void monitor_unfocus_selected(struct monitor *mon, Display *dpy, Window root)
+void
+monitor_unfocus_selected(struct monitor *mon, Display *dpy, Window root)
 {
 	DBG("%s(%p, %p)\n", __func__, (void *)mon, (void *)mon->sel);
 
@@ -244,7 +263,8 @@ void monitor_unfocus_selected(struct monitor *mon, Display *dpy, Window root)
 		client_unfocus(mon->sel, dpy, root);
 }
 
-void monitor_update_window_size(struct monitor *mon)
+void
+monitor_update_window_size(struct monitor *mon)
 {
 	mon->wy = mon->my;
 	mon->wh = mon->mh;
@@ -258,7 +278,8 @@ void monitor_update_window_size(struct monitor *mon)
 	}
 }
 
-struct client *find_client_by_window(struct monitor *mon, Window win)
+struct client *
+find_client_by_window(struct monitor *mon, Window win)
 {
 	struct client *c;
 
@@ -273,14 +294,16 @@ struct client *find_client_by_window(struct monitor *mon, Window win)
 	return NULL;
 }
 
-struct monitor *find_monitor_by_pos(struct monitor *mon, int x, int y)
+struct monitor *
+find_monitor_by_pos(struct monitor *mon, int x, int y)
 {
 	for ( ; mon && !INSIDE(x, y, mon->mx, mon->my, mon->mw, mon->mh);
 			mon = mon->next) ;
 	return mon;
 }
 
-void monitor_show_hide(struct monitor *mon, Display *dpy)
+void
+monitor_show_hide(struct monitor *mon, Display *dpy)
 {
 	show_hide(mon->cstack, dpy);
 }

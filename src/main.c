@@ -12,7 +12,8 @@ static void usage(const char *);
 static void version(void);
 
 /* prints an usage message */
-void usage(const char *cmd)
+void
+usage(const char *cmd)
 {
 	version();
 	printf("\nUsage: %s [OPTION]...\n\n", cmd);
@@ -23,12 +24,14 @@ void usage(const char *cmd)
 }
 
 /* prints a version message */
-void version(void)
+void
+version(void)
 {
 	printf("%s: %s\n", WMNAME, VERSION);
 }
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
 	struct config *cfg;
 	struct wm *wm;

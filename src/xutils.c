@@ -1,6 +1,8 @@
 #include "xutils.h"
 
-int get_text_prop(Display *dpy, Window win, Atom prop, char *str, unsigned int size)
+int
+get_text_prop(Display *dpy, Window win, Atom prop, char *str,
+		unsigned int size)
 {
 	char **list = NULL;
 	int n;
@@ -27,7 +29,8 @@ int get_text_prop(Display *dpy, Window win, Atom prop, char *str, unsigned int s
 
 }
 
-int send_event(Display *dpy, Window win, Atom proto)
+int
+send_event(Display *dpy, Window win, Atom proto)
 {
 	XEvent ev;
 
@@ -47,7 +50,8 @@ int send_event(Display *dpy, Window win, Atom proto)
 	}
 }
 
-void set_text_prop(Display *dpy, Window win, Atom prop, char *str)
+void
+set_text_prop(Display *dpy, Window win, Atom prop, char *str)
 {
 	XChangeProperty(dpy, win, prop, XA_STRING, 8, PropModeReplace,
 			(unsigned char *)str, strlen(str));

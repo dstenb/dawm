@@ -34,7 +34,8 @@ static char *action_str[LASTAction] = {
 
 static unsigned int num_lock = 0;
 
-KeyAction key_action_from_str(const char *str)
+KeyAction
+key_action_from_str(const char *str)
 {
 	int i;
 
@@ -46,7 +47,8 @@ KeyAction key_action_from_str(const char *str)
 	return InvalidAction;
 }
 
-struct key *key_append(struct key *klist, struct key *new)
+struct key *
+key_append(struct key *klist, struct key *new)
 {
 	struct key *trav;
 
@@ -59,12 +61,14 @@ struct key *key_append(struct key *klist, struct key *new)
 	}
 }
 
-struct key *key_copy(struct key *key)
+struct key *
+key_copy(struct key *key)
 {
 	return key_create(key->mod, key->keysym, key->action, key->args, NULL);
 }
 
-struct key *key_create(unsigned int mod, KeySym keysym, KeyAction action,
+struct key *
+key_create(unsigned int mod, KeySym keysym, KeyAction action,
 		char *args, struct key *next)
 {
 	struct key *key = xmalloc(sizeof(struct key));
@@ -78,7 +82,8 @@ struct key *key_create(unsigned int mod, KeySym keysym, KeyAction action,
 	return key;
 }
 
-struct key *key_default_keys(void)
+struct key *
+key_default_keys(void)
 {
 	struct key *tmp, *head = NULL;
 	int i;
@@ -92,7 +97,8 @@ struct key *key_default_keys(void)
 	return head;
 }
 
-struct key *key_free_all(struct key *key)
+struct key *
+key_free_all(struct key *key)
 {
 	struct key *tmp;
 
@@ -106,7 +112,8 @@ struct key *key_free_all(struct key *key)
 	return NULL;
 }
 
-void key_grab_all(struct key *key, Display *dpy, Window root)
+void
+key_grab_all(struct key *key, Display *dpy, Window root)
 {
 	int i;
 	unsigned int mod[] = { 0, LockMask, num_lock, num_lock | LockMask };
@@ -120,14 +127,15 @@ void key_grab_all(struct key *key, Display *dpy, Window root)
 	}
 }
 
-int key_pressed(struct key *key, Display *dpy, KeyCode code,
-		unsigned int state)
+int
+key_pressed(struct key *key, Display *dpy, KeyCode code, unsigned int state)
 {
 	return ((XKeysymToKeycode(dpy, key->keysym) == code) &&
 			CLEANMASK(state) == key->mod);
 }
 
-int str_to_modifier(const char *str)
+int
+str_to_modifier(const char *str)
 {
 	if (strcasecmp(str, "alt") == 0)
 		return MOD_ALT;
@@ -140,7 +148,8 @@ int str_to_modifier(const char *str)
 	return -1;
 }
 
-void update_num_lock(Display *dpy)
+void
+update_num_lock(Display *dpy)
 {
 	unsigned int i, j;
 	XModifierKeymap *modmap;
