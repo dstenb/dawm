@@ -11,15 +11,15 @@ static struct key default_keys[] = {
 	{ MOD_SUPER,       XK_b,      ToggleBarAction,   NULL,   NULL },
 	{ MOD_SUPER,       XK_t,      ToggleFloatAction, NULL, NULL },
 
-	{ MOD_SUPER,       XK_1,      SetTagAction,      "1",     NULL },
-	{ MOD_SUPER,       XK_2,      SetTagAction,      "2",     NULL },
-	{ MOD_SUPER,       XK_3,      SetTagAction,      "3",     NULL },
-	{ MOD_SUPER,       XK_4,      SetTagAction,      "4",     NULL },
-	{ MOD_SUPER,       XK_5,      SetTagAction,      "5",     NULL },
-	{ MOD_SUPER,       XK_6,      SetTagAction,      "6",     NULL },
-	{ MOD_SUPER,       XK_7,      SetTagAction,      "7",     NULL },
-	{ MOD_SUPER,       XK_8,      SetTagAction,      "8",     NULL },
-	{ MOD_SUPER,       XK_9,      SetTagAction,      "9",     NULL }
+	{ MOD_SUPER,       XK_1,      SetTagAction,      "0",     NULL },
+	{ MOD_SUPER,       XK_2,      SetTagAction,      "1",     NULL },
+	{ MOD_SUPER,       XK_3,      SetTagAction,      "2",     NULL },
+	{ MOD_SUPER,       XK_4,      SetTagAction,      "3",     NULL },
+	{ MOD_SUPER,       XK_5,      SetTagAction,      "4",     NULL },
+	{ MOD_SUPER,       XK_6,      SetTagAction,      "5",     NULL },
+	{ MOD_SUPER,       XK_7,      SetTagAction,      "6",     NULL },
+	{ MOD_SUPER,       XK_8,      SetTagAction,      "7",     NULL },
+	{ MOD_SUPER,       XK_9,      SetTagAction,      "8",     NULL }
 };
 
 /* strings corresponding to KeyAction values */
