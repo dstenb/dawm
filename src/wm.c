@@ -39,6 +39,7 @@ static void wm_handler_unmapnotify(struct wm *, XEvent *);
 static void wm_key_handler_kill(struct wm *, struct key *);
 static void wm_key_handler_quit(struct wm *, struct key *);
 static void wm_key_handler_restart(struct wm *, struct key *);
+static void wm_key_handler_setlayout(struct wm *, struct key *);
 static void wm_key_handler_settag(struct wm *, struct key *);
 static void wm_key_handler_spawn(struct wm *, struct key *);
 static void wm_key_handler_togglebar(struct wm *, struct key *);
@@ -67,6 +68,7 @@ static void (*key_handler[LASTAction]) (struct wm *, struct key *) = {
 	[KillAction] = wm_key_handler_kill,
 	[QuitAction] = wm_key_handler_quit,
 	[RestartAction] = wm_key_handler_restart,
+	[SetLayoutAction] = wm_key_handler_setlayout,
 	[SetTagAction] = wm_key_handler_settag,
 	[SpawnAction] = wm_key_handler_spawn,
 	[ToggleBarAction] = wm_key_handler_togglebar,
@@ -561,6 +563,30 @@ wm_key_handler_restart(struct wm *wm, struct key *key)
 {
 	(void)key;
 	wm_restart(wm);
+}
+
+void
+wm_key_handler_setlayout(struct wm *wm, struct key *key)
+{
+	int layout = wm->selmon->tags[wm->selmon->seltag].layout;
+
+	if (key->args) {
+		if (STREQ(key->args, "horz")) {
+			layout = TileHorzLayout;
+		} else if (STREQ(key->args, "vert")) {
+			layout = TileVertLayout;
+		} else if (STREQ(key->args, "matrix")) {
+			layout = MatrixLayout;
+		} else if (STREQ(key->args, "float")) {
+			layout = FloatingLayout;
+		} else if (STREQ(key->args, "prev")) {
+			layout = (layout > 0) ? layout - 1 : LASTLayout - 1;
+		} else if (STREQ(key->args, "next")) {
+			layout = (layout < LASTLayout - 1) ? layout + 1 : 0;
+		}
+	}
+
+	monitor_set_layout(wm->selmon, wm->dpy, layout);
 }
 
 void

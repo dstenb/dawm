@@ -19,7 +19,14 @@ static struct key default_keys[] = {
 	{ MOD_SUPER,       XK_6,      SetTagAction,      "5",     NULL },
 	{ MOD_SUPER,       XK_7,      SetTagAction,      "6",     NULL },
 	{ MOD_SUPER,       XK_8,      SetTagAction,      "7",     NULL },
-	{ MOD_SUPER,       XK_9,      SetTagAction,      "8",     NULL }
+	{ MOD_SUPER,       XK_9,      SetTagAction,      "8",     NULL },
+
+	{ MOD_SUPER,       XK_h,      SetLayoutAction,   "horz",   NULL },
+	{ MOD_SUPER,       XK_v,      SetLayoutAction,   "vert",   NULL },
+	{ MOD_SUPER,       XK_m,      SetLayoutAction,   "matrix", NULL },
+	{ MOD_SUPER,       XK_n,      SetLayoutAction,   "float",  NULL },
+	{ MOD_SUPER,       XK_space,  SetLayoutAction,   "next",   NULL },
+	{ MOD_SHIFT_SUPER, XK_space,  SetLayoutAction,   "prev",   NULL }
 };
 
 /* strings corresponding to KeyAction values */

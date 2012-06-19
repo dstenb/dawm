@@ -266,6 +266,15 @@ monitor_select_client(struct monitor *mon, struct client *c)
 }
 
 void
+monitor_set_layout(struct monitor *mon, Display *dpy, int layout)
+{
+	assert(layout >= 0 && layout < LASTLayout);
+
+	mon->tags[mon->seltag].layout = layout;
+	monitor_arrange(mon, dpy);
+}
+
+void
 monitor_set_tag(struct monitor *mon, Display *dpy, Window root, int tag)
 {
 	assert(tag >= MIN_TAG && tag <= MAX_TAG);
