@@ -8,6 +8,20 @@
 #include "client.h"
 #include "config.h"
 
+#define ISARRANGED(M) ((M)->tag[(M)->seltag].layout != FloatingLayout)
+
+#define TAG_NAME_LEN 32
+
+typedef enum {
+	TileHorzLayout,
+	TileVertLayout,
+	MatrixLayout,
+	FloatingLayout,
+	LASTLayout
+} LayoutID;
+
+#define DEFAULT_LAYOUT TileHorzLayout
+
 struct monitor {
 	struct bar *bar;
 
@@ -19,6 +33,11 @@ struct monitor {
 	struct client *sel;
 
 	int seltag;
+
+	struct {
+		char name[TAG_NAME_LEN];
+		LayoutID layout;
+	} tags[N_TAGS];
 
 	struct monitor *next;
 };

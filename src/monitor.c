@@ -93,7 +93,7 @@ next_tiled(struct client *c)
 #define M_FACT 0.55
 
 void
-monitor_arrange(struct monitor *mon, Display *dpy)
+arrange_tilehorz(struct monitor *mon, Display *dpy)
 {
 	struct client *c;
 	unsigned int i, n, h, mw, my, ty;
@@ -127,11 +127,45 @@ monitor_arrange(struct monitor *mon, Display *dpy)
 	}
 }
 
+void
+arrange_tilevert(struct monitor *mon, Display *dpy)
+{
+
+}
+
+void
+arrange_matrix(struct monitor *mon, Display *dpy)
+{
+
+}
+
+void
+monitor_arrange(struct monitor *mon, Display *dpy)
+{
+	switch(mon->tags[mon->seltag].layout) {
+		case TileHorzLayout:
+			arrange_tilehorz(mon, dpy);
+			break;
+		case TileVertLayout:
+			arrange_tilevert(mon, dpy);
+			break;
+		case MatrixLayout:
+			arrange_matrix(mon, dpy);
+			break;
+		case FloatingLayout:
+			/* Don't arrange */
+			break;
+		default:
+			break;
+	}
+}
+
 struct monitor *
 monitor_create(struct config *cfg, int x, int y, int w, int h,
 		Display *dpy, Window root, int screen)
 {
 	struct monitor *mon = xcalloc(1, sizeof(struct monitor));
+	int i;
 
 	mon->bar = bar_create(cfg->topbar, cfg->showbar, x, y, w, 20,
 			dpy, root, screen);
@@ -147,6 +181,11 @@ monitor_create(struct config *cfg, int x, int y, int w, int h,
 	mon->mh = mon->wh = h;
 
 	mon->seltag = MIN_TAG;
+
+	for (i = 0; i < N_TAGS; i++) {
+		snprintf(mon->tags[i].name, TAG_NAME_LEN, "%i", (i + 1));
+		mon->tags[i].layout = DEFAULT_LAYOUT;
+	}
 
 	monitor_show_bar(mon, dpy, mon->bar->showbar);
 
