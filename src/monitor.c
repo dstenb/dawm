@@ -257,6 +257,9 @@ monitor_remove_client(struct monitor *mon, struct client *c)
 {
 	remove_from_clients(mon, c);
 	remove_from_stack(mon, c);
+
+	if (c == mon->sel)
+		mon->sel = mon->clients;
 }
 
 void
@@ -277,12 +280,11 @@ monitor_set_layout(struct monitor *mon, Display *dpy, int layout)
 void
 monitor_set_tag(struct monitor *mon, Display *dpy, Window root, int tag)
 {
-	assert(tag >= MIN_TAG && tag <= MAX_TAG);
+	assert(VALID_TAG(tag));
 
 	mon->seltag = tag;
-	monitor_show_hide(mon, dpy);
-	monitor_arrange(mon, dpy);
-	monitor_focus(mon, NULL, dpy, root);
+
+	monitor_update(mon, dpy, root);
 }
 
 void
@@ -354,4 +356,12 @@ void
 monitor_show_hide(struct monitor *mon, Display *dpy)
 {
 	show_hide(mon->cstack, dpy);
+}
+
+void
+monitor_update(struct monitor *mon, Display *dpy, Window root)
+{
+	monitor_show_hide(mon, dpy);
+	monitor_arrange(mon, dpy);
+	monitor_focus(mon, NULL, dpy, root);
 }

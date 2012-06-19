@@ -85,6 +85,9 @@ void monitor_toggle_bar(struct monitor *, Display *);
 /* removes focus from the currently selected client */
 void monitor_unfocus_selected(struct monitor *, Display *, Window);
 
+/* show/hide windows, arrange and focus on first available window */
+void monitor_update(struct monitor *, Display *, Window);
+
 /* searches through all the monitors for the client
  * corresponding to the given window */
 struct client *find_client_by_window(struct monitor *, Window);

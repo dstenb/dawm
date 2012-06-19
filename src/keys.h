@@ -21,6 +21,7 @@
 
 typedef enum {
 	KillAction,
+	MoveWindowAction,
 	QuitAction,
 	RestartAction,
 	SetLayoutAction,

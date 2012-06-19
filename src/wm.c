@@ -37,6 +37,7 @@ static void wm_handler_unmapnotify(struct wm *, XEvent *);
 
 /* key action handlers */
 static void wm_key_handler_kill(struct wm *, struct key *);
+static void wm_key_handler_movewindow(struct wm *, struct key *);
 static void wm_key_handler_quit(struct wm *, struct key *);
 static void wm_key_handler_restart(struct wm *, struct key *);
 static void wm_key_handler_setlayout(struct wm *, struct key *);
@@ -66,6 +67,7 @@ static void (*event_handler[LASTEvent]) (struct wm *, XEvent *) = {
 
 static void (*key_handler[LASTAction]) (struct wm *, struct key *) = {
 	[KillAction] = wm_key_handler_kill,
+	[MoveWindowAction] = wm_key_handler_movewindow,
 	[QuitAction] = wm_key_handler_quit,
 	[RestartAction] = wm_key_handler_restart,
 	[SetLayoutAction] = wm_key_handler_setlayout,
@@ -550,6 +552,19 @@ wm_key_handler_kill(struct wm *wm, struct key *key)
 {
 	(void)key;
 	client_kill(wm->selmon->sel, wm->dpy);
+}
+
+void
+wm_key_handler_movewindow(struct wm *wm, struct key *key)
+{
+	if (key->args && wm->selmon->sel) {
+		int tag = atoi(key->args) - 1; /* off-by-one in binding */
+
+		if (VALID_TAG(tag)) {
+			wm->selmon->sel->tag = tag;
+			monitor_update(wm->selmon, wm->dpy, wm->root);
+		}
+	}
 }
 
 void
