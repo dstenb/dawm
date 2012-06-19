@@ -593,7 +593,7 @@ void
 wm_key_handler_settag(struct wm *wm, struct key *key)
 {
 	if (key->args) {
-		int tag = atoi(key->args);
+		int tag = atoi(key->args) - 1; /* off-by-one in binding */
 
 		if (tag >= MIN_TAG && tag <= MAX_TAG)
 			monitor_set_tag(wm->selmon, wm->dpy,
