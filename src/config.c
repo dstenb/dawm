@@ -25,6 +25,8 @@ config_init(void)
 	cfg->topbar = 1;
 	cfg->showbar = 1;
 	cfg->bw = 1;
+	cfg->nmaster = N_MASTER;
+	cfg->mfact = M_FACT;
 
 	for (i = 0; i < LASTColor; i++)
 		cfg->colors[i] = xstrdup(default_colors[i]);

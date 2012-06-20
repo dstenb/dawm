@@ -20,6 +20,12 @@ typedef enum {
 	MovementMotion
 } MotionType;
 
+struct motion {
+	MotionType type;
+	XButtonEvent start;
+	XWindowAttributes attr;
+};
+
 struct wm {
 	Display *dpy;
 	Window root;
@@ -34,11 +40,7 @@ struct wm {
 	struct config *cfg;
 	const char *cmd;
 
-	struct {
-		MotionType type;
-		XButtonEvent start;
-		XWindowAttributes attr;
-	} motion;
+	struct motion motion;
 };
 
 struct wm *wm_init(struct config *, const char *);

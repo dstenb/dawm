@@ -22,6 +22,13 @@ typedef enum {
 
 #define DEFAULT_LAYOUT TileHorzLayout
 
+struct tag {
+	char name[TAG_NAME_LEN];
+	LayoutID layout;
+	float mfact; /* master size factor (between 0 and 1) */
+	int nmaster; /* number of master clients */
+};
+
 struct monitor {
 	struct bar *bar;
 
@@ -34,10 +41,7 @@ struct monitor {
 
 	int seltag;
 
-	struct {
-		char name[TAG_NAME_LEN];
-		LayoutID layout;
-	} tags[N_TAGS];
+	struct tag tags[N_TAGS];
 
 	struct monitor *next;
 };

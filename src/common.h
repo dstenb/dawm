@@ -14,4 +14,7 @@
 
 #define VALID_TAG(T) (T >= MIN_TAG && T <= MAX_TAG)
 
+#define M_FACT 0.55
+#define N_MASTER 1
+
 #endif

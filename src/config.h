@@ -6,6 +6,7 @@
 #include <limits.h>
 
 #include "colors.h"
+#include "common.h"
 #include "errno.h"
 #include "keys.h"
 #include "utils.h"
@@ -17,6 +18,9 @@ struct config {
 	int showbar;
 	int bw;
 	struct key *keys;
+
+	float mfact;
+	unsigned int nmaster;
 
 	char *colors[LASTColor];
 };

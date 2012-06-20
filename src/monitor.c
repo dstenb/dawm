@@ -89,14 +89,14 @@ next_tiled(struct client *c)
 	return c;
 }
 
-#define N_MASTER 2
-#define M_FACT 0.55
-
 void
 arrange_tilehorz(struct monitor *mon, Display *dpy)
 {
 	struct client *c;
 	unsigned int i, n, h, mw, my, ty;
+
+	float mfact = mon->tags[mon->seltag].mfact;
+	unsigned int nmaster = mon->tags[mon->seltag].nmaster;
 
 	for (n = 0, c = next_tiled(mon->clients); c;
 			c = next_tiled(c->next), n++);
@@ -104,15 +104,15 @@ arrange_tilehorz(struct monitor *mon, Display *dpy)
 	if (n == 0)
 		return;
 
-	if (n > N_MASTER)
-		mw = N_MASTER ? mon->ww * M_FACT : 0;
+	if (n > nmaster)
+		mw = nmaster ? mon->ww * mfact : 0;
 	else
 		mw = mon->ww;
 
 	for(i = my = ty = 0, c = next_tiled(mon->clients); c;
 			c = next_tiled(c->next), i++) {
-		if(i < N_MASTER) {
-			h = (mon->wh - my) / (MIN(n, N_MASTER) - i);
+		if(i < nmaster) {
+			h = (mon->wh - my) / (MIN(n, nmaster) - i);
 			client_move_resize(c, dpy, mon->wx, mon->wy + my,
 					mw - (2*c->bw), h - (2*c->bw));
 			my += HEIGHT(c);
@@ -185,6 +185,8 @@ monitor_create(struct config *cfg, int x, int y, int w, int h,
 	for (i = 0; i < N_TAGS; i++) {
 		snprintf(mon->tags[i].name, TAG_NAME_LEN, "%i", (i + 1));
 		mon->tags[i].layout = DEFAULT_LAYOUT;
+		mon->tags[i].nmaster = cfg->nmaster;
+		mon->tags[i].mfact = cfg->mfact;
 	}
 
 	monitor_show_bar(mon, dpy, mon->bar->showbar);
