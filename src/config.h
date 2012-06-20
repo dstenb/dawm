@@ -11,17 +11,13 @@
 #include "keys.h"
 #include "utils.h"
 
-#define SIZE_COL_ARR 3
-
 struct config {
 	int topbar;
 	int showbar;
 	int bw;
 	struct key *keys;
-
 	float mfact;
 	unsigned int nmaster;
-
 	char *colors[LASTColor];
 };
 

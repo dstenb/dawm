@@ -34,7 +34,7 @@ colors_init(char *colorstr[LASTColor], Display *dpy, int screen)
 }
 
 int
-str_to_color_id(const char *str)
+color_str2id(const char *str)
 {
 	int i;
 

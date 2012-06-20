@@ -66,9 +66,9 @@ void key_grab_all(struct key *, Display *, Window);
 int key_pressed(struct key *, Display *, KeyCode, unsigned int);
 
 /* returns non-zero if the string describes a modifier */
-int str_to_modifier(const char *);
+int key_str2mod(const char *);
 
 /* update the Num Lock modifier */
-void update_num_lock(Display *);
+void key_init(Display *);
 
 #endif

@@ -49,8 +49,8 @@ parse_bind(const char *path, int line, char *keystr,
 		die("%s:%i, missing key action\n", path, line);
 
 	for (p = strtok(keystr, "+"); p; p = strtok(NULL, "+")) {
-		if (str_to_modifier(p) != -1) {
-			modifier |= str_to_modifier(p);
+		if (key_str2mod(p) != -1) {
+			modifier |= key_str2mod(p);
 		} else if (XStringToKeysym(p) != NoSymbol) {
 			if (keysym != NoSymbol)
 				die("%s:%i, two keys given\n", path, line);
@@ -74,12 +74,12 @@ parse_color(struct config *cfg, const char *path, int line,
 		die("%s:%i, missing color id\n", path, line);
 	if (!cvalue)
 		die("%s:%i, missing color value\n", path, line);
-	if (str_to_color_id(cid) == InvalidColor)
+	if (color_str2id(cid) == InvalidColor)
 		die("%s:%i, invalid color id: '%s'\n", path, line, cid);
 	if (!valid_color_value(cvalue))
 		die("%s:%i, invalid color value: '%s'\n", path, line, cvalue);
 
-	replace_str(&cfg->colors[str_to_color_id(cid)], xstrdup(cvalue));
+	replace_str(&cfg->colors[color_str2id(cid)], xstrdup(cvalue));
 }
 
 int

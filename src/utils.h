@@ -21,7 +21,7 @@
 #if DEBUG
 #define DBG(...) dbg(__FILE__, __LINE__, __VA_ARGS__)
 #else
-#define DBG(...) 
+#define DBG(...)
 #endif
 
 /* prints an error message and exits */
@@ -36,7 +36,7 @@ void error(const char *, ...);
 /* spawn a process in the background */
 void spawn(const char *);
 
-/* concatenates a NULL-terminated list of strings to one */
+/* concatenates a NULL-terminated list of strings to one string */
 char *strfvs(char **, char);
 
 /* calloc() wrapper that will exit if unable to allocate */

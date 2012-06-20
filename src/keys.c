@@ -152,7 +152,7 @@ key_pressed(struct key *key, Display *dpy, KeyCode code, unsigned int state)
 }
 
 int
-str_to_modifier(const char *str)
+key_str2mod(const char *str)
 {
 	if (strcasecmp(str, "alt") == 0)
 		return MOD_ALT;
@@ -166,7 +166,7 @@ str_to_modifier(const char *str)
 }
 
 void
-update_num_lock(Display *dpy)
+key_init(Display *dpy)
 {
 	unsigned int i, j;
 	XModifierKeymap *modmap;

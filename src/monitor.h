@@ -10,7 +10,7 @@
 
 #define ISARRANGED(M) ((M)->tag[(M)->seltag].layout != FloatingLayout)
 
-#define TAG_NAME_LEN 32
+#define TAG_NAME_SIZE 32
 
 typedef enum {
 	TileHorzLayout,
@@ -23,7 +23,7 @@ typedef enum {
 #define DEFAULT_LAYOUT TileHorzLayout
 
 struct tag {
-	char name[TAG_NAME_LEN];
+	char name[TAG_NAME_SIZE];
 	LayoutID layout;
 	float mfact; /* master size factor (between 0 and 1) */
 	int nmaster; /* number of master clients */
@@ -31,18 +31,13 @@ struct tag {
 
 struct monitor {
 	struct bar *bar;
-
 	int mx, my, mw, mh; /* monitor geometry */
 	int wx, wy, ww, wh; /* window geometry */
-
 	struct client *clients;
 	struct client *cstack;
 	struct client *sel;
-
 	int seltag;
-
 	struct tag tags[N_TAGS];
-
 	struct monitor *next;
 };
 

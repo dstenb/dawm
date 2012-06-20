@@ -214,7 +214,7 @@ monitor_create(struct config *cfg, int x, int y, int w, int h,
 	mon->seltag = MIN_TAG;
 
 	for (i = 0; i < N_TAGS; i++) {
-		snprintf(mon->tags[i].name, TAG_NAME_LEN, "%i", (i + 1));
+		snprintf(mon->tags[i].name, TAG_NAME_SIZE, "%i", (i + 1));
 		mon->tags[i].layout = DEFAULT_LAYOUT;
 		mon->tags[i].nmaster = cfg->nmaster;
 		mon->tags[i].mfact = cfg->mfact;

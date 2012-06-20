@@ -20,29 +20,15 @@
 
 struct client {
 	char name[CLIENT_NAME_SIZE];
-
-	/* current position and size */
-	int x, y, w, h;
-	/* old position and size */
-	int ox, oy, ow, oh;
-
-	/* non-zero if floating */
-	int floating;
-	/* non-zero if fullscreen */
-	int fullscreen;
-
-	/* border size */
-	int bw;
-
-	/* old border size (before the WM took control of the window) */
-	int obw;
-
+	int x, y, w, h; /* current position and size */
+	int ox, oy, ow, oh; /* old position and size */
+	int floating; /* non-zero if floating */
+	int fullscreen; /* non-zero if fullscreen */
+	int bw; /* border size */
+	int obw; /* old border size */
 	int tag;
-
 	Window win;
-
 	struct monitor *mon;
-
 	struct client *next;
 	struct client *snext;
 };

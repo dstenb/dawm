@@ -10,13 +10,9 @@
 #include "utils.h"
 
 struct bar {
-	/* TODO font */
-
 	Window win;
-
 	int topbar;
 	int showbar;
-
 	int x, y, w, h;
 };
 

@@ -197,7 +197,7 @@ wm_init(struct config *cfg, const char *cmd)
 	XChangeWindowAttributes(wm->dpy, wm->root, CWCursor, &attr);
 
 	/* grab the manager's key bindings */
-	update_num_lock(wm->dpy);
+	key_init(wm->dpy);
 	key_grab_all(wm->keys, wm->dpy, wm->root);
 
 	atoms_init(wm->dpy);

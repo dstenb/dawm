@@ -27,6 +27,6 @@ unsigned long color(ColorID);
 /* initializes the cursors */
 void colors_init(char *[LASTColor], Display *, int);
 
-int str_to_color_id(const char *);
+int color_str2id(const char *);
 
 #endif
