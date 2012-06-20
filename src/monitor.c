@@ -130,7 +130,37 @@ arrange_tilehorz(struct monitor *mon, Display *dpy)
 void
 arrange_tilevert(struct monitor *mon, Display *dpy)
 {
+	struct client *c;
+	unsigned int i, n, w, mh, mx, tx;
 
+	float mfact = mon->tags[mon->seltag].mfact;
+	unsigned int nmaster = mon->tags[mon->seltag].nmaster;
+
+	for (n = 0, c = next_tiled(mon->clients); c;
+			c = next_tiled(c->next), n++);
+
+	if (n == 0)
+		return;
+
+	if (n > nmaster)
+		mh = nmaster ? mon->wh *  mfact : 0;
+	else
+		mh = mon->wh;
+
+	for (i = mx = tx = 0, c = next_tiled(mon->clients); c;
+			c = next_tiled(c->next), i++) {
+		if (i < nmaster) {
+			w = (mon->ww - mx) / (MIN(n, nmaster) - i);
+			client_move_resize(c, dpy, mon->wx + mx, mon->wy,
+					w - (2*c->bw), mh - (2*c->bw));
+			mx += WIDTH(c);
+		} else {
+			w = (mon->ww - tx) / (n - i);
+			client_move_resize(c, dpy, mon->mx + tx, mon->wy + mh,
+					w - (2*c->bw), mon->wh - mh - (2*c->bw));
+			tx += WIDTH(c);
+		}
+	}
 }
 
 void
