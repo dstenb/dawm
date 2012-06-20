@@ -178,6 +178,7 @@ client_show(struct client *c, Display *dpy, int show)
 void
 client_unfocus(struct client *c, Display *dpy, Window root)
 {
+	(void)root;
 	XSetWindowBorder(dpy, c->win, color(WinNormBorder));
 	/* TODO */
 }

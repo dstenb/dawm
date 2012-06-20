@@ -3,6 +3,95 @@
 static void monitor_show_hide(struct monitor *, Display *);
 static void monitor_update_window_size(struct monitor *);
 
+static struct client *
+next_tiled(struct client *c)
+{
+	for ( ; c && (c->floating || !ISVISIBLE(c)); c = c->next) ;
+	return c;
+}
+
+static void
+arrange_tilehorz(struct monitor *mon, Display *dpy)
+{
+	struct client *c;
+	unsigned int i, n, h, mw, my, ty;
+
+	float mfact = mon->tags[mon->seltag].mfact;
+	unsigned int nmaster = mon->tags[mon->seltag].nmaster;
+
+	for (n = 0, c = next_tiled(mon->clients); c;
+			c = next_tiled(c->next), n++);
+
+	if (n == 0)
+		return;
+
+	if (n > nmaster)
+		mw = nmaster ? mon->ww * mfact : 0;
+	else
+		mw = mon->ww;
+
+	for(i = my = ty = 0, c = next_tiled(mon->clients); c;
+			c = next_tiled(c->next), i++) {
+		if(i < nmaster) {
+			h = (mon->wh - my) / (MIN(n, nmaster) - i);
+			client_move_resize(c, dpy, mon->wx, mon->wy + my,
+					mw - (2*c->bw), h - (2*c->bw));
+			my += HEIGHT(c);
+		}
+		else {
+			h = (mon->wh - ty) / (n - i);
+			client_move_resize(c, dpy, mon->wx + mw, mon->wy + ty,
+					mon->ww - mw - (2*c->bw),
+					h - (2*c->bw));
+			ty += HEIGHT(c);
+		}
+	}
+}
+
+static void
+arrange_tilevert(struct monitor *mon, Display *dpy)
+{
+	struct client *c;
+	unsigned int i, n, w, mh, mx, tx;
+
+	float mfact = mon->tags[mon->seltag].mfact;
+	unsigned int nmaster = mon->tags[mon->seltag].nmaster;
+
+	for (n = 0, c = next_tiled(mon->clients); c;
+			c = next_tiled(c->next), n++);
+
+	if (n == 0)
+		return;
+
+	if (n > nmaster)
+		mh = nmaster ? mon->wh *  mfact : 0;
+	else
+		mh = mon->wh;
+
+	for (i = mx = tx = 0, c = next_tiled(mon->clients); c;
+			c = next_tiled(c->next), i++) {
+		if (i < nmaster) {
+			w = (mon->ww - mx) / (MIN(n, nmaster) - i);
+			client_move_resize(c, dpy, mon->wx + mx, mon->wy,
+					w - (2*c->bw), mh - (2*c->bw));
+			mx += WIDTH(c);
+		} else {
+			w = (mon->ww - tx) / (n - i);
+			client_move_resize(c, dpy, mon->mx + tx, mon->wy + mh,
+					w - (2*c->bw), mon->wh - mh - (2*c->bw));
+			tx += WIDTH(c);
+		}
+	}
+}
+
+static void
+arrange_matrix(struct monitor *mon, Display *dpy)
+{
+	(void)mon;
+	(void)dpy;
+}
+
+
 static void
 add_to_clients(struct monitor *mon, struct client *c)
 {
@@ -79,94 +168,6 @@ monitor_append(struct monitor *mons, struct monitor *new)
 	} else {
 		return new;
 	}
-}
-
-/* TODO: move all tiling code */
-static struct client *
-next_tiled(struct client *c)
-{
-	for ( ; c && (c->floating || !ISVISIBLE(c)); c = c->next) ;
-	return c;
-}
-
-void
-arrange_tilehorz(struct monitor *mon, Display *dpy)
-{
-	struct client *c;
-	unsigned int i, n, h, mw, my, ty;
-
-	float mfact = mon->tags[mon->seltag].mfact;
-	unsigned int nmaster = mon->tags[mon->seltag].nmaster;
-
-	for (n = 0, c = next_tiled(mon->clients); c;
-			c = next_tiled(c->next), n++);
-
-	if (n == 0)
-		return;
-
-	if (n > nmaster)
-		mw = nmaster ? mon->ww * mfact : 0;
-	else
-		mw = mon->ww;
-
-	for(i = my = ty = 0, c = next_tiled(mon->clients); c;
-			c = next_tiled(c->next), i++) {
-		if(i < nmaster) {
-			h = (mon->wh - my) / (MIN(n, nmaster) - i);
-			client_move_resize(c, dpy, mon->wx, mon->wy + my,
-					mw - (2*c->bw), h - (2*c->bw));
-			my += HEIGHT(c);
-		}
-		else {
-			h = (mon->wh - ty) / (n - i);
-			client_move_resize(c, dpy, mon->wx + mw, mon->wy + ty,
-					mon->ww - mw - (2*c->bw),
-					h - (2*c->bw));
-			ty += HEIGHT(c);
-		}
-	}
-}
-
-void
-arrange_tilevert(struct monitor *mon, Display *dpy)
-{
-	struct client *c;
-	unsigned int i, n, w, mh, mx, tx;
-
-	float mfact = mon->tags[mon->seltag].mfact;
-	unsigned int nmaster = mon->tags[mon->seltag].nmaster;
-
-	for (n = 0, c = next_tiled(mon->clients); c;
-			c = next_tiled(c->next), n++);
-
-	if (n == 0)
-		return;
-
-	if (n > nmaster)
-		mh = nmaster ? mon->wh *  mfact : 0;
-	else
-		mh = mon->wh;
-
-	for (i = mx = tx = 0, c = next_tiled(mon->clients); c;
-			c = next_tiled(c->next), i++) {
-		if (i < nmaster) {
-			w = (mon->ww - mx) / (MIN(n, nmaster) - i);
-			client_move_resize(c, dpy, mon->wx + mx, mon->wy,
-					w - (2*c->bw), mh - (2*c->bw));
-			mx += WIDTH(c);
-		} else {
-			w = (mon->ww - tx) / (n - i);
-			client_move_resize(c, dpy, mon->mx + tx, mon->wy + mh,
-					w - (2*c->bw), mon->wh - mh - (2*c->bw));
-			tx += WIDTH(c);
-		}
-	}
-}
-
-void
-arrange_matrix(struct monitor *mon, Display *dpy)
-{
-
 }
 
 void
