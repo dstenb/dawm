@@ -109,7 +109,7 @@ config_load(struct config *cfg, const char *path)
 
 			struct key *key = parse_bind(path, line, keystr,
 					actionstr, args);
-			cfg->keys = key_append(cfg->keys, key);
+			cfg->keys = key_append(key, cfg->keys);
 		} else if (STREQ(cmd, "color")) {
 			char *cid = strtok(NULL, " \t\n");
 			char *cvalue = strtok(NULL, " \t\n");

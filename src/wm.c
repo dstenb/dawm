@@ -296,7 +296,7 @@ wm_handler_clientmessage(struct wm *wm, XEvent *ev)
 		} else if (cmev->message_type == atom(WMChangeState)) {
 			if (cmev->data.l[0] == IconicState &&
 					cmev->format == 32) {
-				DBG("%s: minimize window\n", __func__);
+				printf("%s: minimize window\n", __func__);
 				/* TODO: fix minimizing */
 			}
 		}
@@ -386,17 +386,17 @@ wm_handler_focusin(struct wm *wm, XEvent *ev)
 void
 wm_handler_keypress(struct wm *wm, XEvent *ev)
 {
-	XKeyEvent *kev;
+	XKeyEvent *kev = &ev->xkey;
 	struct key *key;
 
 	dbg_print(wm, __func__);
 
-	kev = &ev->xkey;
 	for (key = wm->keys; key; key = key->next) {
 		if (key_pressed(key, wm->dpy, kev->keycode, kev->state)) {
 			if (key->action >= 0 && key->action < LASTAction &&
 					key_handler[key->action]) {
 				key_handler[key->action](wm, key);
+				break; /* skip further bindings */
 			} else {
 				die("unhandled key action (%d), fix this!\n",
 						key->action);

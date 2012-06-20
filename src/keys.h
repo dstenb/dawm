@@ -9,8 +9,6 @@
 
 #include "utils.h"
 
-/* TODO: fix conflicts */
-
 #define MOD_ALT   Mod1Mask
 #define MOD_CTRL  ControlMask
 #define MOD_SHIFT ShiftMask
