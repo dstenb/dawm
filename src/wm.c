@@ -593,6 +593,8 @@ wm_key_handler_setlayout(struct wm *wm, struct key *key)
 			layout = TileVertLayout;
 		} else if (STREQ(key->args, "matrix")) {
 			layout = MatrixLayout;
+		} else if (STREQ(key->args, "max")) {
+			layout = MaxLayout;
 		} else if (STREQ(key->args, "float")) {
 			layout = FloatingLayout;
 		} else if (STREQ(key->args, "prev")) {

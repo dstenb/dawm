@@ -92,6 +92,17 @@ arrange_matrix(struct monitor *mon, Display *dpy)
 	(void)dpy;
 }
 
+static void
+arrange_max(struct monitor *mon, Display *dpy)
+{
+	struct client *c;
+
+	if (!(c = next_tiled(mon->clients)))
+		return;
+
+	client_move_resize(c, dpy, mon->mx, mon->wy, mon->mw - (2*c->bw),
+			mon->mh - (2*c->bw));
+}
 
 static void
 add_to_clients(struct monitor *mon, struct client *c)
@@ -186,6 +197,9 @@ monitor_arrange(struct monitor *mon, Display *dpy)
 			break;
 		case FloatingLayout:
 			/* Don't arrange */
+			break;
+		case MaxLayout:
+			arrange_max(mon, dpy);
 			break;
 		default:
 			break;

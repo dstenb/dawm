@@ -1,43 +1,46 @@
-# Example configuration file for dawm
+### Example configuration for DAWM
 
-# WM bindings
-bind super+shift+q quit
-bind super+ctrl+r restart
-bind super+Return spawn urxvt
+### Colors
+#color bar_border #FF0000
+#color bar_norm_fg #DDDDDD
+#color bar_norm_bg #000000
+#color bar_sel_fg #000000
+#color bar_sel_bg #0000FF
+#color win_norm_border #000000
+#color win_sel_border #FF0000
 
-# Monitor bindings
-bind super+b toggle_bar
-bind super+t toggle_float
+# The following command will unbind all keys
+#unbind_all
 
-# Window bindings
-bind super+x kill
-
-# Layout bindings
-bind super+h set_layout horz
-bind super+v set_layout vert
-bind super+m set_layout matrix
-bind super+n set_layout float
-bind super+space set_layout next
-bind super+shift+space set_layout prev
-
-# Tag bindings
-bind super+1 set_tag 1
-bind super+2 set_tag 2
-bind super+3 set_tag 3
-bind super+4 set_tag 4
-bind super+5 set_tag 5
-bind super+6 set_tag 6
-bind super+7 set_tag 7
-bind super+8 set_tag 8
-bind super+9 set_tag 9
-
-# Move window to another tag
-bind super+shift+1 move_window 1
-bind super+shift+2 move_window 2
-bind super+shift+3 move_window 3
-bind super+shift+4 move_window 4
-bind super+shift+5 move_window 5
-bind super+shift+6 move_window 6
-bind super+shift+7 move_window 7
-bind super+shift+8 move_window 8
-bind super+shift+9 move_window 9
+### Key bindings
+#bind super+x kill 
+#bind super+shift+q quit 
+#bind super+ctrl+r restart 
+#bind super+Return spawn urxvt
+#bind super+b toggle_bar 
+#bind super+t toggle_float 
+#bind super+1 set_tag 1
+#bind super+2 set_tag 2
+#bind super+3 set_tag 3
+#bind super+4 set_tag 4
+#bind super+5 set_tag 5
+#bind super+6 set_tag 6
+#bind super+7 set_tag 7
+#bind super+8 set_tag 8
+#bind super+9 set_tag 9
+#bind super+shift+1 move_window 1
+#bind super+shift+2 move_window 2
+#bind super+shift+3 move_window 3
+#bind super+shift+4 move_window 4
+#bind super+shift+5 move_window 5
+#bind super+shift+6 move_window 6
+#bind super+shift+7 move_window 7
+#bind super+shift+8 move_window 8
+#bind super+shift+9 move_window 9
+#bind super+h set_layout horz
+#bind super+v set_layout vert
+#bind super+s set_layout matrix
+#bind super+m set_layout max
+#bind super+n set_layout float
+#bind super+space set_layout next
+#bind super+shift+space set_layout prev

@@ -17,6 +17,7 @@ typedef enum {
 	TileVertLayout,
 	MatrixLayout,
 	FloatingLayout,
+	MaxLayout,
 	LASTLayout
 } LayoutID;
 
