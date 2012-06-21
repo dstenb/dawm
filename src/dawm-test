@@ -11,4 +11,4 @@ xterm -T "3" -n "3" -fg black -bg orange &
 
 setxkbmap se
 
-valgrind ./dawm -c config
+valgrind ./dawm -c ../data/config
