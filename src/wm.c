@@ -181,7 +181,8 @@ wm_init(struct config *cfg, const char *cmd)
 	wm->motion.type = NoMotion;
 
 	colors_init(cfg->colors, wm->dpy, wm->screen);
-
+	bars_init(wm->dpy, wm->root, wm->screen,
+			"-*-terminus-medium-r-*-*-16-*-*-*-*-*-*-*");
 	wm_create_monitors(wm);
 
 	/* select events to handle */

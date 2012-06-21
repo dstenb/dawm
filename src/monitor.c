@@ -1,5 +1,6 @@
 #include "monitor.h"
 
+static void monitor_draw_bar(struct monitor *, Display *);
 static void monitor_show_hide(struct monitor *, Display *);
 static void monitor_update_window_size(struct monitor *);
 
@@ -198,8 +199,8 @@ monitor_create(struct config *cfg, int x, int y, int w, int h,
 	struct monitor *mon = xcalloc(1, sizeof(struct monitor));
 	int i;
 
-	mon->bar = bar_create(cfg->topbar, cfg->showbar, x, y, w, 20,
-			dpy, root, screen);
+	mon->bar = bar_create(cfg->topbar, cfg->showbar,
+			x, y, w, dpy, root, screen);
 	mon->clients = NULL;
 	mon->cstack = NULL;
 	mon->sel = NULL;
@@ -243,6 +244,15 @@ monitor_dbg_print(struct monitor *m, const char *str)
 }
 
 void
+monitor_draw_bar(struct monitor *mon, Display *dpy)
+{
+	char buf[512];
+	snprintf(buf, sizeof(buf), " %i:%i ", 1, mon->seltag + 1);
+
+	bar_draw(mon->bar, dpy, buf);
+}
+
+void
 monitor_float_selected(struct monitor *mon, Display *dpy, int f)
 {
 	int was_floating;
@@ -282,7 +292,7 @@ monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
 	mon->sel = c;
 
 	/* TODO draw bar */
-	bar_draw(mon->bar, dpy);
+	monitor_draw_bar(mon, dpy);
 }
 
 void
@@ -328,7 +338,7 @@ monitor_show_bar(struct monitor *mon, Display *dpy, int show)
 	XMoveResizeWindow(dpy, mon->bar->win, mon->wx, mon->bar->y,
 			mon->ww, mon->bar->h);
 	monitor_arrange(mon, dpy);
-	bar_draw(mon->bar, dpy);
+	monitor_draw_bar(mon, dpy);
 }
 
 void

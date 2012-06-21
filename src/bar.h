@@ -17,12 +17,11 @@ struct bar {
 };
 
 /* create a bar */
-struct bar *bar_create(int, int, int, int, int, int, Display *, Window, int);
+struct bar *bar_create(int, int, int, int, int, Display *, Window, int);
 
 /* draw the bar */
-void bar_draw(struct bar *, Display *);
+void bar_draw(struct bar *, Display *, const char *str);
 
-/* initialize the draw context used by all bars */
-void bars_init_dc(Display *, Window, int, int);
+void bars_init(Display *, Window, int, const char *fontstr);
 
 #endif
