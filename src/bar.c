@@ -5,7 +5,6 @@
 static void bars_init_dc(Display *, Window, int);
 static void bars_init_font(Display *, Window, const char *);
 
-
 static struct {
 	Drawable drawable;
 	GC gc;
@@ -52,15 +51,19 @@ bar_create(int topbar, int showbar, int x, int y, int w,
 	return bar;
 }
 
-static int text_width(const char *str, int len)
+static void bar_draw_text(struct bar *bar, Display *dpy, const char *str, int len)
 {
-	return XTextWidth(font.xfont, str, len);
-}
+	int x = (font.height) / 2;
+	int y = (bar->h / 2) - (font.height / 2) + font.ascent;
 
-static void text_draw(Display *dpy, const char *str, int len,
-		unsigned long fg, unsigned long bg)
-{
-	XSetForeground(dpy, dc.gc, bg);
+	XSetForeground(dpy, dc.gc, color(BarNormFG));
+
+	if(font.set)
+		XmbDrawString(dpy, dc.drawable, font.set, dc.gc,
+				x, y, str, len);
+	else
+		XDrawString(dpy, dc.drawable, dc.gc,
+				x, y, str, len);
 }
 
 void
@@ -68,17 +71,7 @@ bar_draw(struct bar *bar, Display *dpy, const char *str)
 {
 	XSetForeground(dpy, dc.gc, color(BarNormBG));
 	XFillRectangle(dpy, dc.drawable, dc.gc, 0, 0, bar->w, bar->h);
-
-	XSetForeground(dpy, dc.gc, color(BarNormFG));
-	int x = (font.height) / 2;
-	int y = (bar->h / 2) - (font.height / 2) + font.ascent;
-	if(font.set)
-		XmbDrawString(dpy, dc.drawable, font.set, dc.gc, x, y,
-				str, strlen(str));
-	else
-		XDrawString(dpy, dc.drawable, dc.gc, x, y,
-				str, strlen(str));
-
+	bar_draw_text(bar, dpy, str, strlen(str));
 	XCopyArea(dpy, dc.drawable, bar->win, dc.gc, 0, 0, bar->w, bar->h, 0, 0);
 	XSync(dpy, False);
 }

@@ -193,7 +193,7 @@ monitor_arrange(struct monitor *mon, Display *dpy)
 }
 
 struct monitor *
-monitor_create(struct config *cfg, int x, int y, int w, int h,
+monitor_create(struct config *cfg, int num, int x, int y, int w, int h,
 		Display *dpy, Window root, int screen)
 {
 	struct monitor *mon = xcalloc(1, sizeof(struct monitor));
@@ -201,6 +201,8 @@ monitor_create(struct config *cfg, int x, int y, int w, int h,
 
 	mon->bar = bar_create(cfg->topbar, cfg->showbar,
 			x, y, w, dpy, root, screen);
+	mon->num = num;
+
 	mon->clients = NULL;
 	mon->cstack = NULL;
 	mon->sel = NULL;
@@ -247,7 +249,7 @@ void
 monitor_draw_bar(struct monitor *mon, Display *dpy)
 {
 	char buf[512];
-	snprintf(buf, sizeof(buf), " %i:%i ", 1, mon->seltag + 1);
+	snprintf(buf, sizeof(buf), " %i:%i ", mon->num + 1, mon->seltag + 1);
 
 	bar_draw(mon->bar, dpy, buf);
 }

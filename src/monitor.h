@@ -30,6 +30,7 @@ struct tag {
 };
 
 struct monitor {
+	int num;
 	struct bar *bar;
 	int mx, my, mw, mh; /* monitor geometry */
 	int wx, wy, ww, wh; /* window geometry */
@@ -51,7 +52,7 @@ struct monitor *monitor_append(struct monitor *, struct monitor *);
 void monitor_arrange(struct monitor *, Display *);
 
 /* creates a monitor */
-struct monitor *monitor_create(struct config *, int, int, int, int,
+struct monitor *monitor_create(struct config *, int, int, int, int, int,
 		Display *, Window, int);
 
 /* prints a debug message about the given monitor */
