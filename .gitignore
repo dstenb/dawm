@@ -1,4 +1,5 @@
 version.h
-wm
+dawm
 *.o
 *.swp
+generate-menu
