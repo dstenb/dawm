@@ -42,8 +42,11 @@ static struct key default_keys[] = {
 /* strings corresponding to KeyAction values */
 static char *action_str[LASTAction] = {
 	[KillAction] = "kill",
+	[MoveWindowAction] = "move_window",
 	[QuitAction] = "quit",
 	[RestartAction] = "restart",
+	[SetLayoutAction] = "set_layout",
+	[SetTagAction] = "set_tag",
 	[SpawnAction] = "spawn",
 	[ToggleBarAction] = "toggle_bar",
 	[ToggleFloatAction] = "toggle_float"
