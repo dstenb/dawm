@@ -39,6 +39,8 @@ struct key {
 	struct key *next;
 };
 
+const char *key_action2str(KeyAction);
+
 /* returns the KeyAction responding to the key, returns INVALID if not found */
 KeyAction key_action_from_str(const char *);
 

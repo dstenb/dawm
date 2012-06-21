@@ -54,6 +54,12 @@ static char *action_str[LASTAction] = {
 
 static unsigned int num_lock = 0;
 
+const char *
+key_action2str(KeyAction a)
+{
+	return (a >= 0 && a < LASTAction) ? action_str[a] : NULL;
+}
+
 KeyAction
 key_action_from_str(const char *str)
 {
@@ -108,7 +114,7 @@ key_default_keys(void)
 	struct key *tmp, *head = NULL;
 	int i;
 
-	for (i = 0; i < ARRSIZE(default_keys); i++) {
+	for (i = ARRSIZE(default_keys) - 1; i >= 0; i--) {
 		tmp = key_copy(&default_keys[i]);
 		tmp->next = head;
 		head = tmp;
