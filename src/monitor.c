@@ -11,6 +11,43 @@ next_tiled(struct client *c)
 	return c;
 }
 
+static struct client *
+next_visible_client(struct client *curr)
+{
+	struct monitor *mon = curr->mon;
+	struct client *c;
+
+	for (c = curr->next; c && !ISVISIBLE(c); c = c->next) ;
+
+	/* search from the start of the client list */
+	if (!c)
+		for (c = mon->clients; c && !ISVISIBLE(c); c = c->next) ;
+
+	return c;
+}
+
+static struct client *
+prev_visible_client(struct client *curr)
+{
+	struct monitor *mon = curr->mon;
+	struct client *c = NULL;
+	struct client *t;
+
+	for (t = mon->clients; t != curr; t = t->next) {
+		if (ISVISIBLE(t))
+			c = t;
+	}
+
+	if (!c) {
+		for ( ; t; t = t->next) {
+			if (ISVISIBLE(t))
+				c = t;
+		}
+	}
+
+	return c;
+}
+
 static void
 arrange_tilehorz(struct monitor *mon, Display *dpy)
 {
@@ -326,6 +363,37 @@ monitor_select_client(struct monitor *mon, struct client *c)
 {
 	mon->sel = c;
 }
+
+void
+monitor_select_next_client(struct monitor *mon, Display *dpy, Window root)
+{
+	struct client *c = NULL;
+
+	if (mon->sel)
+		c = next_visible_client(mon->sel);
+
+	if (c) {
+		monitor_unfocus_selected(mon, dpy, root);
+		monitor_select_client(mon, c);
+		monitor_focus(mon, c, dpy, root);
+	}
+}
+
+void
+monitor_select_prev_client(struct monitor *mon, Display *dpy, Window root)
+{
+	struct client *c = NULL;
+
+	if (mon->sel)
+		c = prev_visible_client(mon->sel);
+
+	if (c) {
+		monitor_unfocus_selected(mon, dpy, root);
+		monitor_select_client(mon, c);
+		monitor_focus(mon, c, dpy, root);
+	}
+}
+
 
 void
 monitor_set_layout(struct monitor *mon, Display *dpy, int layout)

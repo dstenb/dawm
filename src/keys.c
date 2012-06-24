@@ -11,6 +11,9 @@ static struct key default_keys[] = {
 	{ MOD_SUPER,       XK_b,      ToggleBarAction,   NULL,   NULL },
 	{ MOD_SUPER,       XK_t,      ToggleFloatAction, NULL, NULL },
 
+	{ MOD_SUPER,       XK_j,      SelectAction,      "next",  NULL },
+	{ MOD_SUPER,       XK_k,      SelectAction,      "prev",  NULL },
+
 	{ MOD_SUPER,       XK_1,      SetTagAction,      "1",     NULL },
 	{ MOD_SUPER,       XK_2,      SetTagAction,      "2",     NULL },
 	{ MOD_SUPER,       XK_3,      SetTagAction,      "3",     NULL },
@@ -46,6 +49,7 @@ static char *action_str[LASTAction] = {
 	[MoveWindowAction] = "move_window",
 	[QuitAction] = "quit",
 	[RestartAction] = "restart",
+	[SelectAction] = "select",
 	[SetLayoutAction] = "set_layout",
 	[SetTagAction] = "set_tag",
 	[SpawnAction] = "spawn",

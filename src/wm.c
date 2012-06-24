@@ -40,6 +40,7 @@ static void wm_key_handler_kill(struct wm *, struct key *);
 static void wm_key_handler_movewindow(struct wm *, struct key *);
 static void wm_key_handler_quit(struct wm *, struct key *);
 static void wm_key_handler_restart(struct wm *, struct key *);
+static void wm_key_handler_select(struct wm *, struct key *);
 static void wm_key_handler_setlayout(struct wm *, struct key *);
 static void wm_key_handler_settag(struct wm *, struct key *);
 static void wm_key_handler_spawn(struct wm *, struct key *);
@@ -70,6 +71,7 @@ static void (*key_handler[LASTAction]) (struct wm *, struct key *) = {
 	[MoveWindowAction] = wm_key_handler_movewindow,
 	[QuitAction] = wm_key_handler_quit,
 	[RestartAction] = wm_key_handler_restart,
+	[SelectAction] = wm_key_handler_select,
 	[SetLayoutAction] = wm_key_handler_setlayout,
 	[SetTagAction] = wm_key_handler_settag,
 	[SpawnAction] = wm_key_handler_spawn,
@@ -579,6 +581,23 @@ wm_key_handler_restart(struct wm *wm, struct key *key)
 {
 	(void)key;
 	wm_restart(wm);
+}
+
+void
+wm_key_handler_select(struct wm *wm, struct key *key)
+{
+	if (key->args) {
+		if (STREQ(key->args, "next")) {
+			monitor_select_next_client(wm->selmon,
+					wm->dpy, wm->root);
+		} else if (STREQ(key->args, "prev")) {
+			monitor_select_prev_client(wm->selmon,
+					wm->dpy, wm->root);
+		} else {
+			error("%s: invalid arg: '%s'", __func__, key->args);
+		}
+
+	}
 }
 
 void

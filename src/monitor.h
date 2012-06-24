@@ -72,6 +72,10 @@ void monitor_remove_client(struct monitor *, struct client *);
 /* select the given client, assumes that the client is valid */
 void monitor_select_client(struct monitor *, struct client *);
 
+void monitor_select_next_client(struct monitor *, Display *, Window);
+
+void monitor_select_prev_client(struct monitor *, Display *, Window);
+
 void monitor_set_layout(struct monitor *, Display *, int);
 
 /* set the current tag */
