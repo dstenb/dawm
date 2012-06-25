@@ -245,6 +245,9 @@ wm_handler_buttonpress(struct wm *wm, XEvent *ev)
 
 	dbg_print(wm, __func__);
 
+	if (wm->motion.type != NoMotion)
+		return;
+
 	if (!(c = find_client_by_window(wm->mons, bpev->window)))
 		return;
 
@@ -270,8 +273,10 @@ wm_handler_buttonrelease(struct wm *wm, XEvent *ev)
 
 	dbg_print(wm, __func__);
 
-	wm->motion.type = NoMotion;
-	XUngrabPointer(wm->dpy, CurrentTime);
+	if (wm->motion.start.button == ev->xbutton.button) {
+		wm->motion.type = NoMotion;
+		XUngrabPointer(wm->dpy, CurrentTime);
+	}
 }
 
 void
