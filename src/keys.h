@@ -24,7 +24,7 @@ typedef enum {
 	RestartAction,
 	SetLayoutAction,
 	SelectAction,
-	SetTagAction,
+	SetWsAction,
 	SpawnAction,
 	ToggleBarAction,
 	ToggleFloatAction,

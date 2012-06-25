@@ -8,9 +8,9 @@
 #include "client.h"
 #include "config.h"
 
-#define ISARRANGED(M) ((M)->tag[(M)->seltag].layout != FloatingLayout)
+#define ISARRANGED(M) ((M)->ws[(M)->selws].layout != FloatingLayout)
 
-#define TAG_NAME_SIZE 32
+#define WS_NAME_SIZE 32
 
 typedef enum {
 	TileHorzLayout,
@@ -23,8 +23,8 @@ typedef enum {
 
 #define DEFAULT_LAYOUT TileHorzLayout
 
-struct tag {
-	char name[TAG_NAME_SIZE];
+struct workspace {
+	char name[WS_NAME_SIZE];
 	LayoutID layout;
 	float mfact; /* master size factor (between 0 and 1) */
 	int nmaster; /* number of master clients */
@@ -38,8 +38,8 @@ struct monitor {
 	struct client *clients;
 	struct client *cstack;
 	struct client *sel;
-	int seltag;
-	struct tag tags[N_TAGS];
+	int selws;
+	struct workspace ws[N_WORKSPACES];
 	struct monitor *next;
 };
 
@@ -78,8 +78,8 @@ void monitor_select_prev_client(struct monitor *, Display *, Window);
 
 void monitor_set_layout(struct monitor *, Display *, int);
 
-/* set the current tag */
-void monitor_set_tag(struct monitor *, Display *, Window, int);
+/* set the current workspace */
+void monitor_set_ws(struct monitor *, Display *, Window, int);
 
 /* show/hide the bar */
 void monitor_show_bar(struct monitor *, Display *, int);

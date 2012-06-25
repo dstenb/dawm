@@ -13,7 +13,7 @@
 
 #define CLIENT_NAME_SIZE 128
 
-#define ISVISIBLE(c)            (c->tag == c->mon->seltag)
+#define ISVISIBLE(c)            (c->ws == c->mon->selws)
 
 #define WIDTH(c)                ((c)->w + 2 * (c)->bw)
 #define HEIGHT(c)               ((c)->h + 2 * (c)->bw)
@@ -26,7 +26,7 @@ struct client {
 	int fullscreen; /* non-zero if fullscreen */
 	int bw; /* border size */
 	int obw; /* old border size */
-	int tag;
+	int ws;
 	Window win;
 	struct monitor *mon;
 	struct client *next;

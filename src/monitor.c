@@ -54,8 +54,8 @@ arrange_tilehorz(struct monitor *mon, Display *dpy)
 	struct client *c;
 	unsigned int i, n, h, mw, my, ty;
 
-	float mfact = mon->tags[mon->seltag].mfact;
-	unsigned int nmaster = mon->tags[mon->seltag].nmaster;
+	float mfact = mon->ws[mon->selws].mfact;
+	unsigned int nmaster = mon->ws[mon->selws].nmaster;
 
 	for (n = 0, c = next_tiled(mon->clients); c;
 			c = next_tiled(c->next), n++);
@@ -92,8 +92,8 @@ arrange_tilevert(struct monitor *mon, Display *dpy)
 	struct client *c;
 	unsigned int i, n, w, mh, mx, tx;
 
-	float mfact = mon->tags[mon->seltag].mfact;
-	unsigned int nmaster = mon->tags[mon->seltag].nmaster;
+	float mfact = mon->ws[mon->selws].mfact;
+	unsigned int nmaster = mon->ws[mon->selws].nmaster;
 
 	for (n = 0, c = next_tiled(mon->clients); c;
 			c = next_tiled(c->next), n++);
@@ -222,7 +222,7 @@ monitor_append(struct monitor *mons, struct monitor *new)
 void
 monitor_arrange(struct monitor *mon, Display *dpy)
 {
-	switch(mon->tags[mon->seltag].layout) {
+	switch(mon->ws[mon->selws].layout) {
 		case TileHorzLayout:
 			arrange_tilehorz(mon, dpy);
 			break;
@@ -265,13 +265,13 @@ monitor_create(struct config *cfg, int num, int x, int y, int w, int h,
 	mon->mw = mon->ww = w;
 	mon->mh = mon->wh = h;
 
-	mon->seltag = MIN_TAG;
+	mon->selws = MIN_WS;
 
-	for (i = 0; i < N_TAGS; i++) {
-		snprintf(mon->tags[i].name, TAG_NAME_SIZE, "%i", (i + 1));
-		mon->tags[i].layout = DEFAULT_LAYOUT;
-		mon->tags[i].nmaster = cfg->nmaster;
-		mon->tags[i].mfact = cfg->mfact;
+	for (i = 0; i < N_WORKSPACES; i++) {
+		snprintf(mon->ws[i].name, WS_NAME_SIZE, "%i", (i + 1));
+		mon->ws[i].layout = DEFAULT_LAYOUT;
+		mon->ws[i].nmaster = cfg->nmaster;
+		mon->ws[i].mfact = cfg->mfact;
 	}
 
 	monitor_show_bar(mon, dpy, mon->bar->showbar);
@@ -300,7 +300,7 @@ void
 monitor_draw_bar(struct monitor *mon, Display *dpy)
 {
 	char buf[512];
-	snprintf(buf, sizeof(buf), " %i:%i ", mon->num + 1, mon->seltag + 1);
+	snprintf(buf, sizeof(buf), " %i:%i ", mon->num + 1, mon->selws + 1);
 
 	bar_draw(mon->bar, dpy, buf);
 }
@@ -400,16 +400,16 @@ monitor_set_layout(struct monitor *mon, Display *dpy, int layout)
 {
 	assert(layout >= 0 && layout < LASTLayout);
 
-	mon->tags[mon->seltag].layout = layout;
+	mon->ws[mon->selws].layout = layout;
 	monitor_arrange(mon, dpy);
 }
 
 void
-monitor_set_tag(struct monitor *mon, Display *dpy, Window root, int tag)
+monitor_set_ws(struct monitor *mon, Display *dpy, Window root, int ws)
 {
-	assert(VALID_TAG(tag));
+	assert(VALID_WORKSPACE(ws));
 
-	mon->seltag = tag;
+	mon->selws = ws;
 
 	monitor_update(mon, dpy, root);
 }

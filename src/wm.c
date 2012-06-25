@@ -42,7 +42,7 @@ static void wm_key_handler_quit(struct wm *, struct key *);
 static void wm_key_handler_restart(struct wm *, struct key *);
 static void wm_key_handler_select(struct wm *, struct key *);
 static void wm_key_handler_setlayout(struct wm *, struct key *);
-static void wm_key_handler_settag(struct wm *, struct key *);
+static void wm_key_handler_setws(struct wm *, struct key *);
 static void wm_key_handler_spawn(struct wm *, struct key *);
 static void wm_key_handler_togglebar(struct wm *, struct key *);
 static void wm_key_handler_togglefloat(struct wm *, struct key *);
@@ -73,7 +73,7 @@ static void (*key_handler[LASTAction]) (struct wm *, struct key *) = {
 	[RestartAction] = wm_key_handler_restart,
 	[SelectAction] = wm_key_handler_select,
 	[SetLayoutAction] = wm_key_handler_setlayout,
-	[SetTagAction] = wm_key_handler_settag,
+	[SetWsAction] = wm_key_handler_setws,
 	[SpawnAction] = wm_key_handler_spawn,
 	[ToggleBarAction] = wm_key_handler_togglebar,
 	[ToggleFloatAction] = wm_key_handler_togglefloat
@@ -106,7 +106,7 @@ wm_create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 	client_setup(c, wm->cfg, wm->selmon, wm->dpy, wm->root, attr);
 
 	monitor_add_client(c->mon, c);
-	c->tag = c->mon->seltag;
+	c->ws = c->mon->selws;
 
 	monitor_unfocus_selected(c->mon, wm->dpy, wm->root);
 	monitor_select_client(c->mon, c);
@@ -566,10 +566,10 @@ void
 wm_key_handler_movewindow(struct wm *wm, struct key *key)
 {
 	if (key->args && wm->selmon->sel) {
-		int tag = atoi(key->args) - 1; /* off-by-one in binding */
+		int ws = atoi(key->args) - 1; /* off-by-one in binding */
 
-		if (VALID_TAG(tag)) {
-			wm->selmon->sel->tag = tag;
+		if (VALID_WORKSPACE(ws)) {
+			wm->selmon->sel->ws = ws;
 			monitor_update(wm->selmon, wm->dpy, wm->root);
 		}
 	}
@@ -608,7 +608,7 @@ wm_key_handler_select(struct wm *wm, struct key *key)
 void
 wm_key_handler_setlayout(struct wm *wm, struct key *key)
 {
-	int layout = wm->selmon->tags[wm->selmon->seltag].layout;
+	int layout = wm->selmon->ws[wm->selmon->selws].layout;
 
 	if (key->args) {
 		if (STREQ(key->args, "horz")) {
@@ -632,14 +632,13 @@ wm_key_handler_setlayout(struct wm *wm, struct key *key)
 }
 
 void
-wm_key_handler_settag(struct wm *wm, struct key *key)
+wm_key_handler_setws(struct wm *wm, struct key *key)
 {
 	if (key->args) {
-		int tag = atoi(key->args) - 1; /* off-by-one in binding */
+		int ws = atoi(key->args) - 1; /* off-by-one in binding */
 
-		if (tag >= MIN_TAG && tag <= MAX_TAG)
-			monitor_set_tag(wm->selmon, wm->dpy,
-					wm->root, tag);
+		if (ws >= MIN_WS && ws <= MAX_WS)
+			monitor_set_ws(wm->selmon, wm->dpy, wm->root, ws);
 	}
 }
 

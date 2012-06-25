@@ -8,11 +8,11 @@
 
 #define WMNAME "dawm"
 
-#define MIN_TAG 0
-#define MAX_TAG 8
-#define N_TAGS (MAX_TAG - MIN_TAG + 1)
+#define MIN_WS 0
+#define MAX_WS 8
+#define N_WORKSPACES (MAX_WS - MIN_WS + 1)
 
-#define VALID_TAG(T) (T >= MIN_TAG && T <= MAX_TAG)
+#define VALID_WORKSPACE(W) (W >= MIN_WS && W <= MAX_WS)
 
 #define M_FACT 0.55
 #define N_MASTER 1
