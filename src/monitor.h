@@ -24,23 +24,23 @@ typedef enum {
 #define DEFAULT_LAYOUT TileHorzLayout
 
 struct workspace {
-	char name[WS_NAME_SIZE];
-	LayoutID layout;
-	float mfact; /* master size factor (between 0 and 1) */
-	int nmaster; /* number of master clients */
+	char name[WS_NAME_SIZE]; /* workspace name */
+	LayoutID layout;         /* workspace layout id */
+	float mfact;             /* master size factor [0, 1] */
+	int nmaster;             /* number of master clients */
 };
 
 struct monitor {
-	int num;
-	struct bar *bar;
-	int mx, my, mw, mh; /* monitor geometry */
-	int wx, wy, ww, wh; /* window geometry */
-	struct client *clients;
-	struct client *cstack;
-	struct client *sel;
-	int selws;
-	struct workspace ws[N_WORKSPACES];
-	struct monitor *next;
+	int num;                           /* monitor number, 0... */
+	struct bar *bar;                   /* bar */
+	int mx, my, mw, mh;                /* monitor geometry */
+	int wx, wy, ww, wh;                /* window geometry */
+	struct client *clients;            /* client list */
+	struct client *cstack;             /* client stack */
+	struct client *sel;                /* selected client */
+	int selws;                         /* selected workspace */
+	struct workspace ws[N_WORKSPACES]; /* workspace information */
+	struct monitor *next;              /* next monitor */
 };
 
 /* add client to a monitor */

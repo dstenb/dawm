@@ -19,18 +19,18 @@
 #define HEIGHT(c)               ((c)->h + 2 * (c)->bw)
 
 struct client {
-	char name[CLIENT_NAME_SIZE];
-	int x, y, w, h; /* current position and size */
-	int ox, oy, ow, oh; /* old position and size */
-	int floating; /* non-zero if floating */
-	int fullscreen; /* non-zero if fullscreen */
-	int bw; /* border size */
-	int obw; /* old border size */
-	int ws;
-	Window win;
-	struct monitor *mon;
-	struct client *next;
-	struct client *snext;
+	char name[CLIENT_NAME_SIZE]; /* title */
+	int x, y, w, h;              /* current position and size */
+	int ox, oy, ow, oh;          /* old position and size */
+	int floating;                /* non-zero if floating */
+	int fullscreen;              /* non-zero if fullscreen */
+	int bw;                      /* border size */
+	int obw;                     /* old border size */
+	Window win;                  /* window that belongs to the client */
+	struct monitor *mon;         /* monitor that the client is on */
+	int ws;                      /* workspace that the client is on */
+	struct client *next;         /* next client in list */
+	struct client *snext;        /* next client in stack */
 };
 
 /* create a client */

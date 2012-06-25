@@ -33,11 +33,11 @@ typedef enum {
 } KeyAction;
 
 struct key {
-	unsigned int mod;
-	KeySym keysym;
-	KeyAction action;
-	char *args;
-	struct key *next;
+	unsigned int mod; /* modifier mask */
+	KeySym keysym;    /* keysym (XK_) */
+	KeyAction action; /* action */
+	char *args;       /* action arguments (can be NULL) */
+	struct key *next; /* next key in key list */
 };
 
 const char *key_action2str(KeyAction);

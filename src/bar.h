@@ -10,10 +10,10 @@
 #include "utils.h"
 
 struct bar {
-	Window win;
-	int topbar;
-	int showbar;
-	int x, y, w, h;
+	Window win;     /* bar window */
+	int topbar;     /* top/bottom of the screen */
+	int showbar;    /* show/hide the bar */
+	int x, y, w, h; /* bar geometry */
 };
 
 /* create a bar */

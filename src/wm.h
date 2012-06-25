@@ -21,22 +21,22 @@ typedef enum {
 } MotionType;
 
 struct motion {
-	MotionType type;
-	XButtonEvent start;
-	XWindowAttributes attr;
+	MotionType type;        /* motion type */
+	XButtonEvent start;     /* event when the motion was started */
+	XWindowAttributes attr; /* window attr. when the motion was started */
 };
 
 struct wm {
-	Display *dpy;
-	Window root;
-	int screen;
-	int width, height;
-	struct monitor *mons;
-	struct monitor *selmon;
-	struct key *keys;
-	struct config *cfg;
-	const char *cmd;
-	struct motion motion;
+	Display *dpy;           /* main Display struct */
+	Window root;            /* root window */
+	int screen;             /* screen number */
+	int width, height;      /* total width and height (all monitors) */
+	struct monitor *mons;   /* monitor list */
+	struct monitor *selmon; /* selected monitor */
+	struct key *keys;       /* key bindings */
+	struct config *cfg;     /* configuration settings */
+	const char *cmd;        /* command used to launch the wm*/
+	struct motion motion;   /* mouse motion info */
 };
 
 struct wm *wm_init(struct config *, const char *);

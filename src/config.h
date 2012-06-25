@@ -12,13 +12,13 @@
 #include "utils.h"
 
 struct config {
-	int topbar;
-	int showbar;
-	int bw;
-	struct key *keys;
-	float mfact;
-	unsigned int nmaster;
-	char *colors[LASTColor];
+	int topbar;              /* non-zero if bars should be in the top */
+	int showbar;             /* non-zero if bars should be shown */
+	int bw;                  /* window border width */
+	struct key *keys;        /* key bindings */
+	float mfact;             /* master size factor [0, 1] */
+	unsigned int nmaster;    /* number of master clients */
+	char *colors[LASTColor]; /* color values, in "#XXXXXX" form */
 };
 
 /* init a config struct, will set all the settings to the default values */
