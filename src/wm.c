@@ -82,9 +82,21 @@ static void (*key_handler[LASTAction]) (struct wm *, struct key *) = {
 static void
 dbg_print(struct wm *wm, const char *str)
 {
+	struct monitor *m = wm->selmon;
+	struct client *c;
+
+	(void)str;
 	DBG(":::: dbg_print(%s)\n", str);
 
-	monitor_dbg_print(wm->selmon, "");
+	DBG("m->sel: %p\n", (void *)m->sel);
+
+	DBG("m->clients:\n");
+	for (c = m->clients; c; c = c->next)
+		DBG("-> %p\n", c);
+	DBG("m->cstack:\n");
+	for (c = m->cstack; c; c = c->snext)
+		DBG("-> %p\n", c);
+	DBG("\n");
 }
 
 void

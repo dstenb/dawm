@@ -12,6 +12,16 @@ next_tiled(struct client *c)
 	return c;
 }
 
+static int
+no_of_tiled_clients(struct client *c)
+{
+	int n;
+
+	for (n = 0, c = next_tiled(c); c; c = next_tiled(c->next), n++);
+
+	return n;
+}
+
 static struct client *
 next_visible_client(struct client *curr)
 {
@@ -58,10 +68,7 @@ arrange_tilehorz(struct monitor *mon, Display *dpy)
 	float mfact = mon->ws[mon->selws].mfact;
 	unsigned int nmaster = mon->ws[mon->selws].nmaster;
 
-	for (n = 0, c = next_tiled(mon->clients); c;
-			c = next_tiled(c->next), n++);
-
-	if (n == 0)
+	if ((n = no_of_tiled_clients(mon->clients)) == 0)
 		return;
 
 	if (n > nmaster)
@@ -96,10 +103,7 @@ arrange_tilevert(struct monitor *mon, Display *dpy)
 	float mfact = mon->ws[mon->selws].mfact;
 	unsigned int nmaster = mon->ws[mon->selws].nmaster;
 
-	for (n = 0, c = next_tiled(mon->clients); c;
-			c = next_tiled(c->next), n++);
-
-	if (n == 0)
+	if ((n = no_of_tiled_clients(mon->clients)) == 0)
 		return;
 
 	if (n > nmaster)
@@ -281,23 +285,6 @@ monitor_create(struct config *cfg, int num, int x, int y, int w, int h,
 	monitor_show_bar(mon, dpy, mon->bar->showbar);
 
 	return mon;
-}
-
-void
-monitor_dbg_print(struct monitor *m, const char *str)
-{
-	struct client *c;
-	DBG("monitor_dbg_print (%s)\n", str);
-	DBG("monitor_dbg_print (%s)\n", str);
-	DBG("m->sel: %p\n", (void *)m->sel);
-
-	DBG("m->clients:\n");
-	for (c = m->clients; c; c = c->next)
-		DBG("-> %p\n", c);
-	DBG("m->cstack:\n");
-	for (c = m->cstack; c; c = c->snext)
-		DBG("-> %p\n", c);
-	DBG("\n");
 }
 
 void

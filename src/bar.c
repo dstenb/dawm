@@ -3,7 +3,7 @@
 #define EVENT_MASK (CWOverrideRedirect | CWBackPixmap | CWEventMask)
 
 static void bars_init_dc(Display *, Window, int);
-static void bars_init_font(Display *, Window, const char *);
+static void bars_init_font(Display *, const char *);
 
 static struct {
 	Drawable drawable;
@@ -80,7 +80,7 @@ void
 bars_init(Display *dpy, Window root, int screen, const char *fontstr)
 {
 	if (!initialized) {
-		bars_init_font(dpy, root, fontstr);
+		bars_init_font(dpy, fontstr);
 		bars_init_dc(dpy, root, screen);
 		initialized = 1;
 	}
@@ -95,7 +95,7 @@ bars_init_dc(Display *dpy, Window root, int screen)
 }
 
 void
-bars_init_font(Display *dpy, Window root, const char *fontstr)
+bars_init_font(Display *dpy, const char *fontstr)
 {
 	char *def, **missing;
 	int n;
@@ -131,5 +131,3 @@ bars_init_font(Display *dpy, Window root, const char *fontstr)
 
 	font.height = font.ascent + font.descent;
 }
-
-

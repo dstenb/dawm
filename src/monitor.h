@@ -56,9 +56,6 @@ void monitor_arrange(struct monitor *, Display *);
 struct monitor *monitor_create(struct config *, int, int, int, int, int,
 		Display *, Window, int);
 
-/* prints a debug message about the given monitor */
-void monitor_dbg_print(struct monitor *m, const char *str);
-
 /* set the floating state for the selected client */
 void monitor_float_selected(struct monitor *, Display *, int);
 
