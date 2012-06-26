@@ -5,78 +5,78 @@
 	EnterWindowMask | LeaveWindowMask | StructureNotifyMask | \
 	PropertyChangeMask
 
-static void wm_checkotherwm(struct wm *);
-static void wm_create_client(struct wm *, Window, XWindowAttributes *);
-static void wm_create_monitors(struct wm *);
-static void wm_get_windows(struct wm *);
-static void wm_handler_propertynotify_client(struct wm *, XPropertyEvent *);
-static void wm_handler_propertynotify_root(struct wm *, XPropertyEvent *);
-static void wm_quit(struct wm *, const char *);
-static void wm_remove_client(struct wm *, struct client *, int);
-static void wm_restart(struct wm *);
-static void wm_update_net_client_list(struct wm *);
-static int wm_xerror_checkotherwm(Display *, XErrorEvent *);
-static int wm_xerror(Display *, XErrorEvent *);
+static void checkotherwm(struct wm *);
+static void create_client(struct wm *, Window, XWindowAttributes *);
+static void create_monitors(struct wm *);
+static void get_windows(struct wm *);
+static void handler_propertynotify_client(struct wm *, XPropertyEvent *);
+static void handler_propertynotify_root(struct wm *, XPropertyEvent *);
+static void quit(struct wm *, const char *);
+static void remove_client(struct wm *, struct client *, int);
+static void restart(struct wm *);
+static void update_net_client_list(struct wm *);
+static int xerror_checkotherwm(Display *, XErrorEvent *);
+static int xerror(Display *, XErrorEvent *);
 
 /* X handlers */
-static void wm_handler_buttonpress(struct wm *, XEvent *);
-static void wm_handler_buttonrelease(struct wm *, XEvent *);
-static void wm_handler_clientmessage(struct wm *, XEvent *);
-static void wm_handler_configurerequest(struct wm *, XEvent *);
-static void wm_handler_configurenotify(struct wm *, XEvent *);
-static void wm_handler_destroynotify(struct wm *, XEvent *);
-static void wm_handler_enternotify(struct wm *, XEvent *);
-static void wm_handler_expose(struct wm *, XEvent *);
-static void wm_handler_focusin(struct wm *, XEvent *);
-static void wm_handler_keypress(struct wm *, XEvent *);
-static void wm_handler_mappingnotify(struct wm *, XEvent *);
-static void wm_handler_maprequest(struct wm *, XEvent *);
-static void wm_handler_motionnotify(struct wm *, XEvent *);
-static void wm_handler_propertynotify(struct wm *, XEvent *);
-static void wm_handler_unmapnotify(struct wm *, XEvent *);
+static void handler_buttonpress(struct wm *, XEvent *);
+static void handler_buttonrelease(struct wm *, XEvent *);
+static void handler_clientmessage(struct wm *, XEvent *);
+static void handler_configurerequest(struct wm *, XEvent *);
+static void handler_configurenotify(struct wm *, XEvent *);
+static void handler_destroynotify(struct wm *, XEvent *);
+static void handler_enternotify(struct wm *, XEvent *);
+static void handler_expose(struct wm *, XEvent *);
+static void handler_focusin(struct wm *, XEvent *);
+static void handler_keypress(struct wm *, XEvent *);
+static void handler_mappingnotify(struct wm *, XEvent *);
+static void handler_maprequest(struct wm *, XEvent *);
+static void handler_motionnotify(struct wm *, XEvent *);
+static void handler_propertynotify(struct wm *, XEvent *);
+static void handler_unmapnotify(struct wm *, XEvent *);
 
 /* key action handlers */
-static void wm_key_handler_kill(struct wm *, struct key *);
-static void wm_key_handler_movewindow(struct wm *, struct key *);
-static void wm_key_handler_quit(struct wm *, struct key *);
-static void wm_key_handler_restart(struct wm *, struct key *);
-static void wm_key_handler_select(struct wm *, struct key *);
-static void wm_key_handler_setlayout(struct wm *, struct key *);
-static void wm_key_handler_setws(struct wm *, struct key *);
-static void wm_key_handler_spawn(struct wm *, struct key *);
-static void wm_key_handler_togglebar(struct wm *, struct key *);
-static void wm_key_handler_togglefloat(struct wm *, struct key *);
+static void key_handler_kill(struct wm *, struct key *);
+static void key_handler_movewindow(struct wm *, struct key *);
+static void key_handler_quit(struct wm *, struct key *);
+static void key_handler_restart(struct wm *, struct key *);
+static void key_handler_select(struct wm *, struct key *);
+static void key_handler_setlayout(struct wm *, struct key *);
+static void key_handler_setws(struct wm *, struct key *);
+static void key_handler_spawn(struct wm *, struct key *);
+static void key_handler_togglebar(struct wm *, struct key *);
+static void key_handler_togglefloat(struct wm *, struct key *);
 
 static int (*xerrxlib) (Display *, XErrorEvent *);
 static void (*event_handler[LASTEvent]) (struct wm *, XEvent *) = {
-	[ButtonPress] = wm_handler_buttonpress,
-	[ButtonRelease] = wm_handler_buttonrelease,
-	[ClientMessage] = wm_handler_clientmessage,
-	[ConfigureRequest] = wm_handler_configurerequest,
-	[ConfigureNotify] = wm_handler_configurenotify,
-	[DestroyNotify] = wm_handler_destroynotify,
-	[EnterNotify] = wm_handler_enternotify,
-	[Expose] = wm_handler_expose,
-	[FocusIn] = wm_handler_focusin,
-	[KeyPress] = wm_handler_keypress,
-	[MappingNotify] = wm_handler_mappingnotify,
-	[MapRequest] = wm_handler_maprequest,
-	[MotionNotify] = wm_handler_motionnotify,
-	[PropertyNotify] = wm_handler_propertynotify,
-	[UnmapNotify] = wm_handler_unmapnotify
+	[ButtonPress] = handler_buttonpress,
+	[ButtonRelease] = handler_buttonrelease,
+	[ClientMessage] = handler_clientmessage,
+	[ConfigureRequest] = handler_configurerequest,
+	[ConfigureNotify] = handler_configurenotify,
+	[DestroyNotify] = handler_destroynotify,
+	[EnterNotify] = handler_enternotify,
+	[Expose] = handler_expose,
+	[FocusIn] = handler_focusin,
+	[KeyPress] = handler_keypress,
+	[MappingNotify] = handler_mappingnotify,
+	[MapRequest] = handler_maprequest,
+	[MotionNotify] = handler_motionnotify,
+	[PropertyNotify] = handler_propertynotify,
+	[UnmapNotify] = handler_unmapnotify
 };
 
 static void (*key_handler[LASTAction]) (struct wm *, struct key *) = {
-	[KillAction] = wm_key_handler_kill,
-	[MoveWindowAction] = wm_key_handler_movewindow,
-	[QuitAction] = wm_key_handler_quit,
-	[RestartAction] = wm_key_handler_restart,
-	[SelectAction] = wm_key_handler_select,
-	[SetLayoutAction] = wm_key_handler_setlayout,
-	[SetWsAction] = wm_key_handler_setws,
-	[SpawnAction] = wm_key_handler_spawn,
-	[ToggleBarAction] = wm_key_handler_togglebar,
-	[ToggleFloatAction] = wm_key_handler_togglefloat
+	[KillAction] = key_handler_kill,
+	[MoveWindowAction] = key_handler_movewindow,
+	[QuitAction] = key_handler_quit,
+	[RestartAction] = key_handler_restart,
+	[SelectAction] = key_handler_select,
+	[SetLayoutAction] = key_handler_setlayout,
+	[SetWsAction] = key_handler_setws,
+	[SpawnAction] = key_handler_spawn,
+	[ToggleBarAction] = key_handler_togglebar,
+	[ToggleFloatAction] = key_handler_togglefloat
 };
 
 static void
@@ -88,18 +88,18 @@ dbg_print(struct wm *wm, const char *str)
 }
 
 void
-wm_checkotherwm(struct wm *wm)
+checkotherwm(struct wm *wm)
 {
-	xerrxlib = XSetErrorHandler(wm_xerror_checkotherwm);
+	xerrxlib = XSetErrorHandler(xerror_checkotherwm);
 	/* this causes an error if some other window manager is running */
 	XSelectInput(wm->dpy, wm->root, SubstructureRedirectMask);
 	XSync(wm->dpy, False);
-	XSetErrorHandler(wm_xerror);
+	XSetErrorHandler(xerror);
 	XSync(wm->dpy, False);
 }
 
 void
-wm_create_client(struct wm *wm, Window win, XWindowAttributes *attr)
+create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 {
 	struct client *c = client_create(win, attr);
 
@@ -119,7 +119,7 @@ wm_create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 
 /* TODO: fix Xinerama */
 void
-wm_create_monitors(struct wm *wm)
+create_monitors(struct wm *wm)
 {
 	/* TODO: test code, to be removed */
 
@@ -132,7 +132,7 @@ wm_create_monitors(struct wm *wm)
 }
 
 int
-wm_destroy(struct wm *wm)
+destroy(struct wm *wm)
 {
 	/* TODO */
 
@@ -146,7 +146,7 @@ wm_destroy(struct wm *wm)
 }
 
 int
-wm_eventloop(struct wm *wm)
+eventloop(struct wm *wm)
 {
 	XEvent ev;
 
@@ -159,7 +159,7 @@ wm_eventloop(struct wm *wm)
 }
 
 struct wm *
-wm_init(struct config *cfg, const char *cmd)
+init(struct config *cfg, const char *cmd)
 {
 	XSetWindowAttributes attr;
 	struct wm *wm;
@@ -173,7 +173,7 @@ wm_init(struct config *cfg, const char *cmd)
 	wm->root = RootWindow(wm->dpy, wm->screen);
 
 	/* check if another wm is running */
-	wm_checkotherwm(wm);
+	checkotherwm(wm);
 
 	wm->width = DisplayWidth(wm->dpy, wm->screen);
 	wm->height = DisplayHeight(wm->dpy, wm->screen);
@@ -185,7 +185,7 @@ wm_init(struct config *cfg, const char *cmd)
 	colors_init(cfg->colors, wm->dpy, wm->screen);
 	bars_init(wm->dpy, wm->root, wm->screen,
 			"-*-terminus-medium-r-*-*-16-*-*-*-*-*-*-*");
-	wm_create_monitors(wm);
+	create_monitors(wm);
 
 	/* select events to handle */
 	attr.event_mask = WM_EVENT_MASK;
@@ -207,7 +207,7 @@ wm_init(struct config *cfg, const char *cmd)
 	net_set_supported(wm->dpy, wm->root);
 
 	/* manage all windows that already exists */
-	wm_get_windows(wm);
+	get_windows(wm);
 
 	set_text_prop(wm->dpy, wm->root, atom(NetWMName), WMNAME);
 
@@ -215,7 +215,7 @@ wm_init(struct config *cfg, const char *cmd)
 }
 
 void
-wm_get_windows(struct wm *wm)
+get_windows(struct wm *wm)
 {
 	XWindowAttributes attr;
 	Window d1, d2;
@@ -229,7 +229,7 @@ wm_get_windows(struct wm *wm)
 				continue;
 
 			/* TODO: fix hints */
-			wm_create_client(wm, wins[i], &attr);
+			create_client(wm, wins[i], &attr);
 		}
 
 		if (wins)
@@ -238,7 +238,7 @@ wm_get_windows(struct wm *wm)
 }
 
 void
-wm_handler_buttonpress(struct wm *wm, XEvent *ev)
+handler_buttonpress(struct wm *wm, XEvent *ev)
 {
 	XButtonPressedEvent *bpev = &ev->xbutton;
 	struct client *c;
@@ -267,7 +267,7 @@ wm_handler_buttonpress(struct wm *wm, XEvent *ev)
 }
 
 void
-wm_handler_buttonrelease(struct wm *wm, XEvent *ev)
+handler_buttonrelease(struct wm *wm, XEvent *ev)
 {
 	(void)ev;
 
@@ -280,7 +280,7 @@ wm_handler_buttonrelease(struct wm *wm, XEvent *ev)
 }
 
 void
-wm_handler_clientmessage(struct wm *wm, XEvent *ev)
+handler_clientmessage(struct wm *wm, XEvent *ev)
 {
 	XClientMessageEvent *cmev = &ev->xclient;
 
@@ -312,7 +312,7 @@ wm_handler_clientmessage(struct wm *wm, XEvent *ev)
 }
 
 void
-wm_handler_configurerequest(struct wm *wm, XEvent *ev)
+handler_configurerequest(struct wm *wm, XEvent *ev)
 {
 	XConfigureRequestEvent *crev = &ev->xconfigurerequest;
 	struct client *c;
@@ -337,7 +337,7 @@ wm_handler_configurerequest(struct wm *wm, XEvent *ev)
 }
 
 void
-wm_handler_configurenotify(struct wm *wm, XEvent *ev)
+handler_configurenotify(struct wm *wm, XEvent *ev)
 {
 	(void)wm;
 	(void)ev;
@@ -345,7 +345,7 @@ wm_handler_configurenotify(struct wm *wm, XEvent *ev)
 }
 
 void
-wm_handler_destroynotify(struct wm *wm, XEvent *ev)
+handler_destroynotify(struct wm *wm, XEvent *ev)
 {
 	struct client *c;
 	Window win;
@@ -354,11 +354,11 @@ wm_handler_destroynotify(struct wm *wm, XEvent *ev)
 
 	win = ev->xdestroywindow.window;
 	if ((c = find_client_by_window(wm->mons, win)))
-		wm_remove_client(wm, c, 1);
+		remove_client(wm, c, 1);
 }
 
 void
-wm_handler_enternotify(struct wm *wm, XEvent *ev)
+handler_enternotify(struct wm *wm, XEvent *ev)
 {
 	XCrossingEvent *cev = &ev->xcrossing;
 	struct client *c;
@@ -372,7 +372,7 @@ wm_handler_enternotify(struct wm *wm, XEvent *ev)
 }
 
 void
-wm_handler_expose(struct wm *wm, XEvent *ev)
+handler_expose(struct wm *wm, XEvent *ev)
 {
 	(void)wm;
 	(void)ev;
@@ -380,7 +380,7 @@ wm_handler_expose(struct wm *wm, XEvent *ev)
 }
 
 void
-wm_handler_focusin(struct wm *wm, XEvent *ev)
+handler_focusin(struct wm *wm, XEvent *ev)
 {
 	XFocusChangeEvent *fcev = &ev->xfocus;
 
@@ -392,7 +392,7 @@ wm_handler_focusin(struct wm *wm, XEvent *ev)
 }
 
 void
-wm_handler_keypress(struct wm *wm, XEvent *ev)
+handler_keypress(struct wm *wm, XEvent *ev)
 {
 	XKeyEvent *kev = &ev->xkey;
 	struct key *key;
@@ -414,7 +414,7 @@ wm_handler_keypress(struct wm *wm, XEvent *ev)
 }
 
 void
-wm_handler_mappingnotify(struct wm *wm, XEvent *ev)
+handler_mappingnotify(struct wm *wm, XEvent *ev)
 {
 	(void)wm;
 	(void)ev;
@@ -422,7 +422,7 @@ wm_handler_mappingnotify(struct wm *wm, XEvent *ev)
 }
 
 void
-wm_handler_maprequest(struct wm *wm, XEvent *ev)
+handler_maprequest(struct wm *wm, XEvent *ev)
 {
 	static XWindowAttributes attr;
 	XMapRequestEvent *mrev = &ev->xmaprequest;
@@ -433,11 +433,11 @@ wm_handler_maprequest(struct wm *wm, XEvent *ev)
 			attr.override_redirect)
 		return;
 	if(!find_client_by_window(wm->mons, mrev->window))
-		wm_create_client(wm, mrev->window, &attr);
+		create_client(wm, mrev->window, &attr);
 }
 
 void
-wm_handler_motionnotify(struct wm *wm, XEvent *ev)
+handler_motionnotify(struct wm *wm, XEvent *ev)
 {
 	XMotionEvent *mev = &ev->xmotion;
 	struct client *c;
@@ -485,21 +485,21 @@ wm_handler_motionnotify(struct wm *wm, XEvent *ev)
 }
 
 void
-wm_handler_propertynotify(struct wm *wm, XEvent *ev)
+handler_propertynotify(struct wm *wm, XEvent *ev)
 {
 	XPropertyEvent *pev = &ev->xproperty;
 
 	dbg_print(wm, __func__);
 
 	if (pev->window == wm->root)
-		wm_handler_propertynotify_root(wm, pev);
+		handler_propertynotify_root(wm, pev);
 	else
-		wm_handler_propertynotify_client(wm, pev);
+		handler_propertynotify_client(wm, pev);
 
 }
 
 void
-wm_handler_propertynotify_client(struct wm *wm, XPropertyEvent *ev)
+handler_propertynotify_client(struct wm *wm, XPropertyEvent *ev)
 {
 	struct client *c;
 
@@ -525,7 +525,7 @@ wm_handler_propertynotify_client(struct wm *wm, XPropertyEvent *ev)
 }
 
 void
-wm_handler_propertynotify_root(struct wm *wm, XPropertyEvent *ev)
+handler_propertynotify_root(struct wm *wm, XPropertyEvent *ev)
 {
 	(void)wm;
 
@@ -540,7 +540,7 @@ wm_handler_propertynotify_root(struct wm *wm, XPropertyEvent *ev)
 }
 
 void
-wm_handler_unmapnotify(struct wm *wm, XEvent *ev)
+handler_unmapnotify(struct wm *wm, XEvent *ev)
 {
 	struct client *c;
 	XUnmapEvent *uev = &ev->xunmap;
@@ -551,19 +551,19 @@ wm_handler_unmapnotify(struct wm *wm, XEvent *ev)
 		if(uev->send_event)
 			client_set_state(c, wm->dpy, WithdrawnState);
 		else
-			wm_remove_client(wm, c, 0);
+			remove_client(wm, c, 0);
 	}
 }
 
 void
-wm_key_handler_kill(struct wm *wm, struct key *key)
+key_handler_kill(struct wm *wm, struct key *key)
 {
 	(void)key;
 	client_kill(wm->selmon->sel, wm->dpy);
 }
 
 void
-wm_key_handler_movewindow(struct wm *wm, struct key *key)
+key_handler_movewindow(struct wm *wm, struct key *key)
 {
 	if (key->args && wm->selmon->sel) {
 		int ws = atoi(key->args) - 1; /* off-by-one in binding */
@@ -577,20 +577,20 @@ wm_key_handler_movewindow(struct wm *wm, struct key *key)
 }
 
 void
-wm_key_handler_quit(struct wm *wm, struct key *key)
+key_handler_quit(struct wm *wm, struct key *key)
 {
 	(void)key;
-	wm_quit(wm, "received exit key command");
+	quit(wm, "received exit key command");
 }
 void
-wm_key_handler_restart(struct wm *wm, struct key *key)
+key_handler_restart(struct wm *wm, struct key *key)
 {
 	(void)key;
-	wm_restart(wm);
+	restart(wm);
 }
 
 void
-wm_key_handler_select(struct wm *wm, struct key *key)
+key_handler_select(struct wm *wm, struct key *key)
 {
 	if (key->args) {
 		if (STREQ(key->args, "next")) {
@@ -607,7 +607,7 @@ wm_key_handler_select(struct wm *wm, struct key *key)
 }
 
 void
-wm_key_handler_setlayout(struct wm *wm, struct key *key)
+key_handler_setlayout(struct wm *wm, struct key *key)
 {
 	int layout = wm->selmon->ws[wm->selmon->selws].layout;
 
@@ -633,7 +633,7 @@ wm_key_handler_setlayout(struct wm *wm, struct key *key)
 }
 
 void
-wm_key_handler_setws(struct wm *wm, struct key *key)
+key_handler_setws(struct wm *wm, struct key *key)
 {
 	if (key->args) {
 		int ws = atoi(key->args) - 1; /* off-by-one in binding */
@@ -644,21 +644,21 @@ wm_key_handler_setws(struct wm *wm, struct key *key)
 }
 
 void
-wm_key_handler_spawn(struct wm *wm, struct key *key)
+key_handler_spawn(struct wm *wm, struct key *key)
 {
 	(void)wm;
 	spawn(key->args);
 }
 
 void
-wm_key_handler_togglebar(struct wm *wm, struct key *key)
+key_handler_togglebar(struct wm *wm, struct key *key)
 {
 	(void)key;
 	monitor_toggle_bar(wm->selmon, wm->dpy);
 }
 
 void
-wm_key_handler_togglefloat(struct wm *wm, struct key *key)
+key_handler_togglefloat(struct wm *wm, struct key *key)
 {
 	(void)key;
 	if (wm->selmon->sel)
@@ -667,16 +667,16 @@ wm_key_handler_togglefloat(struct wm *wm, struct key *key)
 }
 
 void
-wm_quit(struct wm *wm, const char *reason)
+quit(struct wm *wm, const char *reason)
 {
-	wm_destroy(wm);
+	destroy(wm);
 	if (reason)
 		die("quitting (%s)\n", reason);
 	die("quitting\n");
 }
 
 void
-wm_remove_client(struct wm *wm, struct client *c, int destroyed)
+remove_client(struct wm *wm, struct client *c, int destroyed)
 {
 	struct monitor *mon = c->mon;
 
@@ -690,11 +690,11 @@ wm_remove_client(struct wm *wm, struct client *c, int destroyed)
 	monitor_focus(mon, NULL, wm->dpy, wm->root);
 	monitor_arrange(mon, wm->dpy);
 
-	wm_update_net_client_list(wm);
+	update_net_client_list(wm);
 }
 
 void
-wm_restart(struct wm *wm)
+restart(struct wm *wm)
 {
 	DBG("%s. restarting!\n", __func__);
 	if (wm->cmd)
@@ -702,7 +702,7 @@ wm_restart(struct wm *wm)
 }
 
 void
-wm_update_net_client_list(struct wm *wm)
+update_net_client_list(struct wm *wm)
 {
 	struct monitor *mon;
 	struct client *c;
@@ -715,7 +715,7 @@ wm_update_net_client_list(struct wm *wm)
 }
 
 int
-wm_xerror(Display *dpy, XErrorEvent *ee)
+xerror(Display *dpy, XErrorEvent *ee)
 {
 	error("fatal error: request code=%d, error code=%d\n",
 			ee->request_code, ee->error_code);
@@ -724,7 +724,7 @@ wm_xerror(Display *dpy, XErrorEvent *ee)
 }
 
 int
-wm_xerror_checkotherwm(Display *dpy, XErrorEvent *ee)
+xerror_checkotherwm(Display *dpy, XErrorEvent *ee)
 {
 	(void)dpy;
 	(void)ee;

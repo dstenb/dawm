@@ -65,9 +65,9 @@ main(int argc, char **argv)
 	if (config_load(cfg, cfg_str) != 0)
 		error("error loading '%s': %s\n", cfg_str, strerror(errno));
 
-	wm = wm_init(cfg, strfvs(argv, ' '));
-	wm_eventloop(wm);
-	wm_destroy(wm);
+	wm = init(cfg, strfvs(argv, ' '));
+	eventloop(wm);
+	destroy(wm);
 
 	return 0;
 }

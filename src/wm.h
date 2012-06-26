@@ -39,10 +39,10 @@ struct wm {
 	struct motion motion;   /* mouse motion info */
 };
 
-struct wm *wm_init(struct config *, const char *);
+struct wm *init(struct config *, const char *);
 
-int wm_eventloop(struct wm *);
+int eventloop(struct wm *);
 
-int wm_destroy(struct wm *);
+int destroy(struct wm *);
 
 #endif
