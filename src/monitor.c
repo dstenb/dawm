@@ -120,7 +120,7 @@ arrange_tilevert(struct monitor *mon, Display *dpy)
 			mx += WIDTH(c);
 		} else {
 			w = (mon->ww - tx) / (n - i);
-			client_move_resize(c, dpy, mon->mx + tx, mon->wy + mh,
+			client_move_resize(c, dpy, mon->wx + tx, mon->wy + mh,
 					w - (2*c->bw), mon->wh - mh - (2*c->bw));
 			tx += WIDTH(c);
 		}
@@ -140,8 +140,8 @@ arrange_max(struct monitor *mon, Display *dpy)
 	struct client *c;
 
 	for (c = next_tiled(mon->clients); c; c = next_tiled(c->next)) {
-		client_move_resize(c, dpy, mon->mx, mon->wy,
-				mon->mw - (2*c->bw), mon->mh - (2*c->bw));
+		client_move_resize(c, dpy, mon->wx, mon->wy,
+				mon->ww - (2*c->bw), mon->wh - (2*c->bw));
 	}
 }
 
