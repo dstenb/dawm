@@ -14,6 +14,7 @@ static void handler_propertynotify_root(struct wm *, XPropertyEvent *);
 static void quit(struct wm *, const char *);
 static void remove_client(struct wm *, struct client *, int);
 static void restart(struct wm *);
+static void update_bars(struct wm *);
 static void update_net_client_list(struct wm *);
 static int xerror_checkotherwm(Display *, XErrorEvent *);
 static int xerror(Display *, XErrorEvent *);
@@ -167,12 +168,42 @@ int
 eventloop(struct wm *wm)
 {
 	XEvent ev;
+	struct timeval tv;
+	fd_set fds;
+	int xfd;
+	int n;
+
+	/* get display fd */
+	xfd = ConnectionNumber(wm->dpy);
+
+	tv.tv_sec = BAR_UPDATE_RATE;
+	tv.tv_usec = 0;
 
 	for (;;) {
-		XNextEvent(wm->dpy, &ev);
-		if (event_handler[ev.type])
-			event_handler[ev.type](wm, &ev);
+
+		FD_ZERO(&fds);
+		FD_SET(xfd, &fds);
+
+		if ((n = select(xfd + 1, &fds, NULL, NULL, &tv)) < 0) {
+			if (errno == EINTR) /* interrupt during select() */
+				continue;
+			die("select(): %s\n", strerror(errno));
+		} else if (n > 0) {
+			while (XPending(wm->dpy)) {
+				XNextEvent(wm->dpy, &ev);
+				if (event_handler[ev.type])
+					event_handler[ev.type](wm, &ev);
+			}
+		} else {
+			/* bar timer event */
+
+			update_bars(wm);
+
+			tv.tv_sec = BAR_UPDATE_RATE;
+			tv.tv_usec = 0;
+		}
 	}
+
 	return 0;
 }
 
@@ -721,6 +752,18 @@ restart(struct wm *wm)
 	DBG("%s. restarting!\n", __func__);
 	if (wm->cmd)
 		execlp("/bin/sh", "sh" , "-c", wm->cmd, NULL);
+}
+
+void
+update_bars(struct wm *wm)
+{
+	/* TODO: test code, to be removed */
+	struct monitor *mon;
+
+	for (mon = wm->mons; mon; mon = mon->next)
+		monitor_draw_bar(mon, wm->dpy);
+
+	dbg_print(wm, __func__);
 }
 
 void

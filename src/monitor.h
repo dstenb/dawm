@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "bar.h"
 #include "client.h"
@@ -55,6 +56,8 @@ void monitor_arrange(struct monitor *, Display *);
 /* creates a monitor */
 struct monitor *monitor_create(struct config *, int, int, int, int, int,
 		Display *, Window, int);
+
+void monitor_draw_bar(struct monitor *, Display *);
 
 /* set the floating state for the selected client */
 void monitor_float_selected(struct monitor *, Display *, int);

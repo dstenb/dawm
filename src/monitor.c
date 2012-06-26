@@ -1,6 +1,5 @@
 #include "monitor.h"
 
-static void monitor_draw_bar(struct monitor *, Display *);
 static void monitor_restack(struct monitor *, Display *);
 static void monitor_show_hide(struct monitor *, Display *);
 static void monitor_update_window_size(struct monitor *);
@@ -291,7 +290,14 @@ void
 monitor_draw_bar(struct monitor *mon, Display *dpy)
 {
 	char buf[512];
-	snprintf(buf, sizeof(buf), " %i:%i ", mon->num + 1, mon->selws + 1);
+	char timestr[64];
+	time_t t;
+
+	t = time(NULL);
+
+	strftime(timestr, sizeof(timestr), "%y/%m/%d %H:%M:%S", localtime(&t));
+	snprintf(buf, sizeof(buf), "  %i:%i  %s ", mon->num + 1,
+			mon->selws + 1, timestr);
 
 	bar_draw(mon->bar, dpy, buf);
 }
