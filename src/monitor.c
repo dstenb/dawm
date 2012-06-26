@@ -135,11 +135,10 @@ arrange_max(struct monitor *mon, Display *dpy)
 {
 	struct client *c;
 
-	if (!(c = next_tiled(mon->clients)))
-		return;
-
-	client_move_resize(c, dpy, mon->mx, mon->wy, mon->mw - (2*c->bw),
-			mon->mh - (2*c->bw));
+	for (c = next_tiled(mon->clients); c; c = next_tiled(c->next)) {
+		client_move_resize(c, dpy, mon->mx, mon->wy,
+				mon->mw - (2*c->bw), mon->mh - (2*c->bw));
+	}
 }
 
 static void
@@ -413,6 +412,7 @@ monitor_select_next_client(struct monitor *mon, Display *dpy, Window root)
 		monitor_unfocus_selected(mon, dpy, root);
 		monitor_select_client(mon, c);
 		monitor_focus(mon, c, dpy, root);
+		monitor_restack(mon, dpy);
 	}
 }
 
@@ -428,6 +428,7 @@ monitor_select_prev_client(struct monitor *mon, Display *dpy, Window root)
 		monitor_unfocus_selected(mon, dpy, root);
 		monitor_select_client(mon, c);
 		monitor_focus(mon, c, dpy, root);
+		monitor_restack(mon, dpy);
 	}
 }
 
