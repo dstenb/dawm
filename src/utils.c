@@ -54,7 +54,7 @@ strfvs(char **v, char c)
 	if (v && *v) {
 		l = 1 + strlen(v[0]);
 		for (i = 1; v[i]; i++)
-			l += strlen(v[1]) + 1;
+			l += strlen(v[i]) + 1;
 
 		s = xcalloc(l, sizeof(char));
 
