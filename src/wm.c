@@ -570,7 +570,8 @@ wm_key_handler_movewindow(struct wm *wm, struct key *key)
 
 		if (VALID_WORKSPACE(ws)) {
 			wm->selmon->sel->ws = ws;
-			monitor_update(wm->selmon, wm->dpy, wm->root);
+			monitor_focus(wm->selmon, NULL, wm->dpy, wm->root);
+			monitor_arrange(wm->selmon, wm->dpy);
 		}
 	}
 }

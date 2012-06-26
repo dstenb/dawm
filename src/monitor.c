@@ -1,6 +1,7 @@
 #include "monitor.h"
 
 static void monitor_draw_bar(struct monitor *, Display *);
+static void monitor_restack(struct monitor *, Display *);
 static void monitor_show_hide(struct monitor *, Display *);
 static void monitor_update_window_size(struct monitor *);
 
@@ -222,6 +223,8 @@ monitor_append(struct monitor *mons, struct monitor *new)
 void
 monitor_arrange(struct monitor *mon, Display *dpy)
 {
+	monitor_show_hide(mon, dpy);
+
 	switch(mon->ws[mon->selws].layout) {
 		case TileHorzLayout:
 			arrange_tilehorz(mon, dpy);
@@ -241,6 +244,8 @@ monitor_arrange(struct monitor *mon, Display *dpy)
 		default:
 			break;
 	}
+
+	monitor_restack(mon, dpy);
 }
 
 struct monitor *
@@ -358,6 +363,38 @@ monitor_remove_client(struct monitor *mon, struct client *c)
 		mon->sel = mon->clients;
 }
 
+#define RES_MASK (CWSibling | CWStackMode)
+
+void
+monitor_restack(struct monitor *mon, Display *dpy)
+{
+	struct client *c;
+	XEvent ev;
+	XWindowChanges wc;
+
+	monitor_draw_bar(mon, dpy);
+
+	if (!mon->sel)
+		return;
+	if (mon->sel->floating || !ISARRANGED(mon))
+		XRaiseWindow(dpy, mon->sel->win);
+
+	if (ISARRANGED(mon)) {
+		wc.stack_mode = Below;
+		wc.sibling = mon->bar->win;
+
+		for (c = mon->cstack; c; c = c->snext) {
+			if (!c->floating && ISVISIBLE(c)) {
+				XConfigureWindow(dpy, c->win, RES_MASK, &wc);
+				wc.sibling = c->win;
+			}
+		}
+	}
+
+	XSync(dpy, False);
+	while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
+}
+
 void
 monitor_select_client(struct monitor *mon, struct client *c)
 {
@@ -411,7 +448,8 @@ monitor_set_ws(struct monitor *mon, Display *dpy, Window root, int ws)
 
 	mon->selws = ws;
 
-	monitor_update(mon, dpy, root);
+	monitor_focus(mon, NULL,dpy, root);
+	monitor_arrange(mon, dpy);
 }
 
 void
@@ -483,12 +521,4 @@ void
 monitor_show_hide(struct monitor *mon, Display *dpy)
 {
 	show_hide(mon->cstack, dpy);
-}
-
-void
-monitor_update(struct monitor *mon, Display *dpy, Window root)
-{
-	monitor_show_hide(mon, dpy);
-	monitor_arrange(mon, dpy);
-	monitor_focus(mon, NULL, dpy, root);
 }
