@@ -79,14 +79,17 @@ static void (*key_handler[LASTAction]) (struct wm *, struct key *) = {
 	[ToggleFloatAction] = key_handler_togglefloat
 };
 
+/*#define MONITOR_DBG*/
+
 static void
 dbg_print(struct wm *wm, const char *str)
 {
-	struct monitor *m = wm->selmon;
-	struct client *c;
-
 	(void)str;
 	DBG(":::: dbg_print(%s)\n", str);
+
+#ifdef MONITOR_DBG
+	struct monitor *m = wm->selmon;
+	struct client *c;
 
 	DBG("m->sel: %p\n", (void *)m->sel);
 
@@ -97,6 +100,9 @@ dbg_print(struct wm *wm, const char *str)
 	for (c = m->cstack; c; c = c->snext)
 		DBG("-> %p\n", c);
 	DBG("\n");
+#else
+	(void)wm;
+#endif
 }
 
 void
