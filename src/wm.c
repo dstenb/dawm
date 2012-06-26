@@ -351,9 +351,13 @@ handler_configurerequest(struct wm *wm, XEvent *ev)
 void
 handler_configurenotify(struct wm *wm, XEvent *ev)
 {
-	(void)wm;
-	(void)ev;
 	dbg_print(wm, __func__);
+
+	if (ev->xconfigure.window == wm->root) {
+		/* restart the WM to make sure that any changes to the
+		 * X server are handled (e.g. resolution change etc.) */
+		restart(wm);
+	}
 }
 
 void
