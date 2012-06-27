@@ -10,6 +10,7 @@
 #include "colors.h"
 #include "config.h"
 #include "cursors.h"
+#include "info.h"
 #include "keys.h"
 #include "monitor.h"
 #include "utils.h"

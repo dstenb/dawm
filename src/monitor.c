@@ -291,13 +291,22 @@ monitor_draw_bar(struct monitor *mon, Display *dpy)
 {
 	char buf[512];
 	char timestr[64];
-	time_t t;
+	const struct info *i = info();
 
-	t = time(NULL);
+	strftime(timestr, sizeof(timestr), "%y/%m/%d %H:%M",
+			localtime(&i->time));
 
-	strftime(timestr, sizeof(timestr), "%y/%m/%d %H:%M:%S", localtime(&t));
-	snprintf(buf, sizeof(buf), "  %i:%i  %s ", mon->num + 1,
-			mon->selws + 1, timestr);
+#ifdef __linux__
+	snprintf(buf, sizeof(buf), "  %i:%i  %s  UPTIME: %ld:%ld  CPU: %i%c  "
+			"MEM: %ld/%ldMB  BAT: %i%c",
+			mon->num + 1, mon->selws + 1, timestr,
+			i->uptime / 3600, (i->uptime / 60) % 60,
+			i->cpu, '%', i->mem_used / 1024, i->mem_total / 1024,
+			i->battery, '%');
+#else
+	snprintf(buf, sizeof(buf), "  %i:%i  %s", mon->num + 1, mon->selws + 1,
+			timestr);
+#endif
 
 	bar_draw(mon->bar, dpy, buf);
 }

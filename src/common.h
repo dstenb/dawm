@@ -17,6 +17,7 @@
 #define M_FACT 0.55
 #define N_MASTER 1
 
-#define BAR_UPDATE_RATE 1
+#define BAR_FONT "-*-terminus-medium-r-*-*-12-*-*-*-*-*-*-*"
+#define BAR_UPDATE_RATE 5
 
 #endif
