@@ -1,30 +1,35 @@
-CC = cc
-CFLAGS = -std=c99 -Wall -O2 -pedantic -Wextra -D_GNU_SOURCE
-CFLAGS += -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes \
-	  -Wmissing-prototypes
-CC_COMPILE = $(CC) $(CFLAGS) -c
+include config.mk
 
-OBJFILES := $(patsubst %.c,%.o,$(wildcard *.c))
+#CFLAGS = -std=c99 -Wall -O2 -pedantic -Wextra -D_GNU_SOURCE
+#CFLAGS += -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes \
+#	  -Wmissing-prototypes
+#CC_COMPILE = $(CC) $(CFLAGS) -c -DXINERAMA
 
-PREFIX=/usr/local
+SRC = main.c atoms.c bar.c client.c colors.c config.c cursors.c info.c \
+      keys.c monitor.c utils.c wm.c xutils.c
+OBJ = ${SRC:.c=.o}
 
-all: clean version.h dawm
+all: options version.h dawm
 
-dawm : $(OBJFILES)
-	$(CC) -o dawm $(OBJFILES) -lX11
+options:
+	@echo dawm build options:
+	@echo "CFLAGS   = ${CFLAGS}"
+	@echo "LDFLAGS  = ${LDFLAGS}"
+	@echo "CC       = ${CC}"
 
-%.o: %.c
-	$(CC_COMPILE) -o $@ $<
+.c.o:
+	@echo CC $<
+	@${CC} -c ${CFLAGS} $<
+
+${OBJ}: version.h
+
+dawm: ${OBJ}
+	@echo CC -o $@
+	@${CC} -o $@ ${OBJ} ${LDFLAGS}
 
 clean:
 	@echo cleaning directory
 	@rm -f *.o dawm
-
-install: all
-	@echo installing dawm to ${PREFIX}/bin
-	@mkdir -p ${PREFIX}/bin
-	@cp -f dawm ${PREFIX}/bin
-	@chmod 755 ${PREFIX}/bin/dawm
 
 version.h:
 	@echo "#ifndef _VERSION_H_" >  version.h

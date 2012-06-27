@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define XINERAMA
-
 #define WMNAME "dawm"
 
 #define MIN_WS 0

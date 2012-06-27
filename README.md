@@ -5,9 +5,10 @@ DAWM is a tiling window manager written in C, that is partially based on dwm.
 
 The long-term goals of DAWM are:
 
-* To have as few dependencies as possible (Only standard C library and Xlib)
+* To have as few dependencies as possible (Should be compilable with only POSIX libraries and Xlib)
 * EWMH (NetWM) compliance
-* Xinerama support
+* (Optional) Xinerama support
+* (Optional) Xft support
 
 Installation
 ------------
