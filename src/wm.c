@@ -140,14 +140,30 @@ create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 void
 create_monitors(struct wm *wm)
 {
-	/* TODO: test code, to be removed */
+#ifdef XINERAMA
+	struct monitor *mon;
+	int i, nmon;
 
-	wm->mons = monitor_create(wm->cfg, 0, 0, 0, wm->width / 2, wm->height, wm->dpy,
-			wm->root, wm->screen);
-	wm->mons->next = monitor_create(wm->cfg, 1, wm->width / 2, 0,
-			wm->width/2, wm->height, wm->dpy,
-			wm->root, wm->screen);
-	wm->selmon = wm->mons;
+	if (XineramaIsActive(wm->dpy)) {
+		XineramaScreenInfo *xsi = XineramaQueryScreens(wm->dpy, &nmon);
+
+		wm->mons = NULL;
+
+		for (i = 0; i < nmon; i++) {
+			mon = monitor_create(wm->cfg, i, xsi[i].x_org,
+					xsi[i].y_org, xsi[i].width,
+					xsi[i].height, wm->dpy, wm->root,
+					wm->screen);
+			wm->mons = monitor_append(wm->mons, mon);
+		}
+
+		wm->selmon = wm->mons;
+		return;
+	}
+#endif /* XINERAMA */
+
+	wm->selmon = wm->mons = monitor_create(wm->cfg, 0, 0, 0, wm->width,
+			wm->height, wm->dpy, wm->root, wm->screen);
 }
 
 int
@@ -530,6 +546,7 @@ handler_motionnotify(struct wm *wm, XEvent *ev)
 				mev->x_root, mev->y_root);
 
 		if (wm->selmon != mon) {
+			monitor_unfocus_selected(wm->selmon, wm->dpy, wm->root);
 			wm->selmon = mon;
 			monitor_focus(mon, mon->sel, wm->dpy, wm->root);
 		}

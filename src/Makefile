@@ -1,10 +1,5 @@
 include config.mk
 
-#CFLAGS = -std=c99 -Wall -O2 -pedantic -Wextra -D_GNU_SOURCE
-#CFLAGS += -Wshadow -Wpointer-arith -Wcast-qual -Wstrict-prototypes \
-#	  -Wmissing-prototypes
-#CC_COMPILE = $(CC) $(CFLAGS) -c -DXINERAMA
-
 SRC = main.c atoms.c bar.c client.c colors.c config.c cursors.c info.c \
       keys.c monitor.c utils.c wm.c xutils.c
 OBJ = ${SRC:.c=.o}

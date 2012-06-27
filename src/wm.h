@@ -6,6 +6,10 @@
 #include <unistd.h>
 #include <X11/Xlib.h>
 
+#ifdef XINERAMA
+#include <X11/extensions/Xinerama.h>
+#endif /* XINERAMA */
+
 #include "atoms.h"
 #include "colors.h"
 #include "config.h"
