@@ -16,7 +16,7 @@
 #define M_FACTSTEP 0.05
 #define N_MASTER 1
 
-#define BAR_FONT "-*-terminus-medium-r-*-*-12-*-*-*-*-*-*-*"
+#define BAR_FONT "-*-profont-*-*-*-*-10-*-*-*-*-*-*-*"
 #define BAR_UPDATE_RATE 5
 
 #endif
