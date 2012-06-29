@@ -272,7 +272,7 @@ init(struct config *cfg, const char *cmd)
 	key_grab_all(wm->keys, wm->dpy, wm->root);
 
 	atoms_init(wm->dpy);
-	ewmh_init(wm->dpy, wm->root);
+	ewmh_init(wm->dpy, wm->root, 9);
 
 	/* manage all windows that already exists */
 	get_windows(wm);

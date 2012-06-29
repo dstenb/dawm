@@ -35,11 +35,9 @@ void
 client_focus(struct client *c, Display *dpy, Window root)
 {
 	XSetWindowBorder(dpy, c->win, color(WinSelBorder));
-
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
-	XChangeProperty(dpy, root, atom(NetActiveWindow), XA_WINDOW, 32,
-			PropModeReplace, (unsigned char *) &(c->win), 1);
 
+	ewmh_set_active_window(dpy, root, c->win);
 	send_event(dpy, c->win, atom(WMTakeFocus));
 }
 
