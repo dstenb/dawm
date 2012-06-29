@@ -11,6 +11,9 @@ static struct key default_keys[] = {
 	{ MOD_SUPER,       XK_b,      ToggleBarAction,   NULL,   NULL },
 	{ MOD_SUPER,       XK_t,      ToggleFloatAction, NULL, NULL },
 
+	{ MOD_SUPER,       XK_l,      SetMasterFactAction, "+", NULL },
+	{ MOD_SUPER,       XK_h,      SetMasterFactAction, "-", NULL },
+
 	{ MOD_SUPER,       XK_j,      SelectAction,      "next",  NULL },
 	{ MOD_SUPER,       XK_k,      SelectAction,      "prev",  NULL },
 
@@ -51,6 +54,7 @@ static char *action_str[LASTAction] = {
 	[RestartAction] = "restart",
 	[SelectAction] = "select",
 	[SetLayoutAction] = "set_layout",
+	[SetMasterFactAction] = "set_mfact",
 	[SetWsAction] = "set_ws",
 	[SpawnAction] = "spawn",
 	[ToggleBarAction] = "toggle_bar",

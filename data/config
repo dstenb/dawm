@@ -19,6 +19,8 @@
 #bind super+Return spawn urxvt
 #bind super+b toggle_bar 
 #bind super+t toggle_float 
+#bind super+l set_mfact +
+#bind super+h set_mfact -
 #bind super+j select next
 #bind super+k select prev
 #bind super+1 set_ws 1

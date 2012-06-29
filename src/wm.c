@@ -43,6 +43,7 @@ static void key_handler_quit(struct wm *, struct key *);
 static void key_handler_restart(struct wm *, struct key *);
 static void key_handler_select(struct wm *, struct key *);
 static void key_handler_setlayout(struct wm *, struct key *);
+static void key_handler_setmfact(struct wm *, struct key *);
 static void key_handler_setws(struct wm *, struct key *);
 static void key_handler_spawn(struct wm *, struct key *);
 static void key_handler_togglebar(struct wm *, struct key *);
@@ -74,6 +75,7 @@ static void (*key_handler[LASTAction]) (struct wm *, struct key *) = {
 	[RestartAction] = key_handler_restart,
 	[SelectAction] = key_handler_select,
 	[SetLayoutAction] = key_handler_setlayout,
+	[SetMasterFactAction] = key_handler_setmfact,
 	[SetWsAction] = key_handler_setws,
 	[SpawnAction] = key_handler_spawn,
 	[ToggleBarAction] = key_handler_togglebar,
@@ -701,6 +703,24 @@ key_handler_setlayout(struct wm *wm, struct key *key)
 	}
 
 	monitor_set_layout(wm->selmon, wm->dpy, layout);
+}
+
+void
+key_handler_setmfact(struct wm *wm, struct key *key)
+{
+	struct monitor *mon = wm->selmon;
+
+	if (key->args) {
+		if (STREQ(key->args, "+")) {
+			mon->ws[mon->selws].mfact = MIN(0.99,
+					mon->ws[mon->selws].mfact + M_FACTSTEP);
+		} else if (STREQ(key->args, "-")) {
+			mon->ws[mon->selws].mfact = MAX(0.01,
+					mon->ws[mon->selws].mfact - M_FACTSTEP);
+		}
+
+		monitor_arrange(wm->selmon, wm->dpy);
+	}
 }
 
 void

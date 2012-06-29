@@ -13,6 +13,7 @@
 #define VALID_WORKSPACE(W) (W >= MIN_WS && W <= MAX_WS)
 
 #define M_FACT 0.55
+#define M_FACTSTEP 0.05
 #define N_MASTER 1
 
 #define BAR_FONT "-*-terminus-medium-r-*-*-12-*-*-*-*-*-*-*"
