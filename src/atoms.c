@@ -44,29 +44,3 @@ int has_wm_protocol(Display *dpy, Window win, Atom prot)
 
 	return found;
 }
-
-void
-net_client_list_add(Display *dpy, Window root, Window win)
-{
-	XChangeProperty(dpy, root, atom(NetClientList), XA_WINDOW, 32,
-			PropModeAppend, (unsigned char *) &(win), 1);
-}
-
-void
-net_client_list_clear(Display *dpy, Window root)
-{
-	XDeleteProperty(dpy, root, atom(NetClientList));
-}
-
-void
-net_set_supported(Display *dpy, Window root)
-{
-	Atom netatoms[] = {
-		atom(NetClientList),
-		atom(NetSupported),
-	};
-
-	XChangeProperty(dpy, root, atom(NetSupported), XA_ATOM, 32,
-			PropModeReplace, (unsigned char *) netatoms,
-			ARRSIZE(netatoms));
-}

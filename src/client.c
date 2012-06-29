@@ -163,7 +163,7 @@ client_setup(struct client *c, struct config *cfg, struct monitor *mon,
 	client_raise(c, dpy);
 
 	/* add the client to the NetClientList */
-	net_client_list_add(dpy, root, c->win);
+	ewmh_client_list_add(dpy, root, c->win);
 }
 
 void

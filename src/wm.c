@@ -272,7 +272,7 @@ init(struct config *cfg, const char *cmd)
 	key_grab_all(wm->keys, wm->dpy, wm->root);
 
 	atoms_init(wm->dpy);
-	net_set_supported(wm->dpy, wm->root);
+	ewmh_init(wm->dpy, wm->root);
 
 	/* manage all windows that already exists */
 	get_windows(wm);
@@ -812,11 +812,11 @@ update_net_client_list(struct wm *wm)
 	struct monitor *mon;
 	struct client *c;
 
-	net_client_list_clear(wm->dpy, wm->root);
+	ewmh_client_list_clear(wm->dpy, wm->root);
 
 	for (mon = wm->mons; mon; mon = mon->next)
 		for (c = mon->clients; c; c = c->next)
-			net_client_list_add(wm->dpy, wm->root, c->win);
+			ewmh_client_list_add(wm->dpy, wm->root, c->win);
 }
 
 int

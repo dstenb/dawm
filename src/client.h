@@ -8,6 +8,7 @@
 #include "atoms.h"
 #include "common.h"
 #include "config.h"
+#include "ewmh.h"
 #include "utils.h"
 #include "xutils.h"
 

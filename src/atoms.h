@@ -32,13 +32,4 @@ void atoms_init(Display *);
 
 int has_wm_protocol(Display *, Window, Atom);
 
-/* add a window to the NetClientList property */
-void net_client_list_add(Display *, Window, Window);
-
-/* delete the NetClientList property */
-void net_client_list_clear(Display *, Window);
-
-/* set supported NetWM atoms */
-void net_set_supported(Display *, Window);
-
 #endif
