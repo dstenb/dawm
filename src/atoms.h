@@ -18,6 +18,7 @@ typedef enum {
 	WMTakeFocus,
 	NetActiveWindow,
 	NetClientList,
+	NetCurrentDesktop,
 	NetDesktops,
 	NetSupported,
 	NetWMName,

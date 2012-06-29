@@ -10,6 +10,7 @@ static char *atom_names[LASTAtom] = {
 
 	"_NET_ACTIVE_WINDOW",
 	"_NET_CLIENT_LIST",
+	"_NET_CURRENT_DESKTOP",
 	"_NET_NUMBER_OF_DESKTOPS",
 	"_NET_SUPPORTED",
 	"_NET_WM_NAME",
