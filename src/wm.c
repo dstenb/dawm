@@ -396,7 +396,7 @@ handler_configurerequest(struct wm *wm, XEvent *ev)
 		}
 	} else {
 		/* TODO: send XConfigureWindow to window */
-		DBG("%s: send XConfigureWindow\n");
+		DBG("%s: send XConfigureWindow\n", __func__);
 	}
 
 	XSync(wm->dpy, False);
