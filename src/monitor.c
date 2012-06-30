@@ -250,6 +250,15 @@ monitor_arrange(struct monitor *mon, Display *dpy)
 	monitor_restack(mon, dpy);
 }
 
+int
+monitor_count(struct monitor *mon)
+{
+	int i;
+
+	for (i = 0; mon; mon = mon->next, i++);
+	return i;
+}
+
 struct monitor *
 monitor_create(struct config *cfg, int num, int x, int y, int w, int h,
 		Display *dpy, Window root, int screen)
@@ -297,12 +306,21 @@ monitor_draw_bar(struct monitor *mon, Display *dpy)
 			localtime(&i->time));
 
 #ifdef __linux__
-	snprintf(buf, sizeof(buf), "  %i:%i  %s  UPTIME: %ld:%ld  CPU: %i%c  "
-			"MEM: %ld/%ldMB  BAT: %i%c",
+	char *batstr;
+
+	if (i->batstatus == Charging)
+		batstr = "+";
+	else if (i->batstatus == Discharging)
+		batstr = "-";
+	else
+		batstr = "";
+
+	snprintf(buf, sizeof(buf), "  %i:%i  %s  UPTIME: %ld:%02ld  CPU: %i%c  "
+			"MEM: %ld/%ldMB  BAT: %s%i%c",
 			mon->num + 1, mon->selws + 1, timestr,
 			i->uptime / 3600, (i->uptime / 60) % 60,
 			i->cpu, '%', i->mem_used / 1024, i->mem_total / 1024,
-			i->battery, '%');
+			batstr, i->batlevel, '%');
 #else
 	snprintf(buf, sizeof(buf), "  %i:%i  %s", mon->num + 1, mon->selws + 1,
 			timestr);
@@ -453,6 +471,8 @@ monitor_set_ws(struct monitor *mon, Display *dpy, Window root, int ws)
 
 	monitor_focus(mon, NULL,dpy, root);
 	monitor_arrange(mon, dpy);
+
+	ewmh_set_current_desktop(dpy, root, mon->num * N_WORKSPACES + ws);
 }
 
 void

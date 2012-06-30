@@ -14,6 +14,7 @@ static void handler_propertynotify_root(struct wm *, XPropertyEvent *);
 static void quit(struct wm *, const char *);
 static void remove_client(struct wm *, struct client *, int);
 static void restart(struct wm *);
+static void set_monitor(struct wm *, struct monitor *);
 static void update_bars(struct wm *);
 static void update_net_client_list(struct wm *);
 static int xerror_checkotherwm(Display *, XErrorEvent *);
@@ -253,7 +254,6 @@ init(struct config *cfg, const char *cmd)
 
 	colors_init(cfg->colors, wm->dpy, wm->screen);
 	bars_init(wm->dpy, wm->root, wm->screen, BAR_FONT);
-	create_monitors(wm);
 
 	/* select events to handle */
 	attr.event_mask = WM_EVENT_MASK;
@@ -267,14 +267,22 @@ init(struct config *cfg, const char *cmd)
 	attr.cursor = cursor(NormalCursor);
 	XChangeWindowAttributes(wm->dpy, wm->root, CWCursor, &attr);
 
-	/* grab the manager's key bindings */
+	/* setup key bindings */
 	key_init(wm->dpy);
 	key_grab_all(wm->keys, wm->dpy, wm->root);
 
+	/* init atoms and ewmh */
 	atoms_init(wm->dpy);
-	ewmh_init(wm->dpy, wm->root, 9);
+	ewmh_init(wm->dpy, wm->root);
 
-	/* manage all windows that already exists */
+	/* create monitors */
+	create_monitors(wm);
+
+	/* init ewmh desktop functionality */
+	ewmh_set_desktops(wm->dpy, wm->root, monitor_count(wm->mons),
+			N_WORKSPACES);
+	ewmh_set_current_desktop(wm->dpy, wm->root, 0);
+	
 	get_windows(wm);
 
 	set_text_prop(wm->dpy, wm->root, atom(NetWMName), WMNAME);
@@ -547,11 +555,7 @@ handler_motionnotify(struct wm *wm, XEvent *ev)
 		struct monitor *mon = find_monitor_by_pos(wm->mons,
 				mev->x_root, mev->y_root);
 
-		if (wm->selmon != mon) {
-			monitor_unfocus_selected(wm->selmon, wm->dpy, wm->root);
-			wm->selmon = mon;
-			monitor_focus(mon, mon->sel, wm->dpy, wm->root);
-		}
+		set_monitor(wm, mon);
 
 		return;
 	}
@@ -790,6 +794,19 @@ restart(struct wm *wm)
 	DBG("%s. restarting!\n", __func__);
 	if (wm->cmd)
 		execlp("/bin/sh", "sh" , "-c", wm->cmd, NULL);
+}
+
+void
+set_monitor(struct wm *wm, struct monitor *mon)
+{
+	if (wm->selmon != mon) {
+		monitor_unfocus_selected(wm->selmon, wm->dpy, wm->root);
+		wm->selmon = mon;
+		monitor_focus(mon, mon->sel, wm->dpy, wm->root);
+
+		ewmh_set_current_desktop(wm->dpy, wm->root,
+				mon->num * N_WORKSPACES + mon->selws);
+	}
 }
 
 void

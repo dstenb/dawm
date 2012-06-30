@@ -8,7 +8,7 @@
 
 #include "atoms.h"
 
-void ewmh_init(Display *, Window, unsigned);
+void ewmh_init(Display *, Window);
 
 /* add a window to the _NET_CLIENT_LIST */
 void ewmh_client_list_add(Display *, Window, Window);
@@ -19,8 +19,10 @@ void ewmh_client_list_clear(Display *, Window);
 /* set _NET_ACTIVE_WINDOW */
 void ewmh_set_active_window(Display *, Window, Window);
 
-/* TODO */
 /*  set _NET_CURRENT_DESKTOP */
-void ewmh_set_current_desktop(unsigned);
+void ewmh_set_current_desktop(Display *, Window, unsigned);
+
+/* set _NET_NUMBER_OF_DESKTOPS and _NET_DESKTOP_NAMES */
+void ewmh_set_desktops(Display *, Window, unsigned, unsigned);
 
 #endif

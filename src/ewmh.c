@@ -1,16 +1,13 @@
 #include "ewmh.h"
 
 static void
-ewmh_init_desktops(Display *dpy, Window root, unsigned desktops)
-{
-}
-
-static void
 ewmh_init_supported(Display *dpy, Window root)
 {
  	Atom atoms[] = {
 		atom(NetActiveWindow),
 		atom(NetClientList),
+		atom(NetCurrentDesktop),
+		atom(NetDesktops),
 		atom(NetSupported),
 	};
 
@@ -20,10 +17,9 @@ ewmh_init_supported(Display *dpy, Window root)
 }
 
 void
-ewmh_init(Display *dpy, Window root, unsigned desktops)
+ewmh_init(Display *dpy, Window root)
 {
 	ewmh_init_supported(dpy, root);
-	ewmh_init_desktops(dpy, root, desktops);
 }
 
 void
@@ -46,3 +42,21 @@ ewmh_set_active_window(Display *dpy, Window root, Window win)
 			PropModeReplace, (unsigned char *) &(win), 1);
 }
 
+void
+ewmh_set_current_desktop(Display *dpy, Window root, unsigned n)
+{
+	XChangeProperty(dpy, root, atom(NetCurrentDesktop), XA_CARDINAL, 32,
+			PropModeReplace, (unsigned char *) &n, 1);
+}
+
+void
+ewmh_set_desktops(Display *dpy, Window root, unsigned m, unsigned d)
+{
+	unsigned desktops = m * d;
+
+	XChangeProperty(dpy, root, atom(NetDesktops), XA_CARDINAL, 32,
+			PropModeReplace, (unsigned char *) &desktops, 1);
+
+	/* TODO: set desktop names (monitor i:desktop d maybe?) */
+	/* _NET_DESKTOP_NAMES */
+}

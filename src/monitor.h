@@ -54,6 +54,9 @@ struct monitor *monitor_append(struct monitor *, struct monitor *);
 /* arrange the clients on the monitor */
 void monitor_arrange(struct monitor *, Display *);
 
+/* count number of monitors */
+int monitor_count(struct monitor *);
+
 /* creates a monitor */
 struct monitor *monitor_create(struct config *, int, int, int, int, int,
 		Display *, Window, int);
