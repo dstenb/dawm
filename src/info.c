@@ -216,7 +216,7 @@ info_update()
 
 #ifdef __linux__
 	/* update the battery value */
-	get_battery(&_info.batlevel, &_info.batstatus);
+	get_battery(&_info.bat_level, &_info.bat_status);
 	get_mem(&_info.mem_used, &_info.mem_total);
 	get_uptime(&_info.uptime);
 

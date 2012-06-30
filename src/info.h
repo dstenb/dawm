@@ -21,8 +21,8 @@ struct info {
 	time_t time;    /* current time */
 #ifdef __linux__
 	int cpu;        /* cpu usage, -1 if unable to calculate cpu */
-	int batlevel;   /* battery level, -1 if unable to get value */
-	int batstatus;  /* battery status */
+	int bat_level;  /* battery level, -1 if unable to get value */
+	int bat_status; /* battery status */
 	long uptime;    /* uptime in seconds, -1 if unable to get value */
 	long mem_used;  /* used memory (in kb), -1 if unable to get value */
 	long mem_total; /* total memory (in kb), -1 if unable to get value */

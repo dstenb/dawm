@@ -308,9 +308,9 @@ monitor_draw_bar(struct monitor *mon, Display *dpy)
 #ifdef __linux__
 	char *batstr;
 
-	if (i->batstatus == Charging)
+	if (i->bat_status == Charging)
 		batstr = "+";
-	else if (i->batstatus == Discharging)
+	else if (i->bat_status == Discharging)
 		batstr = "-";
 	else
 		batstr = "";
@@ -320,7 +320,7 @@ monitor_draw_bar(struct monitor *mon, Display *dpy)
 			mon->num + 1, mon->selws + 1, timestr,
 			i->uptime / 3600, (i->uptime / 60) % 60,
 			i->cpu, '%', i->mem_used / 1024, i->mem_total / 1024,
-			batstr, i->batlevel, '%');
+			batstr, i->bat_level, '%');
 #else
 	snprintf(buf, sizeof(buf), "  %i:%i  %s", mon->num + 1, mon->selws + 1,
 			timestr);
