@@ -44,9 +44,11 @@ static void key_handler_quit(struct wm *, struct key *);
 static void key_handler_restart(struct wm *, struct key *);
 static void key_handler_select(struct wm *, struct key *);
 static void key_handler_setlayout(struct wm *, struct key *);
+static void key_handler_setmaster(struct wm *, struct key *);
 static void key_handler_setmfact(struct wm *, struct key *);
 static void key_handler_setws(struct wm *, struct key *);
 static void key_handler_spawn(struct wm *, struct key *);
+static void key_handler_swap(struct wm *, struct key *);
 static void key_handler_togglebar(struct wm *, struct key *);
 static void key_handler_togglefloat(struct wm *, struct key *);
 
@@ -76,9 +78,11 @@ static void (*key_handler[LASTAction]) (struct wm *, struct key *) = {
 	[RestartAction] = key_handler_restart,
 	[SelectAction] = key_handler_select,
 	[SetLayoutAction] = key_handler_setlayout,
+	[SetMasterAction] = key_handler_setmaster,
 	[SetMasterFactAction] = key_handler_setmfact,
 	[SetWsAction] = key_handler_setws,
 	[SpawnAction] = key_handler_spawn,
+	[SwapAction] = key_handler_swap,
 	[ToggleBarAction] = key_handler_togglebar,
 	[ToggleFloatAction] = key_handler_togglefloat
 };
@@ -710,6 +714,15 @@ key_handler_setlayout(struct wm *wm, struct key *key)
 }
 
 void
+key_handler_setmaster(struct wm *wm, struct key *key)
+{
+	(void)wm;
+	(void)key;
+
+	/* TODO */
+}
+
+void
 key_handler_setmfact(struct wm *wm, struct key *key)
 {
 	struct monitor *mon = wm->selmon;
@@ -743,6 +756,20 @@ key_handler_spawn(struct wm *wm, struct key *key)
 {
 	(void)wm;
 	spawn(key->args);
+}
+
+void
+key_handler_swap(struct wm *wm, struct key *key)
+{
+	(void)wm;
+
+	if (key->args) {
+		if (STREQ(key->args, "next")) {
+			/* TODO: monitor_swap_next(wm->selmon); */
+		} else if (STREQ(key->args, "prev")) {
+			/* TODO: monitor_swap_prev(wm->selmon); */
+		}
+	}
 }
 
 void

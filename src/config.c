@@ -60,7 +60,7 @@ parse_bind(const char *path, int line, char *keystr,
 		}
 	}
 
-	if ((action = key_action_from_str(keyaction)) == InvalidAction)
+	if ((action = key_str2action(keyaction)) == InvalidAction)
 		die("%s:%i, invalid action '%s'\n", path, line, keyaction);
 
 	return key_create(modifier, keysym, action, args, NULL);

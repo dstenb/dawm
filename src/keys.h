@@ -18,17 +18,19 @@
 #define MOD_SHIFT_SUPER (MOD_SHIFT | MOD_SUPER)
 
 typedef enum {
-	KillAction,
-	MoveWindowAction,
-	QuitAction,
-	RestartAction,
-	SetLayoutAction,
-	SelectAction,
-	SetMasterFactAction,
-	SetWsAction,
-	SpawnAction,
-	ToggleBarAction,
-	ToggleFloatAction,
+	KillAction,          /* kill client */
+	MoveWindowAction,    /* move client to another workspace */
+	QuitAction,          /* close the window manager */
+	RestartAction,       /* restart the window manager */
+	SetLayoutAction,     /* set the layout for the current workspace */
+	SelectAction,        /* select a client */
+	SetMasterAction,     /* move the client to the master position */
+	SetMasterFactAction, /* set the master size */
+	SetWsAction,         /* set the current workspace */
+	SpawnAction,         /* spawn a program in the background */
+	SwapAction,          /* swap windows */
+	ToggleBarAction,     /* show/hide the bar on the current monitor */
+	ToggleFloatAction,   /* float/arrange the selected client */
 	LASTAction,
 	InvalidAction = -1
 } KeyAction;
@@ -41,10 +43,8 @@ struct key {
 	struct key *next; /* next key in key list */
 };
 
+/* converts a KeyAction to a string, returns NULL if the action is invalid */
 const char *key_action2str(KeyAction);
-
-/* returns the KeyAction responding to the key, returns INVALID if not found */
-KeyAction key_action_from_str(const char *);
 
 /* appends two key lists to one, will return the head pointer */
 struct key *key_append(struct key *, struct key *);
@@ -64,13 +64,16 @@ struct key *key_free_all(struct key *);
 /* grab all keys */
 void key_grab_all(struct key *, Display *, Window);
 
+/* update the Num Lock modifier */
+void key_init(Display *);
+
 /* returns non-zero if the key is pressed */
 int key_pressed(struct key *, Display *, KeyCode, unsigned int);
 
+/* returns the KeyAction responding to the key, returns INVALID if not found */
+KeyAction key_str2action(const char *);
+
 /* returns non-zero if the string describes a modifier */
 int key_str2mod(const char *);
-
-/* update the Num Lock modifier */
-void key_init(Display *);
 
 #endif
