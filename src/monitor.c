@@ -11,6 +11,13 @@ next_tiled(struct client *c)
 	return c;
 }
 
+static struct client *
+prev_tiled(struct client *c)
+{
+	for ( ; c && (c->floating || !ISVISIBLE(c)); c = c->prev) ;
+	return c;
+}
+
 static int
 no_of_tiled_clients(struct client *c)
 {
@@ -39,23 +46,19 @@ next_visible_client(struct client *curr)
 static struct client *
 prev_visible_client(struct client *curr)
 {
-	struct monitor *mon = curr->mon;
-	struct client *c = NULL;
-	struct client *t;
+	struct client *c;
 
-	for (t = mon->clients; t != curr; t = t->next) {
-		if (ISVISIBLE(t))
-			c = t;
+	for (c = curr->prev; c; c = c->prev) {
+		if (ISVISIBLE(c))
+			return c;
 	}
 
-	if (!c) {
-		for ( ; t; t = t->next) {
-			if (ISVISIBLE(t))
-				c = t;
-		}
+	for (c = curr; c; c = c->next) {
+		if (ISVISIBLE(c))
+			curr = c;
 	}
 
-	return c;
+	return curr;
 }
 
 static void
@@ -498,6 +501,12 @@ monitor_show_bar(struct monitor *mon, Display *dpy, int show)
 }
 
 void
+monitor_show_hide(struct monitor *mon, Display *dpy)
+{
+	show_hide(mon->cstack, dpy);
+}
+
+void
 monitor_toggle_bar(struct monitor *mon, Display *dpy)
 {
 	monitor_show_bar(mon, dpy, !mon->bar->showbar);
@@ -506,8 +515,6 @@ monitor_toggle_bar(struct monitor *mon, Display *dpy)
 void
 monitor_unfocus_selected(struct monitor *mon, Display *dpy, Window root)
 {
-	DBG("%s(%p, %p)\n", __func__, (void *)mon, (void *)mon->sel);
-
 	if (mon->sel)
 		client_unfocus(mon->sel, dpy, root);
 }
@@ -549,10 +556,4 @@ find_monitor_by_pos(struct monitor *mon, int x, int y)
 	for ( ; mon && !INSIDE(x, y, mon->mx, mon->my, mon->mw, mon->mh);
 			mon = mon->next) ;
 	return mon;
-}
-
-void
-monitor_show_hide(struct monitor *mon, Display *dpy)
-{
-	show_hide(mon->cstack, dpy);
 }
