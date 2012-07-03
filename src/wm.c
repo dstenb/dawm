@@ -716,10 +716,10 @@ key_handler_setlayout(struct wm *wm, struct key *key)
 void
 key_handler_setmaster(struct wm *wm, struct key *key)
 {
-	(void)wm;
 	(void)key;
 
-	/* TODO */
+	monitor_selected_to_master(wm->selmon);
+	monitor_arrange(wm->selmon, wm->dpy);
 }
 
 void

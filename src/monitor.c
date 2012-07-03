@@ -452,6 +452,14 @@ monitor_select_prev_client(struct monitor *mon, Display *dpy, Window root)
 	}
 }
 
+void
+monitor_selected_to_master(struct monitor *mon)
+{
+	if (mon->sel && !mon->sel->floating) {
+		remove_from_clients(mon, mon->sel);
+		add_to_clients(mon, mon->sel);
+	}
+}
 
 void
 monitor_set_layout(struct monitor *mon, Display *dpy, int layout)

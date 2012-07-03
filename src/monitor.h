@@ -80,6 +80,8 @@ void monitor_select_next_client(struct monitor *, Display *, Window);
 
 void monitor_select_prev_client(struct monitor *, Display *, Window);
 
+void monitor_selected_to_master(struct monitor *);
+
 void monitor_set_layout(struct monitor *, Display *, int);
 
 /* set the current workspace */
