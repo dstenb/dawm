@@ -148,7 +148,10 @@ static void
 add_to_clients(struct monitor *mon, struct client *c)
 {
 	c->mon = mon;
+	c->prev = NULL;
 	c->next = mon->clients;
+	if (mon->clients)
+		mon->clients->prev = c;
 	mon->clients = c;
 }
 
@@ -162,14 +165,14 @@ add_to_stack(struct monitor *mon, struct client *c)
 static void
 remove_from_clients(struct monitor *mon, struct client *c)
 {
-	struct client *trav;
-
 	if (c == mon->clients) {
 		mon->clients = mon->clients->next;
+		mon->clients->prev = NULL;
 	} else {
-		for (trav = mon->clients; trav->next && trav->next != c;
-				trav = trav->next);
-		trav->next = trav->next ? trav->next->next : NULL;
+		if (c->prev)
+			c->prev->next = c->next;
+		if (c->next)
+			c->next->prev = c->prev;
 	}
 }
 

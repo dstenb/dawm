@@ -24,6 +24,7 @@ client_create(Window win, XWindowAttributes *wa)
 	c->name[0] = '\0';
 	c->floating = 0;
 	c->fullscreen = 0;
+	c->prev = NULL;
 	c->next = NULL;
 	c->snext = NULL;
 	c->win = win;

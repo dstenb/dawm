@@ -30,6 +30,7 @@ struct client {
 	Window win;                  /* window that belongs to the client */
 	struct monitor *mon;         /* monitor that the client is on */
 	int ws;                      /* workspace that the client is on */
+	struct client *prev;         /* previous client in list */
 	struct client *next;         /* next client in list */
 	struct client *snext;        /* next client in stack */
 };
