@@ -100,6 +100,10 @@ void monitor_unfocus_selected(struct monitor *, Display *, Window);
 void monitor_update(struct monitor *, Display *, Window);
 
 /* searches through all the monitors for the client
+ * that is transient for the given window */
+struct client *find_client_by_trans(struct monitor *, Display *, Window);
+
+/* searches through all the monitors for the client
  * corresponding to the given window */
 struct client *find_client_by_window(struct monitor *, Window);
 

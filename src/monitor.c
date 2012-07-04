@@ -535,6 +535,15 @@ monitor_update_window_size(struct monitor *mon)
 }
 
 struct client *
+find_client_by_trans(struct monitor *mon, Display *dpy, Window win)
+{
+	Window trans = None;
+
+	return XGetTransientForHint(dpy, win, &trans) ?
+		find_client_by_window(mon, trans) : NULL;
+}
+
+struct client *
 find_client_by_window(struct monitor *mon, Window win)
 {
 	struct client *c;
