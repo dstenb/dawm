@@ -142,11 +142,18 @@ client_set_state(struct client *c, Display *dpy, long state)
 
 void
 client_setup(struct client *c, struct config *cfg, struct monitor *mon,
-		Display *dpy, Window root, XWindowAttributes *wa)
+		Display *dpy, Window root, XWindowAttributes *wa,
+		struct client *trans)
 {
-	c->mon = mon;
-
 	client_update_title(c, dpy);
+
+	if (trans) {
+		c->mon = trans->mon;
+		c->ws = trans->ws;
+	} else {
+		c->mon = mon;
+		c->ws = mon->selws;
+	}
 
 	/* TODO: fix client rules (rule.h) */
 

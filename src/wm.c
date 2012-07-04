@@ -127,13 +127,15 @@ checkotherwm(struct wm *wm)
 void
 create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 {
-	struct client *c = client_create(win, attr);
+	struct client *c, *tc;
 
-	client_setup(c, wm->cfg, wm->selmon, wm->dpy, wm->root, attr);
+	c = client_create(win, attr);
+
+	tc = find_client_by_trans(wm->mons, wm->dpy, win);
+
+	client_setup(c, wm->cfg, wm->selmon, wm->dpy, wm->root, attr, tc);
 
 	monitor_add_client(c->mon, c);
-	c->ws = c->mon->selws;
-
 	monitor_unfocus_selected(c->mon, wm->dpy, wm->root);
 	monitor_select_client(c->mon, c);
 

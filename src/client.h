@@ -9,6 +9,7 @@
 #include "common.h"
 #include "config.h"
 #include "ewmh.h"
+#include "monitor.h"
 #include "utils.h"
 #include "xutils.h"
 
@@ -68,7 +69,7 @@ void client_set_border(struct client *, Display *, int);
 void client_set_state(struct client *, Display *, long);
 
 void client_setup(struct client *, struct config *, struct monitor *,
-		Display *, Window, XWindowAttributes *);
+		Display *, Window, XWindowAttributes *, struct client *);
 
 void client_show(struct client *, Display *, int);
 
