@@ -291,7 +291,7 @@ init(struct config *cfg, const char *cmd)
 	
 	get_windows(wm);
 
-	set_text_prop(wm->dpy, wm->root, atom(NetWMName), WMNAME);
+	set_text_prop(wm->dpy, wm->root, netatom(NetWMName), WMNAME);
 
 	return wm;
 }
@@ -381,7 +381,7 @@ handler_clientmessage(struct wm *wm, XEvent *ev)
 
 		if (cmev->message_type == atom(WMState)) {
 			DBG("%s: WMState", __func__);
-		} else if (cmev->message_type == atom(NetActiveWindow)) {
+		} else if (cmev->message_type == netatom(NetActiveWindow)) {
 			DBG("%s: NetActiveWindow", __func__);
 		} else if (cmev->message_type == atom(WMChangeState)) {
 			if (cmev->data.l[0] == IconicState &&
@@ -589,7 +589,7 @@ handler_propertynotify_client(struct wm *wm, XPropertyEvent *ev)
 	if (!(c = find_client_by_window(wm->mons, ev->window)))
 		return;
 
-	if (ev->atom == XA_WM_NAME || ev->atom == atom(NetWMName)) {
+	if (ev->atom == XA_WM_NAME || ev->atom == netatom(NetWMName)) {
 		client_update_title(c, wm->dpy);
 		/* TODO: redraw the bar */
 	} else if (ev->atom == XA_WM_TRANSIENT_FOR) {
@@ -601,7 +601,7 @@ handler_propertynotify_client(struct wm *wm, XPropertyEvent *ev)
 	} else if (ev->atom == XA_WM_HINTS) {
 		/* TODO: check for fullscreen and floating */
 		DBG("hints\n");
-	} else if (ev->atom == atom(NetWMWindowType)) {
+	} else if (ev->atom == netatom(NetWMWindowType)) {
 		/* TODO */
 		DBG("window type\n");
 	}

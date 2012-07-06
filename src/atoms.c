@@ -6,21 +6,13 @@ static char *atom_names[LASTAtom] = {
 	"WM_NAME",
 	"WM_PROTOCOLS",
 	"WM_STATE",
-	"WM_TAKE_FOCUS",
-
-	"_NET_ACTIVE_WINDOW",
-	"_NET_CLIENT_LIST",
-	"_NET_CURRENT_DESKTOP",
-	"_NET_WM_DESKTOP",
-	"_NET_NUMBER_OF_DESKTOPS",
-	"_NET_SUPPORTED",
-	"_NET_WM_NAME",
-	"_NET_WM_WINDOW_TYPE"
+	"WM_TAKE_FOCUS"
 };
 
 static Atom atoms[LASTAtom];
 
-Atom atom(AtomID id)
+Atom
+atom(AtomID id)
 {
 	assert(id < LASTAtom);
 	return atoms[id];

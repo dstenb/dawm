@@ -8,6 +8,20 @@
 
 #include "atoms.h"
 
+typedef enum {
+	NetActiveWindow,
+	NetClientList,
+	NetCurrentDesktop,
+	NetDesktop,
+	NetDesktops,
+	NetSupported,
+	NetWMName,
+	NetWMWindowType,
+	LASTNetAtom
+} NetAtomID;
+
+Atom netatom(NetAtomID id);
+
 void ewmh_init(Display *, Window);
 
 /* add a window to the _NET_CLIENT_LIST */

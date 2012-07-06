@@ -16,14 +16,6 @@ typedef enum {
 	WMProtocols,
 	WMState,
 	WMTakeFocus,
-	NetActiveWindow,
-	NetClientList,
-	NetCurrentDesktop,
-	NetDesktop,
-	NetDesktops,
-	NetSupported,
-	NetWMName,
-	NetWMWindowType,
 	LASTAtom
 } AtomID;
 
