@@ -73,8 +73,27 @@ ewmh_root_set_desktops(Display *dpy, Window root, unsigned m, unsigned d)
 	/* _NET_DESKTOP_NAMES */
 }
 
+int
+ewmh_client_get_desktop(Display *dpy, Window win, unsigned long *d)
+{
+	Atom a;
+	int f;
+	unsigned long n, r;
+	unsigned char *p;
+
+	if (XGetWindowProperty(dpy, win, netatom(NetDesktop), 0, 1L, False,
+				XA_CARDINAL, &a, &f, &n, &r, &p) == Success) {
+		if (p) {
+			*d = *(unsigned long *)p;
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
 void
-ewmh_client_set_desktop(Display *dpy, Window win, int d)
+ewmh_client_set_desktop(Display *dpy, Window win, unsigned long d)
 {
 	XChangeProperty(dpy, win, netatom(NetDesktop), XA_CARDINAL, 32,
 			PropModeReplace, (unsigned char *) &d, 1);

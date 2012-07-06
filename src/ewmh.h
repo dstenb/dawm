@@ -37,6 +37,7 @@ void ewmh_root_set_desktops(Display *, Window, unsigned, unsigned);
 /* application window properties
  * http://standards.freedesktop.org/wm-spec/wm-spec-latest.html#id2577833
  */
-void ewmh_client_set_desktop(Display *, Window, int);
+int ewmh_client_get_desktop(Display *, Window, unsigned long *);
+void ewmh_client_set_desktop(Display *, Window, unsigned long);
 
 #endif
