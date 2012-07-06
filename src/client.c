@@ -141,6 +141,15 @@ client_set_state(struct client *c, Display *dpy, long state)
 }
 
 void
+client_set_ws(struct client *c, Display *dpy, int ws)
+{
+	assert(VALID_WORKSPACE(ws));
+
+	c->ws = ws;
+	ewmh_client_set_desktop(dpy, c->win, c->mon->num * N_WORKSPACES + ws);
+}
+
+void
 client_setup(struct client *c, struct config *cfg, struct monitor *mon,
 		Display *dpy, Window root, XWindowAttributes *wa,
 		struct client *trans)
@@ -149,10 +158,10 @@ client_setup(struct client *c, struct config *cfg, struct monitor *mon,
 
 	if (trans) {
 		c->mon = trans->mon;
-		c->ws = trans->ws;
+		client_set_ws(c, dpy, trans->ws);
 	} else {
 		c->mon = mon;
-		c->ws = mon->selws;
+		client_set_ws(c, dpy, mon->selws);
 	}
 
 	/* TODO: fix client rules (rule.h) */

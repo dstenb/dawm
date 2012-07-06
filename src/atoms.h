@@ -19,6 +19,7 @@ typedef enum {
 	NetActiveWindow,
 	NetClientList,
 	NetCurrentDesktop,
+	NetDesktop,
 	NetDesktops,
 	NetSupported,
 	NetWMName,

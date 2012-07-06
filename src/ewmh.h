@@ -25,4 +25,9 @@ void ewmh_set_current_desktop(Display *, Window, unsigned);
 /* set _NET_NUMBER_OF_DESKTOPS and _NET_DESKTOP_NAMES */
 void ewmh_set_desktops(Display *, Window, unsigned, unsigned);
 
+/* application window properties
+ * http://standards.freedesktop.org/wm-spec/wm-spec-latest.html#id2577833
+ */
+void ewmh_client_set_desktop(Display *, Window, int);
+
 #endif

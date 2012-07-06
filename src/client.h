@@ -68,6 +68,8 @@ void client_set_border(struct client *, Display *, int);
 /* set the WM_STATE */
 void client_set_state(struct client *, Display *, long);
 
+void client_set_ws(struct client *, Display *, int);
+
 void client_setup(struct client *, struct config *, struct monitor *,
 		Display *, Window, XWindowAttributes *, struct client *);
 

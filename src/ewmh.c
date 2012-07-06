@@ -7,6 +7,7 @@ ewmh_init_supported(Display *dpy, Window root)
 		atom(NetActiveWindow),
 		atom(NetClientList),
 		atom(NetCurrentDesktop),
+		atom(NetDesktop),
 		atom(NetDesktops),
 		atom(NetSupported),
 	};
@@ -33,6 +34,13 @@ void
 ewmh_client_list_clear(Display *dpy, Window root)
 {
 	XDeleteProperty(dpy, root, atom(NetClientList));
+}
+
+void
+ewmh_client_set_desktop(Display *dpy, Window win, int d)
+{
+	XChangeProperty(dpy, win, atom(NetDesktop), XA_CARDINAL, 32,
+			PropModeReplace, (unsigned char *) &d, 1);
 }
 
 void
