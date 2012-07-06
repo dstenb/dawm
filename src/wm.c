@@ -651,7 +651,7 @@ key_handler_movewindow(struct wm *wm, struct key *key)
 	if (key->args && wm->selmon->sel) {
 		int ws = atoi(key->args) - 1; /* off-by-one in binding */
 
-		if (VALID_WORKSPACE(ws)) {
+		if (VALID_WORKSPACE(ws) && wm->selmon->sel->ws != ALL_WS) {
 			client_set_ws(wm->selmon->sel, wm->dpy, ws);
 			monitor_focus(wm->selmon, NULL, wm->dpy, wm->root);
 			monitor_arrange(wm->selmon, wm->dpy);
