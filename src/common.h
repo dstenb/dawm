@@ -9,8 +9,9 @@
 #define MIN_WS 0
 #define MAX_WS 8
 #define N_WORKSPACES (MAX_WS - MIN_WS + 1)
+#define ALL_WS 0xFFFFFFFF
 
-#define VALID_WORKSPACE(W) (W >= MIN_WS && W <= MAX_WS)
+#define VALID_WORKSPACE(W) ((W >= MIN_WS && W <= MAX_WS) || W == ALL_WS)
 
 #define M_FACT 0.55
 #define M_FACTSTEP 0.05

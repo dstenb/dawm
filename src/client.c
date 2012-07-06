@@ -154,15 +154,24 @@ client_setup(struct client *c, struct config *cfg, struct monitor *mon,
 		Display *dpy, Window root, XWindowAttributes *wa,
 		struct client *trans)
 {
+	unsigned long ws;
+
 	client_update_title(c, dpy);
 
 	if (trans) {
 		c->mon = trans->mon;
-		client_set_ws(c, dpy, trans->ws);
+		ws = trans->ws;
 	} else {
 		c->mon = mon;
-		client_set_ws(c, dpy, mon->selws);
+		ws = mon->selws;
+
+		/* (try to) get previous desktop value
+		 * TODO: handle multiple monitors */
+		if (ewmh_client_get_desktop(dpy, c->win, &ws) && ws != ALL_WS)
+			ws = MIN(ws % N_WORKSPACES, MAX_WS);
 	}
+
+	client_set_ws(c, dpy, ws);
 
 	/* TODO: fix client rules (rule.h) */
 

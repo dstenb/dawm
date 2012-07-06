@@ -288,7 +288,7 @@ init(struct config *cfg, const char *cmd)
 	ewmh_root_set_desktops(wm->dpy, wm->root, monitor_count(wm->mons),
 			N_WORKSPACES);
 	ewmh_root_set_current_desktop(wm->dpy, wm->root, 0);
-	
+
 	get_windows(wm);
 
 	set_text_prop(wm->dpy, wm->root, netatom(NetWMName), WMNAME);

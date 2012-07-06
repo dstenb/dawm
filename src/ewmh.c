@@ -31,7 +31,7 @@ ewmh_init(Display *dpy, Window root)
 	/* set supported atoms */
 	XChangeProperty(dpy, root, netatom(NetSupported), XA_ATOM, 32,
 			PropModeReplace, (unsigned char *) netatoms,
-			ARRSIZE(netatoms) - 1);
+			ARRSIZE(netatoms));
 }
 
 void
