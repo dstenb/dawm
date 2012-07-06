@@ -40,7 +40,7 @@ struct monitor {
 	struct client *clients;            /* client list */
 	struct client *cstack;             /* client stack */
 	struct client *sel;                /* selected client */
-	int selws;                         /* selected workspace */
+	unsigned long selws;               /* selected workspace */
 	struct workspace ws[N_WORKSPACES]; /* workspace information */
 	struct monitor *next;              /* next monitor */
 };
@@ -85,7 +85,7 @@ void monitor_selected_to_master(struct monitor *);
 void monitor_set_layout(struct monitor *, Display *, int);
 
 /* set the current workspace */
-void monitor_set_ws(struct monitor *, Display *, Window, int);
+void monitor_set_ws(struct monitor *, Display *, Window, unsigned long);
 
 /* show/hide the bar */
 void monitor_show_bar(struct monitor *, Display *, int);

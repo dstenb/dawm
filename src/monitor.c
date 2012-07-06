@@ -321,8 +321,8 @@ monitor_draw_bar(struct monitor *mon, Display *dpy)
 	else
 		batstr = "";
 
-	snprintf(buf, sizeof(buf), "  %i:%i  %s  UPTIME: %ld:%02ld  CPU: %i%c  "
-			"MEM: %ld/%ldMB  BAT: %s%i%c",
+	snprintf(buf, sizeof(buf), "  %i:%lu  %s  UPTIME: %ld:%02ld  "
+			"CPU: %i%c  MEM: %ld/%ldMB  BAT: %s%i%c",
 			mon->num + 1, mon->selws + 1, timestr,
 			i->uptime / 3600, (i->uptime / 60) % 60,
 			i->cpu, '%', i->mem_used / 1024, i->mem_total / 1024,
@@ -477,7 +477,8 @@ monitor_set_layout(struct monitor *mon, Display *dpy, int layout)
 }
 
 void
-monitor_set_ws(struct monitor *mon, Display *dpy, Window root, int ws)
+monitor_set_ws(struct monitor *mon, Display *dpy, Window root,
+		unsigned long ws)
 {
 	assert(VALID_WORKSPACE(ws));
 

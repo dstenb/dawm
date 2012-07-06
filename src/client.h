@@ -15,7 +15,7 @@
 
 #define CLIENT_NAME_SIZE 128
 
-#define ISVISIBLE(c)            (c->ws == c->mon->selws)
+#define ISVISIBLE(c)            (c->ws == c->mon->selws || c->ws == 0xFFFFFFFF)
 
 #define WIDTH(c)                ((c)->w + 2 * (c)->bw)
 #define HEIGHT(c)               ((c)->h + 2 * (c)->bw)
@@ -30,7 +30,7 @@ struct client {
 	int obw;                     /* old border size */
 	Window win;                  /* window that belongs to the client */
 	struct monitor *mon;         /* monitor that the client is on */
-	int ws;                      /* workspace that the client is on */
+	unsigned long ws;            /* workspace that the client is on */
 	struct client *prev;         /* previous client in list */
 	struct client *next;         /* next client in list */
 	struct client *snext;        /* next client in stack */
@@ -68,7 +68,7 @@ void client_set_border(struct client *, Display *, int);
 /* set the WM_STATE */
 void client_set_state(struct client *, Display *, long);
 
-void client_set_ws(struct client *, Display *, int);
+void client_set_ws(struct client *, Display *, unsigned long);
 
 void client_setup(struct client *, struct config *, struct monitor *,
 		Display *, Window, XWindowAttributes *, struct client *);

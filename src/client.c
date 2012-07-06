@@ -141,7 +141,7 @@ client_set_state(struct client *c, Display *dpy, long state)
 }
 
 void
-client_set_ws(struct client *c, Display *dpy, int ws)
+client_set_ws(struct client *c, Display *dpy, unsigned long ws)
 {
 	assert(VALID_WORKSPACE(ws));
 
