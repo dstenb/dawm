@@ -38,7 +38,7 @@ client_focus(struct client *c, Display *dpy, Window root)
 	XSetWindowBorder(dpy, c->win, color(WinSelBorder));
 	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 
-	ewmh_set_active_window(dpy, root, c->win);
+	ewmh_root_set_active_window(dpy, root, c->win);
 	send_event(dpy, c->win, atom(WMTakeFocus));
 }
 
@@ -178,7 +178,7 @@ client_setup(struct client *c, struct config *cfg, struct monitor *mon,
 	client_raise(c, dpy);
 
 	/* add the client to the NetClientList */
-	ewmh_client_list_add(dpy, root, c->win);
+	ewmh_root_client_list_add(dpy, root, c->win);
 }
 
 void

@@ -486,7 +486,7 @@ monitor_set_ws(struct monitor *mon, Display *dpy, Window root, int ws)
 	monitor_focus(mon, NULL,dpy, root);
 	monitor_arrange(mon, dpy);
 
-	ewmh_set_current_desktop(dpy, root, mon->num * N_WORKSPACES + ws);
+	ewmh_root_set_current_desktop(dpy, root, mon->num * N_WORKSPACES + ws);
 }
 
 void

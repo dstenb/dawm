@@ -285,9 +285,9 @@ init(struct config *cfg, const char *cmd)
 	create_monitors(wm);
 
 	/* init ewmh desktop functionality */
-	ewmh_set_desktops(wm->dpy, wm->root, monitor_count(wm->mons),
+	ewmh_root_set_desktops(wm->dpy, wm->root, monitor_count(wm->mons),
 			N_WORKSPACES);
-	ewmh_set_current_desktop(wm->dpy, wm->root, 0);
+	ewmh_root_set_current_desktop(wm->dpy, wm->root, 0);
 	
 	get_windows(wm);
 
@@ -833,7 +833,7 @@ set_monitor(struct wm *wm, struct monitor *mon)
 		wm->selmon = mon;
 		monitor_focus(mon, mon->sel, wm->dpy, wm->root);
 
-		ewmh_set_current_desktop(wm->dpy, wm->root,
+		ewmh_root_set_current_desktop(wm->dpy, wm->root,
 				mon->num * N_WORKSPACES + mon->selws);
 	}
 }
@@ -858,11 +858,11 @@ update_net_client_list(struct wm *wm)
 	struct monitor *mon;
 	struct client *c;
 
-	ewmh_client_list_clear(wm->dpy, wm->root);
+	ewmh_root_client_list_clear(wm->dpy, wm->root);
 
 	for (mon = wm->mons; mon; mon = mon->next)
 		for (c = mon->clients; c; c = c->next)
-			ewmh_client_list_add(wm->dpy, wm->root, c->win);
+			ewmh_root_client_list_add(wm->dpy, wm->root, c->win);
 }
 
 int

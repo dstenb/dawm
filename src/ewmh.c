@@ -35,41 +35,34 @@ ewmh_init(Display *dpy, Window root)
 }
 
 void
-ewmh_client_list_add(Display *dpy, Window root, Window win)
+ewmh_root_client_list_add(Display *dpy, Window root, Window win)
 {
 	XChangeProperty(dpy, root, netatom(NetClientList), XA_WINDOW, 32,
 			PropModeAppend, (unsigned char *) &(win), 1);
 }
 
 void
-ewmh_client_list_clear(Display *dpy, Window root)
+ewmh_root_client_list_clear(Display *dpy, Window root)
 {
 	XDeleteProperty(dpy, root, netatom(NetClientList));
 }
 
 void
-ewmh_client_set_desktop(Display *dpy, Window win, int d)
-{
-	XChangeProperty(dpy, win, netatom(NetDesktop), XA_CARDINAL, 32,
-			PropModeReplace, (unsigned char *) &d, 1);
-}
-
-void
-ewmh_set_active_window(Display *dpy, Window root, Window win)
+ewmh_root_set_active_window(Display *dpy, Window root, Window win)
 {
 	XChangeProperty(dpy, root, netatom(NetActiveWindow), XA_WINDOW, 32,
 			PropModeReplace, (unsigned char *) &(win), 1);
 }
 
 void
-ewmh_set_current_desktop(Display *dpy, Window root, unsigned n)
+ewmh_root_set_current_desktop(Display *dpy, Window root, unsigned n)
 {
 	XChangeProperty(dpy, root, netatom(NetCurrentDesktop), XA_CARDINAL, 32,
 			PropModeReplace, (unsigned char *) &n, 1);
 }
 
 void
-ewmh_set_desktops(Display *dpy, Window root, unsigned m, unsigned d)
+ewmh_root_set_desktops(Display *dpy, Window root, unsigned m, unsigned d)
 {
 	unsigned desktops = m * d;
 
@@ -78,4 +71,11 @@ ewmh_set_desktops(Display *dpy, Window root, unsigned m, unsigned d)
 
 	/* TODO: set desktop names (monitor i:desktop d maybe?) */
 	/* _NET_DESKTOP_NAMES */
+}
+
+void
+ewmh_client_set_desktop(Display *dpy, Window win, int d)
+{
+	XChangeProperty(dpy, win, netatom(NetDesktop), XA_CARDINAL, 32,
+			PropModeReplace, (unsigned char *) &d, 1);
 }
