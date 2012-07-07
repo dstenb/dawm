@@ -16,6 +16,7 @@ typedef enum {
 	WMProtocols,
 	WMState,
 	WMTakeFocus,
+	UTF8String,
 	LASTAtom
 } AtomID;
 

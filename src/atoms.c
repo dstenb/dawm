@@ -6,7 +6,8 @@ static char *atom_names[LASTAtom] = {
 	"WM_NAME",
 	"WM_PROTOCOLS",
 	"WM_STATE",
-	"WM_TAKE_FOCUS"
+	"WM_TAKE_FOCUS",
+	"UTF8_STRING"
 };
 
 static Atom atoms[LASTAtom];

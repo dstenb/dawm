@@ -14,6 +14,7 @@ typedef enum {
 	NetCurrentDesktop,
 	NetDesktop,
 	NetDesktops,
+	NetDesktopNames,
 	NetSupported,
 	NetWMName,
 	NetWMWindowType,
@@ -32,7 +33,8 @@ void ewmh_root_client_list_add(Display *, Window, Window);
 void ewmh_root_client_list_clear(Display *, Window);
 void ewmh_root_set_active_window(Display *, Window, Window);
 void ewmh_root_set_current_desktop(Display *, Window, unsigned);
-void ewmh_root_set_desktops(Display *, Window, unsigned, unsigned);
+void ewmh_root_set_number_of_desktops(Display *, Window, unsigned);
+void ewmh_root_set_desktop_names(Display *, Window, unsigned char *, unsigned);
 
 /* application window properties
  * http://standards.freedesktop.org/wm-spec/wm-spec-latest.html#id2577833

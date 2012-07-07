@@ -6,6 +6,7 @@ static char *atom_names[LASTNetAtom] = {
 	"_NET_CURRENT_DESKTOP",
 	"_NET_WM_DESKTOP",
 	"_NET_NUMBER_OF_DESKTOPS",
+	"_NET_DESKTOP_NAMES",
 	"_NET_SUPPORTED",
 	"_NET_WM_NAME",
 	"_NET_WM_WINDOW_TYPE"
@@ -62,15 +63,18 @@ ewmh_root_set_current_desktop(Display *dpy, Window root, unsigned n)
 }
 
 void
-ewmh_root_set_desktops(Display *dpy, Window root, unsigned m, unsigned d)
+ewmh_root_set_number_of_desktops(Display *dpy, Window root, unsigned desktops)
 {
-	unsigned desktops = m * d;
-
 	XChangeProperty(dpy, root, netatom(NetDesktops), XA_CARDINAL, 32,
 			PropModeReplace, (unsigned char *) &desktops, 1);
+}
 
-	/* TODO: set desktop names (monitor i:desktop d maybe?) */
-	/* _NET_DESKTOP_NAMES */
+void
+ewmh_root_set_desktop_names(Display *dpy, Window root, unsigned char *names,
+		unsigned n)
+{
+	XChangeProperty(dpy, root, netatom(NetDesktopNames), atom(UTF8String),
+			8, PropModeReplace, names, n);
 }
 
 int
