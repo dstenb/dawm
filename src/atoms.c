@@ -40,3 +40,64 @@ int has_wm_protocol(Display *dpy, Window win, Atom prot)
 
 	return found;
 }
+
+void
+atom_append_window(Display *dpy, Window win, Atom prop, Window propwin)
+{
+	XChangeProperty(dpy, win, prop, XA_WINDOW, 32, PropModeAppend,
+			(unsigned char *) &(propwin), 1);
+}
+
+void
+atom_delete(Display *dpy, Window win, Atom atom)
+{
+	XDeleteProperty(dpy, win, atom);
+}
+
+int
+atom_get_cardinal(Display *dpy, Window win, Atom prop, unsigned long *value)
+{
+	Atom a;
+	int f;
+	unsigned long n, r;
+	unsigned char *p;
+
+	if (XGetWindowProperty(dpy, win, prop, 0, 1L, False, XA_CARDINAL, &a,
+				&f, &n, &r, &p) == Success && p) {
+		*value = *(unsigned long *) p;
+		return 1;
+	}
+
+	return 0;
+}
+
+void
+atom_set_atoms(Display *dpy, Window win, Atom prop, Atom *atoms, unsigned n)
+{
+	XChangeProperty(dpy, win, prop, XA_ATOM, 32, PropModeReplace,
+			(unsigned char *) atoms, n);
+}
+
+void
+atom_set_cardinal(Display *dpy, Window win, Atom prop, unsigned long value)
+{
+	XChangeProperty(dpy, win, prop, XA_CARDINAL, 32, PropModeReplace,
+			(unsigned char *) &value, 1);
+}
+
+void
+atom_set_utf8array(Display *dpy, Window win, Atom prop,
+		unsigned char *buf, unsigned size)
+{
+	XChangeProperty(dpy, win, prop, atom(UTF8String),
+			8, PropModeReplace, buf, size);
+
+}
+
+void
+atom_set_window(Display *dpy, Window win, Atom prop, Window propwin)
+{
+	XChangeProperty(dpy, win, prop, XA_WINDOW, 32, PropModeReplace,
+			(unsigned char *) &(propwin), 1);
+
+}
