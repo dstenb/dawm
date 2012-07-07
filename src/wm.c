@@ -380,15 +380,24 @@ handler_clientmessage(struct wm *wm, XEvent *ev)
 			return;
 
 		if (cmev->message_type == atom(WMState)) {
-			DBG("%s: WMState", __func__);
+			DBG("%s: WMState\n", __func__);
 		} else if (cmev->message_type == netatom(NetActiveWindow)) {
-			DBG("%s: NetActiveWindow", __func__);
+			DBG("%s: NetActiveWindow\n", __func__);
 		} else if (cmev->message_type == atom(WMChangeState)) {
 			if (cmev->data.l[0] == IconicState &&
 					cmev->format == 32) {
 				printf("%s: minimize window\n", __func__);
 				/* TODO: fix minimizing */
 			}
+		} else if (cmev->message_type == netatom(NetDesktop)) {
+			unsigned long ws;
+			DBG("%s: NetDesktop\n", __func__);
+			/* TODO: handle multiple monitors */
+			if ((ws = cmev->data.l[0]) != ALL_WS)
+				ws = ws % N_WORKSPACES;
+			client_set_ws(c, wm->dpy, ws);
+			monitor_focus(c->mon, NULL, wm->dpy, wm->root);
+			monitor_arrange(c->mon, wm->dpy);
 		}
 	}
 }

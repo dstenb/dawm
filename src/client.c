@@ -168,7 +168,7 @@ client_setup(struct client *c, struct config *cfg, struct monitor *mon,
 		/* (try to) get previous desktop value
 		 * TODO: handle multiple monitors */
 		if (ewmh_client_get_desktop(dpy, c->win, &ws) && ws != ALL_WS)
-			ws = MIN(ws % N_WORKSPACES, MAX_WS);
+			ws = ws % N_WORKSPACES;
 	}
 
 	client_set_ws(c, dpy, ws);
