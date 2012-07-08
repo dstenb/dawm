@@ -11,6 +11,7 @@ static void create_monitors(struct wm *);
 static void get_windows(struct wm *);
 static void handler_propertynotify_client(struct wm *, XPropertyEvent *);
 static void handler_propertynotify_root(struct wm *, XPropertyEvent *);
+static int manageable_window(Display *, Window, XWindowAttributes *, int);
 static void quit(struct wm *, const char *);
 static void remove_client(struct wm *, struct client *, int);
 static void restart(struct wm *);
@@ -317,23 +318,14 @@ get_windows(struct wm *wm)
 	unsigned int i, n;
 
 	if (XQueryTree(wm->dpy, wm->root, &d1, &d2, &wins, &n)) {
+		/* normal windows */
 		for (i = 0; i < n; i++) {
-			if (!XGetWindowAttributes(wm->dpy, wins[i], &attr) ||
-					attr.override_redirect ||
-					XGetTransientForHint(wm->dpy,
-						wins[i], &d1))
-				continue;
-			if ((attr.map_state == IsViewable) ||
-					(get_state(wm->dpy, wins[i]) ==
-					 IconicState))
+			if (manageable_window(wm->dpy, wins[i], &attr, 0))
 				create_client(wm, wins[i], &attr);
 		}
+		/* transient windows */
 		for (i = 0; i < n; i++) {
-			if (!XGetWindowAttributes(wm->dpy, wins[i], &attr))
-				continue;
-			if (XGetTransientForHint(wm->dpy, wins[i], &d1) &&
-					(attr.map_state == IsViewable
-					 || get_state(wm->dpy, wins[i]) == IconicState))
+			if (manageable_window(wm->dpy, wins[i], &attr, 1))
 				create_client(wm, wins[i], &attr);
 		}
 
@@ -820,6 +812,23 @@ key_handler_togglefloat(struct wm *wm, struct key *key)
 	if (wm->selmon->sel)
 		monitor_float_selected(wm->selmon, wm->dpy,
 				!wm->selmon->sel->floating);
+}
+
+int
+manageable_window(Display *dpy, Window win, XWindowAttributes *attr,
+		int trans)
+{
+	Window dummy;
+
+	if (!XGetWindowAttributes(dpy, win, attr))
+		return 0;
+	if (trans && !XGetTransientForHint(dpy, win, &dummy))
+		return 0;
+	if (!trans && (attr->override_redirect ||
+				XGetTransientForHint(dpy, win, &dummy)))
+		return 0;
+	return (attr->map_state == IsViewable ||
+			get_state(dpy, win) == IconicState);
 }
 
 void
