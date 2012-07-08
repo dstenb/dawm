@@ -379,6 +379,17 @@ monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
 	monitor_draw_bar(mon, dpy);
 }
 
+struct monitor *
+monitor_free(struct monitor *mon, Display *dpy)
+{
+	struct monitor *next = mon->next;
+
+	bar_free(mon->bar, dpy);
+	free(mon);
+
+	return next;
+}
+
 void
 monitor_remove_client(struct monitor *mon, struct client *c)
 {

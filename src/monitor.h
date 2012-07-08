@@ -70,6 +70,8 @@ void monitor_float_selected(struct monitor *, Display *, int);
  * client will be focused */
 void monitor_focus(struct monitor *, struct client *, Display *, Window);
 
+struct monitor *monitor_free(struct monitor *, Display *);
+
 /* remove the given client from the monitor */
 void monitor_remove_client(struct monitor *, struct client *);
 

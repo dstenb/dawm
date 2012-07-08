@@ -51,7 +51,8 @@ bar_create(int topbar, int showbar, int x, int y, int w,
 	return bar;
 }
 
-static void bar_draw_text(struct bar *bar, Display *dpy, const char *str, int len)
+static void
+bar_draw_text(struct bar *bar, Display *dpy, const char *str, int len)
 {
 	int x = (font.height) / 2;
 	int y = (bar->h / 2) - (font.height / 2) + font.ascent;
@@ -74,6 +75,14 @@ bar_draw(struct bar *bar, Display *dpy, const char *str)
 	bar_draw_text(bar, dpy, str, strlen(str));
 	XCopyArea(dpy, dc.drawable, bar->win, dc.gc, 0, 0, bar->w, bar->h, 0, 0);
 	XSync(dpy, False);
+}
+
+void
+bar_free(struct bar *bar, Display *dpy)
+{
+	XUnmapWindow(dpy, bar->win);
+	XDestroyWindow(dpy, bar->win);
+	free(bar);
 }
 
 void
@@ -130,4 +139,18 @@ bars_init_font(Display *dpy, const char *fontstr)
 	}
 
 	font.height = font.ascent + font.descent;
+}
+
+void
+bars_free(Display *dpy)
+{
+	if (initialized) {
+		if (font.set)
+			XFreeFontSet(dpy, font.set);
+		else
+			XFreeFont(dpy, font.xfont);
+
+		XFreePixmap(dpy, dc.drawable);
+		XFreeGC(dpy, dc.gc);
+	}
 }

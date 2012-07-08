@@ -178,12 +178,25 @@ create_monitors(struct wm *wm)
 int
 destroy(struct wm *wm)
 {
-	/* TODO */
+	struct monitor *mon;
 
+	for (mon = wm->mons; mon; mon = mon->next) {
+		while (mon->cstack)
+			remove_client(wm, mon->cstack, 0);
+	}
+
+	bars_free(wm->dpy);
+	cursors_free(wm->dpy);
 	config_free(wm->cfg);
 
 	XUngrabKey(wm->dpy, AnyKey, AnyModifier, wm->root);
-	cursors_free(wm->dpy);
+
+	while (wm->mons)
+		wm->mons = monitor_free(wm->mons, wm->dpy);
+
+	XSync(wm->dpy, False);
+	XSetInputFocus(wm->dpy, PointerRoot, RevertToPointerRoot,
+			CurrentTime);
 	XCloseDisplay(wm->dpy);
 	free(wm);
 	return 0;
