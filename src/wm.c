@@ -841,9 +841,13 @@ remove_client(struct wm *wm, struct client *c, int destroyed)
 void
 restart(struct wm *wm)
 {
-	DBG("%s. restarting!\n", __func__);
-	if (wm->cmd)
-		execlp("/bin/sh", "sh" , "-c", wm->cmd, NULL);
+	if (wm->cmd) {
+		char *cmd = xstrdup(wm->cmd);
+
+		DBG("%s. restarting!\n", __func__);
+		destroy(wm);
+		execlp("/bin/sh", "sh" , "-c", cmd, NULL);
+	}
 }
 
 void
