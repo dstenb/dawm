@@ -1,5 +1,24 @@
 #include "xutils.h"
 
+long
+get_state(Display *dpy, Window win)
+{
+	int format;
+	long result = -1;
+	unsigned char *p = NULL;
+	unsigned long n, extra;
+	Atom real;
+
+	if(XGetWindowProperty(dpy, win, atom(WMState), 0L, 2L, False,
+				atom(WMState), &real, &format, &n, &extra,
+				(unsigned char **)&p) != Success)
+		return -1;
+	if(n != 0)
+		result = *p;
+	XFree(p);
+	return result;
+}
+
 int
 send_event(Display *dpy, Window win, Atom proto)
 {

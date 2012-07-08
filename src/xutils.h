@@ -12,6 +12,8 @@
 #include "atoms.h"
 #include "utils.h"
 
+long get_state(Display *, Window win);
+
 int send_event(Display *, Window, Atom);
 
 #endif

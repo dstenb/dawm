@@ -318,12 +318,23 @@ get_windows(struct wm *wm)
 
 	if (XQueryTree(wm->dpy, wm->root, &d1, &d2, &wins, &n)) {
 		for (i = 0; i < n; i++) {
-			if(!XGetWindowAttributes(wm->dpy, wins[i], &attr) ||
-					attr.override_redirect)
+			if (!XGetWindowAttributes(wm->dpy, wins[i], &attr) ||
+					attr.override_redirect ||
+					XGetTransientForHint(wm->dpy,
+						wins[i], &d1))
 				continue;
-
-			/* TODO: fix hints */
-			create_client(wm, wins[i], &attr);
+			if ((attr.map_state == IsViewable) ||
+					(get_state(wm->dpy, wins[i]) ==
+					 IconicState))
+				create_client(wm, wins[i], &attr);
+		}
+		for (i = 0; i < n; i++) {
+			if (!XGetWindowAttributes(wm->dpy, wins[i], &attr))
+				continue;
+			if (XGetTransientForHint(wm->dpy, wins[i], &d1) &&
+					(attr.map_state == IsViewable
+					 || get_state(wm->dpy, wins[i]) == IconicState))
+				create_client(wm, wins[i], &attr);
 		}
 
 		if (wins)
