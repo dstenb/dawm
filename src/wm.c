@@ -280,6 +280,7 @@ init(struct config *cfg, const char *cmd)
 	/* init atoms and ewmh */
 	atoms_init(wm->dpy);
 	ewmh_init(wm->dpy, wm->root);
+	ewmh_root_set_name(wm->dpy, wm->root, WMNAME);
 
 	/* create monitors */
 	create_monitors(wm);
@@ -290,8 +291,6 @@ init(struct config *cfg, const char *cmd)
 	ewmh_root_set_current_desktop(wm->dpy, wm->root, 0);
 
 	get_windows(wm);
-
-	set_text_prop(wm->dpy, wm->root, netatom(NetWMName), WMNAME);
 
 	return wm;
 }

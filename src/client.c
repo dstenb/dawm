@@ -229,7 +229,7 @@ client_unmap(struct client *c, Display *dpy)
 void
 client_update_title(struct client *c, Display *dpy)
 {
-	if (!(get_text_prop(dpy, c->win, atom(WMName), c->name,
+	if (!(atom_get_string(dpy, c->win, atom(WMName), c->name,
 					CLIENT_NAME_SIZE)))
 		snprintf(c->name, CLIENT_NAME_SIZE, "unnamed window");
 	error("c->name: %s\n", c->name);

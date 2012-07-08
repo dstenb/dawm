@@ -59,6 +59,12 @@ ewmh_root_set_current_desktop(Display *dpy, Window root, unsigned long n)
 }
 
 void
+ewmh_root_set_name(Display *dpy, Window root, char *name)
+{
+	atom_set_string(dpy, root, netatom(NetWMName), name);
+}
+
+void
 ewmh_root_set_number_of_desktops(Display *dpy, Window root, unsigned long n)
 {
 	atom_set_cardinal(dpy, root, netatom(NetDesktops), n);

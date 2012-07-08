@@ -33,6 +33,7 @@ void ewmh_root_client_list_add(Display *, Window, Window);
 void ewmh_root_client_list_clear(Display *, Window);
 void ewmh_root_set_active_window(Display *, Window, Window);
 void ewmh_root_set_current_desktop(Display *, Window, unsigned long);
+void ewmh_root_set_name(Display *, Window, char *);
 void ewmh_root_set_number_of_desktops(Display *, Window, unsigned long);
 void ewmh_root_set_desktop_names(Display *, Window, unsigned char *, unsigned);
 
