@@ -93,6 +93,7 @@ atom_get_cardinal(Display *dpy, Window win, Atom prop, unsigned long *value)
 	if (XGetWindowProperty(dpy, win, prop, 0, 1L, False, XA_CARDINAL, &a,
 				&f, &n, &r, &p) == Success && p) {
 		*value = *(unsigned long *) p;
+		XFree(p);
 		return 1;
 	}
 
