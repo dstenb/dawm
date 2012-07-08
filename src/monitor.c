@@ -170,7 +170,8 @@ remove_from_clients(struct monitor *mon, struct client *c)
 {
 	if (c == mon->clients) {
 		mon->clients = mon->clients->next;
-		mon->clients->prev = NULL;
+		if (mon->clients)
+			mon->clients->prev = NULL;
 	} else {
 		if (c->prev)
 			c->prev->next = c->next;
