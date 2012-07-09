@@ -10,7 +10,9 @@ static char *atom_names[LASTNetAtom] = {
 	"_NET_SUPPORTED",
 	"_NET_WM_NAME",
 	"_NET_WM_STATE",
-	"_NET_WM_WINDOW_TYPE"
+	"_NET_WM_STATE_FULLSCREEN",
+	"_NET_WM_WINDOW_TYPE",
+	"_NET_WM_WINDOW_TYPE_DIALOG"
 };
 
 static Atom netatoms[LASTNetAtom];
@@ -91,9 +93,9 @@ ewmh_client_get_state(Display *dpy, Window win, Atom *state)
 }
 
 int
-ewmh_client_get_window_type(Display *dpy, Window win, Atom *type)
+ewmh_client_get_window_types(Display *dpy, Window win, Atom **t, unsigned *n)
 {
-	return atom_get_atom(dpy, win, netatom(NetWMWindowType), type);
+	return atom_get_atoms(dpy, win, netatom(NetWMWindowType), t, n);
 }
 
 void

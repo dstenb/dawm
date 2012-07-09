@@ -36,13 +36,21 @@ void
 client_fix_window_type(struct client *c, Display *dpy)
 {
 	Atom state;
-	Atom type;
+	Atom *types;
+	unsigned i, n;
 
 	if (ewmh_client_get_state(dpy, c->win, &state))
-		error("oh yes\n");
+		if (state == netatom(NetWMStateFullscreen))
+			die("FULLSCREEN\n");
 
-	if (ewmh_client_get_window_type(dpy, c->win, &type))
-		error("oh yes\n");
+	if (ewmh_client_get_window_types(dpy, c->win, &types, &n)) {
+		for (i = 0; i < n; i++) {
+			if (types[i] == netatom(NetWMWindowTypeDialog))
+				c->floating = 1;
+		}
+
+		XFree(types);
+	}
 }
 
 void
@@ -192,7 +200,7 @@ client_setup(struct client *c, struct config *cfg, struct monitor *mon,
 	client_set_border(c, dpy, cfg->bw);
 
 	/* TODO: configureevent */
-	/*client_fix_window_type(c);*/
+	client_fix_window_type(c, dpy);
 	/* TODO: fix size & wm hints */
 
 	client_select_input(c, dpy);
