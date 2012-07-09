@@ -61,6 +61,14 @@ prev_visible_client(struct client *curr)
 	return curr;
 }
 
+static const char *
+layout2str(LayoutID id)
+{
+	static char *arr[] = { "|", "-", "=", " ", "M" };
+
+	return (id < ARRSIZE(arr)) ? arr[id] : "";
+}
+
 static void
 arrange_tilehorz(struct monitor *mon, Display *dpy)
 {
@@ -308,6 +316,7 @@ monitor_draw_bar(struct monitor *mon, Display *dpy)
 	char buf[512];
 	char timestr[64];
 	const struct info *i = info();
+	const char *layoutstr = layout2str(mon->ws[mon->selws].layout);
 
 	strftime(timestr, sizeof(timestr), "%y/%m/%d %H:%M",
 			localtime(&i->time));
@@ -322,15 +331,15 @@ monitor_draw_bar(struct monitor *mon, Display *dpy)
 	else
 		batstr = "";
 
-	snprintf(buf, sizeof(buf), "  %i:%lu  %s  UPTIME: %ld:%02ld  "
+	snprintf(buf, sizeof(buf), "  %i:%lu  [%s]  %s  UPTIME: %ld:%02ld  "
 			"CPU: %i%c  MEM: %ld/%ldMB  BAT: %s%i%c",
-			mon->num + 1, mon->selws + 1, timestr,
+			mon->num + 1, mon->selws + 1, layoutstr, timestr,
 			i->uptime / 3600, (i->uptime / 60) % 60,
 			i->cpu, '%', i->mem_used / 1024, i->mem_total / 1024,
 			batstr, i->bat_level, '%');
 #else
-	snprintf(buf, sizeof(buf), "  %i:%i  %s", mon->num + 1, mon->selws + 1,
-			timestr);
+	snprintf(buf, sizeof(buf), "  %i:%lu  [%s]  %s", mon->num + 1,
+			mon->selws + 1, layoutstr, timestr);
 #endif
 
 	bar_draw(mon->bar, dpy, buf);
