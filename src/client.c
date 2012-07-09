@@ -33,6 +33,19 @@ client_create(Window win, XWindowAttributes *wa)
 }
 
 void
+client_fix_window_type(struct client *c, Display *dpy)
+{
+	Atom state;
+	Atom type;
+
+	if (ewmh_client_get_state(dpy, c->win, &state))
+		error("oh yes\n");
+
+	if (ewmh_client_get_window_type(dpy, c->win, &type))
+		error("oh yes\n");
+}
+
+void
 client_focus(struct client *c, Display *dpy, Window root)
 {
 	XSetWindowBorder(dpy, c->win, color(WinSelBorder));

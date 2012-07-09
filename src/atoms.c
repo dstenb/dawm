@@ -55,6 +55,24 @@ atom_delete(Display *dpy, Window win, Atom prop)
 }
 
 int
+atom_get_atom(Display *dpy, Window win, Atom prop, Atom *value)
+{
+	Atom a;
+	int f;
+	unsigned long n, r;
+	unsigned char *p;
+
+	if (XGetWindowProperty(dpy, win, prop, 0L, sizeof(Atom), False,
+				XA_ATOM, &a, &f, &n, &r, &p) == Success && p) {
+		*value = *(Atom *) p;
+		XFree(p);
+		return 1;
+	}
+
+	return 0;
+}
+
+int
 atom_get_string(Display *dpy, Window win, Atom prop,
 		char *str, unsigned int size)
 {

@@ -9,6 +9,7 @@ static char *atom_names[LASTNetAtom] = {
 	"_NET_DESKTOP_NAMES",
 	"_NET_SUPPORTED",
 	"_NET_WM_NAME",
+	"_NET_WM_STATE",
 	"_NET_WM_WINDOW_TYPE"
 };
 
@@ -81,6 +82,18 @@ int
 ewmh_client_get_desktop(Display *dpy, Window win, unsigned long *d)
 {
 	return atom_get_cardinal(dpy, win, netatom(NetDesktop), d);
+}
+
+int
+ewmh_client_get_state(Display *dpy, Window win, Atom *state)
+{
+	return atom_get_atom(dpy, win, netatom(NetWMState), state);
+}
+
+int
+ewmh_client_get_window_type(Display *dpy, Window win, Atom *type)
+{
+	return atom_get_atom(dpy, win, netatom(NetWMWindowType), type);
 }
 
 void

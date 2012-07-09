@@ -17,6 +17,7 @@ typedef enum {
 	NetDesktopNames,
 	NetSupported,
 	NetWMName,
+	NetWMState,
 	NetWMWindowType,
 	LASTNetAtom
 } NetAtomID;
@@ -41,6 +42,8 @@ void ewmh_root_set_desktop_names(Display *, Window, unsigned char *, unsigned);
  * http://standards.freedesktop.org/wm-spec/wm-spec-latest.html#id2577833
  */
 int ewmh_client_get_desktop(Display *, Window, unsigned long *);
+int ewmh_client_get_state(Display *, Window, Atom *);
+int ewmh_client_get_window_type(Display *, Window, Atom *);
 void ewmh_client_set_desktop(Display *, Window, unsigned long);
 
 #endif
