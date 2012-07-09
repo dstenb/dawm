@@ -39,6 +39,8 @@ struct client {
 /* create a client */
 struct client *client_create(Window, XWindowAttributes *);
 
+void client_fix_window_type(struct client *, Display *);
+
 /* set focus on the client */
 void client_focus(struct client *, Display *, Window);
 
