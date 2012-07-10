@@ -65,7 +65,7 @@ main(int argc, char **argv)
 	}
 
 	cfg_str = cfg_str ? cfg_str : config_default_path();
-	cfg = config_init();
+	cfg = config_create();
 	if (config_load(cfg, cfg_str) != 0)
 		error("error loading '%s': %s\n", cfg_str, strerror(errno));
 

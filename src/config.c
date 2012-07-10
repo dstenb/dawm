@@ -3,7 +3,8 @@
 static struct key *parse_bind(const char *, int, char *, char *, char *);
 static void parse_color(struct config *, const char *, int, char *, char *);
 static void replace_str(char **, char *);
-static int valid_color_value(const char *);
+
+static char default_path[PATH_MAX + 1];
 
 static const char *default_colors[LASTColor] = {
 	[BarBorder] = "#FF0000",
@@ -16,7 +17,7 @@ static const char *default_colors[LASTColor] = {
 };
 
 struct config *
-config_init(void)
+config_create(void)
 {
 	struct config *cfg = xcalloc(1, sizeof(struct config));
 	int i;
@@ -76,8 +77,6 @@ parse_color(struct config *cfg, const char *path, int line,
 		die("%s:%i, missing color value\n", path, line);
 	if (color_str2id(cid) == InvalidColor)
 		die("%s:%i, invalid color id: '%s'\n", path, line, cid);
-	if (!valid_color_value(cvalue))
-		die("%s:%i, invalid color value: '%s'\n", path, line, cvalue);
 
 	replace_str(&cfg->colors[color_str2id(cid)], xstrdup(cvalue));
 }
@@ -125,14 +124,12 @@ config_load(struct config *cfg, const char *path)
 	return 0;
 }
 
-char *
+const char *
 config_default_path(void)
 {
-	char buf[PATH_MAX + 1];
-
-	snprintf(buf, sizeof(buf), "%s/.config/dawm/config", getenv("HOME"));
-
-	return xstrdup(buf);
+	snprintf(default_path, sizeof(default_path),
+			"%s/.config/dawm/config", getenv("HOME"));
+	return default_path;
 }
 
 void
@@ -153,12 +150,4 @@ replace_str(char **p, char *new)
 	if (*p)
 		free(*p);
 	*p = new;
-}
-
-int
-valid_color_value(const char *str)
-{
-	/* TODO */
-	(void)str;
-	return 1;
 }
