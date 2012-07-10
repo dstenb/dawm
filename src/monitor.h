@@ -112,4 +112,7 @@ struct client *find_client_by_window(struct monitor *, Window);
 /* returns the monitor that corresponds to the given position */
 struct monitor *find_monitor_by_pos(struct monitor *, int, int);
 
+/* returns the monitor that corresponds to the given workspace index */
+struct monitor *find_monitor_by_ws(struct monitor *, unsigned);
+
 #endif

@@ -20,6 +20,7 @@ client_create(Window win, XWindowAttributes *wa)
 	c->y = c->oy = wa->y;
 	c->w = c->ow = wa->width;
 	c->h = c->oh = wa->height;
+	c->obw = wa->border_width;
 
 	c->name[0] = '\0';
 	c->floating = 0;
@@ -171,8 +172,8 @@ client_set_ws(struct client *c, Display *dpy, unsigned long ws)
 }
 
 void
-client_setup(struct client *c, struct config *cfg, struct monitor *mon,
-		Display *dpy, Window root, XWindowAttributes *wa,
+client_setup(struct client *c, struct config *cfg, struct monitor *selmon,
+		struct monitor *mons, Display *dpy, Window root,
 		struct client *trans)
 {
 	unsigned long ws;
@@ -183,25 +184,25 @@ client_setup(struct client *c, struct config *cfg, struct monitor *mon,
 		c->mon = trans->mon;
 		ws = trans->ws;
 	} else {
-		c->mon = mon;
-		ws = mon->selws;
+		c->mon = selmon;
+		ws = selmon->selws;
 
-		/* (try to) get previous desktop value
-		 * TODO: handle multiple monitors */
-		if (ewmh_client_get_desktop(dpy, c->win, &ws) && ws != ALL_WS)
+		/* (try to) get previous desktop value and set the monitor
+		 * and workspace according to that */
+		if (ewmh_client_get_desktop(dpy, c->win, &ws) && ws != ALL_WS) {
+			if (find_monitor_by_ws(mons, ws))
+				c->mon = find_monitor_by_ws(mons, ws);
 			ws = ws % N_WORKSPACES;
+		}
 	}
 
 	client_set_ws(c, dpy, ws);
-
-	/* TODO: fix client rules (rule.h) */
-
-	c->obw = wa->border_width;
 	client_set_border(c, dpy, cfg->bw);
-
 	/* TODO: configureevent */
 	client_fix_window_type(c, dpy);
 	/* TODO: fix size & wm hints */
+
+	/* TODO: rule_apply_all(cfg->rules, c, selmon, mons); */
 
 	client_select_input(c, dpy);
 	client_grab_buttons(c, dpy);

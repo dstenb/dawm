@@ -73,7 +73,7 @@ void client_set_state(struct client *, Display *, long);
 void client_set_ws(struct client *, Display *, unsigned long);
 
 void client_setup(struct client *, struct config *, struct monitor *,
-		Display *, Window, XWindowAttributes *, struct client *);
+		struct monitor *, Display *, Window, struct client *);
 
 void client_show(struct client *, Display *, int);
 

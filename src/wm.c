@@ -134,7 +134,7 @@ create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 
 	tc = find_client_by_trans(wm->mons, wm->dpy, win);
 
-	client_setup(c, wm->cfg, wm->selmon, wm->dpy, wm->root, attr, tc);
+	client_setup(c, wm->cfg, wm->selmon, wm->mons, wm->dpy, wm->root, tc);
 
 	monitor_add_client(c->mon, c);
 	monitor_unfocus_selected(c->mon, wm->dpy, wm->root);
@@ -146,10 +146,20 @@ create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 	monitor_focus(c->mon, c, wm->dpy, wm->root);
 }
 
-/* TODO: fix Xinerama */
 void
 create_monitors(struct wm *wm)
 {
+#if 0
+	/* TODO: test code, to be removed */
+	struct monitor *m;
+	wm->mons = monitor_create(wm->cfg, 0, 0, 0, 1024 / 2, 600, wm->dpy,
+			wm->root, wm->screen);
+	m = monitor_create(wm->cfg, 1, 1024 / 2, 0, 1024 / 2, 600, wm->dpy,
+			wm->root, wm->screen);
+	wm->mons = monitor_append(wm->mons, m);
+	wm->selmon = wm->mons;
+	return;
+#endif
 #ifdef XINERAMA
 	struct monitor *mon;
 	int i, nmon;

@@ -588,3 +588,10 @@ find_monitor_by_pos(struct monitor *mon, int x, int y)
 			mon = mon->next) ;
 	return mon;
 }
+
+struct monitor *
+find_monitor_by_ws(struct monitor *mon, unsigned index)
+{
+	for ( ; mon && index > MAX_WS; mon = mon->next, index -= N_WORKSPACES);
+	return mon;
+}
