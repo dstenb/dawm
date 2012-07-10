@@ -11,6 +11,8 @@
 static void usage(const char *);
 static void version(void);
 
+static int check_config = 0;
+
 /* prints an usage message */
 void
 usage(const char *cmd)
@@ -21,6 +23,7 @@ usage(const char *cmd)
 	printf("  -v, --version      print version message.\n");
 	printf("  -c, --config       select a custom configuration file.\n");
 	printf("  -d, --display      select a custom display.\n");
+	printf("  -k, --display      check if the given config file is ok.\n");
 }
 
 /* prints a version message */
@@ -38,8 +41,6 @@ main(int argc, char **argv)
 	char *cfg_str = NULL;
 	int i;
 
-	error("starting!\n");
-
 	for (i = 1; i < argc; i++) {
 		if (STREQ(argv[i], "-v") || STREQ(argv[i], "--version")) {
 			version();
@@ -54,6 +55,9 @@ main(int argc, char **argv)
 			if (++i == argc)
 				die("missing argument for %s\n", argv[i - 1]);
 			cfg_str = argv[i];
+		} else if (STREQ(argv[i], "--check") ||
+				STREQ(argv[i], "-k")) {
+			check_config = 1;
 		} else {
 			usage(argv[0]);
 			exit(1);
@@ -64,6 +68,13 @@ main(int argc, char **argv)
 	cfg = config_init();
 	if (config_load(cfg, cfg_str) != 0)
 		error("error loading '%s': %s\n", cfg_str, strerror(errno));
+
+	if (check_config) {
+		printf("%s: configuration file ok!\n", WMNAME);
+		exit(EXIT_SUCCESS);
+	}
+
+	error("starting!\n");
 
 	wm = init(cfg, strfvs(argv, ' '));
 	eventloop(wm);
