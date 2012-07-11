@@ -15,9 +15,9 @@
 #include "config.h"
 #include "cursors.h"
 #include "ewmh.h"
-#include "info.h"
 #include "keys.h"
 #include "monitor.h"
+#include "sysinfo.h"
 #include "utils.h"
 
 typedef enum {

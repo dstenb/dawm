@@ -281,7 +281,7 @@ init(struct config *cfg, const char *cmd)
 	wm->cfg = cfg;
 	wm->motion.type = NoMotion;
 
-	info_init();
+	sysinfo_init();
 
 	colors_init(cfg->colors, wm->dpy, wm->screen);
 	bars_init(wm->dpy, wm->root, wm->screen, BAR_FONT);
@@ -912,7 +912,7 @@ update_bars(struct wm *wm)
 	/* TODO: test code, to be removed */
 	struct monitor *mon;
 
-	info_update();
+	sysinfo_update();
 
 	for (mon = wm->mons; mon; mon = mon->next)
 		monitor_draw_bar(mon, wm->dpy);

@@ -315,7 +315,7 @@ monitor_draw_bar(struct monitor *mon, Display *dpy)
 {
 	char buf[512];
 	char timestr[64];
-	const struct info *i = info();
+	const struct sysinfo *i = sysinfo();
 	const char *layoutstr = layout2str(mon->ws[mon->selws].layout);
 
 	strftime(timestr, sizeof(timestr), "%y/%m/%d %H:%M",

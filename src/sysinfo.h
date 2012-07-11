@@ -17,7 +17,7 @@ typedef enum {
 } BatteryStatus;
 #endif /* __linux__ */
 
-struct info {
+struct sysinfo {
 	time_t time;    /* current time */
 #ifdef __linux__
 	int cpu;        /* cpu usage, -1 if unable to calculate cpu */
@@ -29,13 +29,13 @@ struct info {
 #endif /* __linux__ */
 };
 
-/* returns a pointer to the main info struct */
-const struct info *info(void);
+/* returns a pointer to the main sysinfo struct */
+const struct sysinfo *sysinfo(void);
 
-/* initializes the main info struct */
-void info_init(void);
+/* initializes the main sysinfo struct */
+void sysinfo_init(void);
 
-/* updates the main info struct */
-void info_update(void);
+/* updates the main sysinfo struct */
+void sysinfo_update(void);
 
 #endif

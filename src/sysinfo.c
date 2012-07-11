@@ -1,4 +1,4 @@
-#include "info.h"
+#include "sysinfo.h"
 
 #ifdef __linux__
 static int get_battery(int *, int *);
@@ -7,7 +7,7 @@ static int get_mem(long *, long *);
 static int get_uptime(long *);
 #endif /* __linux__ */
 
-static struct info _info;
+static struct sysinfo _sysinfo;
 
 #ifdef __linux__
 static struct {
@@ -193,37 +193,37 @@ get_uptime(long *uptime)
 }
 #endif /* __linux__ */
 
-const struct info *
-info()
+const struct sysinfo *
+sysinfo()
 {
-	return &_info;
+	return &_sysinfo;
 }
 
 void
-info_init()
+sysinfo_init()
 {
 #ifdef __linux__
 	get_cpu_stats(&cpu.ou, &cpu.oi); /* get initial cpu values */
 #endif /* __linux__ */
 
-	info_update();
+	sysinfo_update();
 }
 
 void
-info_update()
+sysinfo_update()
 {
-	_info.time = time(NULL);
+	_sysinfo.time = time(NULL);
 
 #ifdef __linux__
 	/* update the battery value */
-	get_battery(&_info.bat_level, &_info.bat_status);
-	get_mem(&_info.mem_used, &_info.mem_total);
-	get_uptime(&_info.uptime);
+	get_battery(&_sysinfo.bat_level, &_sysinfo.bat_status);
+	get_mem(&_sysinfo.mem_used, &_sysinfo.mem_total);
+	get_uptime(&_sysinfo.uptime);
 
 	/* update the cpu value */
-	_info.cpu = -1;
+	_sysinfo.cpu = -1;
 	if (get_cpu_stats(&cpu.u, &cpu.i) == 0) {
-		_info.cpu = 100 * (cpu.u - cpu.ou) /
+		_sysinfo.cpu = 100 * (cpu.u - cpu.ou) /
 			(double) ((cpu.u + cpu.i) - (cpu.ou + cpu.oi));
 		cpu.ou = cpu.u;
 		cpu.oi = cpu.i;

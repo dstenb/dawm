@@ -8,7 +8,7 @@
 #include "bar.h"
 #include "client.h"
 #include "config.h"
-#include "info.h"
+#include "sysinfo.h"
 
 #define ISARRANGED(M) ((M)->ws[(M)->selws].layout != FloatingLayout)
 
