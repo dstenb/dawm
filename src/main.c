@@ -44,7 +44,7 @@ main(int argc, char **argv)
 	for (i = 1; i < argc; i++) {
 		if (STREQ(argv[i], "-v") || STREQ(argv[i], "--version")) {
 			version();
-			exit(0);
+			exit(EXIT_SUCCESS);
 		} else if (STREQ(argv[i], "--display") ||
 				STREQ(argv[i], "-d")) {
 			if (++i == argc)
@@ -60,7 +60,7 @@ main(int argc, char **argv)
 			check_config = 1;
 		} else {
 			usage(argv[0]);
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 	}
 
