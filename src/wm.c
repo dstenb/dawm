@@ -15,6 +15,7 @@ static int manageable_window(Display *, Window, XWindowAttributes *, int);
 static void quit(struct wm *, const char *);
 static void remove_client(struct wm *, struct client *, int);
 static void restart(struct wm *);
+static void set_environment(struct wm *);
 static void set_monitor(struct wm *, struct monitor *);
 static void update_bars(struct wm *);
 static void update_net_client_list(struct wm *);
@@ -315,6 +316,8 @@ init(struct config *cfg, const char *cmd)
 	ewmh_root_set_current_desktop(wm->dpy, wm->root, 0);
 
 	get_windows(wm);
+
+	set_environment(wm);
 
 	return wm;
 }
@@ -878,6 +881,16 @@ restart(struct wm *wm)
 		destroy(wm);
 		execlp("/bin/sh", "sh" , "-c", cmd, NULL);
 	}
+}
+
+void
+set_environment(struct wm *wm)
+{
+	setenv("BAR_FONT", BAR_FONT, 1);
+	setenv("BAR_NORM_FG", wm->cfg->colors[BarNormFG], 1);
+	setenv("BAR_NORM_BG", wm->cfg->colors[BarNormBG], 1);
+	setenv("BAR_SEL_FG", wm->cfg->colors[BarSelFG], 1);
+	setenv("BAR_SEL_BG", wm->cfg->colors[BarSelBG], 1);
 }
 
 void
