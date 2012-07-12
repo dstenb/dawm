@@ -39,6 +39,15 @@ void spawn(const char *);
 /* concatenates a NULL-terminated list of strings to one string */
 char *strfvs(char **, char);
 
+/* remove all the given characters in the back and front of the string */
+char *strtr(char *, const char *);
+
+/* remove all the given characters from the back of the string */
+char *strtrb(char *, const char *);
+
+/* remove all the given characters in front of the string */
+char *strtrf(char *, const char *);
+
 /* calloc() wrapper that will exit if unable to allocate */
 void *xcalloc(size_t, size_t);
 

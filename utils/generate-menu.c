@@ -46,9 +46,10 @@ print_keys()
 int
 main(int argc, char **argv)
 {
-	cfg = config_init();
+	cfg = config_create();
 
 	printf("### Example configuration for DAWM\n\n");
+	printf("#bar_font %s\n\n", BAR_FONT);
 	print_colors();
 	printf("\n# The following command will unbind all keys\n");
 	printf("#unbind_all\n\n");

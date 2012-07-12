@@ -18,6 +18,7 @@ struct config {
 	struct key *keys;        /* key bindings */
 	float mfact;             /* master size factor [0, 1] */
 	unsigned int nmaster;    /* number of master clients */
+	char *barfont;           /* bar font */
 	char *colors[LASTColor]; /* color values, in "#XXXXXX" form */
 };
 
@@ -28,7 +29,7 @@ struct config *config_create(void);
 int config_load(struct config *, const char *);
 
 /* returns the default config path */
-const char *config_default_path(void);
+char *config_default_path(void);
 
 void config_free(struct config *);
 

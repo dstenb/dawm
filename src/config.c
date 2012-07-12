@@ -2,6 +2,7 @@
 
 static struct key *parse_bind(const char *, int, char *, char *, char *);
 static void parse_color(struct config *, const char *, int, char *, char *);
+static void parse_font(struct config *, const char *, int, char *);
 static void replace_str(char **, char *);
 
 static char default_path[PATH_MAX + 1];
@@ -28,6 +29,7 @@ config_create(void)
 	cfg->bw = 1;
 	cfg->nmaster = N_MASTER;
 	cfg->mfact = M_FACT;
+	cfg->barfont = xstrdup(BAR_FONT);
 
 	for (i = 0; i < LASTColor; i++)
 		cfg->colors[i] = xstrdup(default_colors[i]);
@@ -81,6 +83,18 @@ parse_color(struct config *cfg, const char *path, int line,
 	replace_str(&cfg->colors[color_str2id(cid)], xstrdup(cvalue));
 }
 
+void
+parse_font(struct config *cfg, const char *path, int line,
+		char *font)
+{
+	if (font)
+		font = strtr(font, " \t\n");
+	if (!font || *font == '\0')
+		die("%s:%i, missing font value\n", path, line);
+
+	replace_str(&cfg->barfont, xstrdup(font));
+}
+
 int
 config_load(struct config *cfg, const char *path)
 {
@@ -114,6 +128,8 @@ config_load(struct config *cfg, const char *path)
 			char *cvalue = strtok(NULL, " \t\n");
 
 			parse_color(cfg, path, line, cid, cvalue);
+		} else if (STREQ(cmd, "bar_font")) {
+			parse_font(cfg, path, line, strtok(NULL, "\t\n"));
 		} else {
 			die("%s:%i, unknown command '%s'\n", path, line, cmd);
 		}
@@ -124,7 +140,7 @@ config_load(struct config *cfg, const char *path)
 	return 0;
 }
 
-const char *
+char *
 config_default_path(void)
 {
 	snprintf(default_path, sizeof(default_path),
@@ -141,6 +157,7 @@ config_free(struct config *cfg)
 		free(cfg->colors[i]);
 
 	key_free_all(cfg->keys);
+	free(cfg->barfont);
 	free(cfg);
 }
 

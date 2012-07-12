@@ -69,6 +69,33 @@ strfvs(char **v, char c)
 	return s;
 }
 
+char *
+strtr(char *s, const char *skip)
+{
+	return strtrb(strtrf(s, skip), skip);
+
+}
+
+char *
+strtrb(char *s, const char *skip)
+{
+	char *p = s + strlen(s) - 1;
+
+	while (p > s && strchr(skip, *p))
+		p--;
+	*(p + 1) = '\0';
+
+	return s;
+}
+
+char *
+strtrf(char *s, const char *skip)
+{
+	while (*s && strchr(skip, *s))
+		s++;
+	return s;
+}
+
 void *
 xcalloc(size_t nmemb, size_t size)
 {

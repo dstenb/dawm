@@ -284,7 +284,7 @@ init(struct config *cfg, const char *cmd)
 	sysinfo_init();
 
 	colors_init(cfg->colors, wm->dpy, wm->screen);
-	bars_init(wm->dpy, wm->root, wm->screen, BAR_FONT);
+	bars_init(wm->dpy, wm->root, wm->screen, wm->cfg->barfont);
 
 	/* select events to handle */
 	attr.event_mask = WM_EVENT_MASK;
@@ -886,7 +886,7 @@ restart(struct wm *wm)
 void
 set_environment(struct wm *wm)
 {
-	setenv("BAR_FONT", BAR_FONT, 1);
+	setenv("BAR_FONT", wm->cfg->barfont, 1);
 	setenv("BAR_NORM_FG", wm->cfg->colors[BarNormFG], 1);
 	setenv("BAR_NORM_BG", wm->cfg->colors[BarNormBG], 1);
 	setenv("BAR_SEL_FG", wm->cfg->colors[BarSelFG], 1);
