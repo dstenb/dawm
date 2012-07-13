@@ -18,6 +18,12 @@ The software can be installed with the following command:
 
     cd src/ && make install
 
+Documentation
+------------
+The documentation can be built with the following command:
+
+    cd doc/ && make
+
 Configuration
 ------------
 DAWM's configuration file is located in $HOME/.config/dawm/config.

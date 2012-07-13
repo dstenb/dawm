@@ -1,5 +1,10 @@
 version.h
 dawm
+doc/*.css
+doc/*.html
+doc/*.js
+doc/*.png
+doc/search
 *.o
 *.swp
 generate-menu
