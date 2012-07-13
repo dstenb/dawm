@@ -15,6 +15,7 @@
 
 #define CLIENT_NAME_SIZE 128
 
+#define ISTILED(c)              (!c->floating && ISVISIBLE(c))
 #define ISVISIBLE(c)            (c->ws == c->mon->selws || c->ws == 0xFFFFFFFF)
 
 #define WIDTH(c)                ((c)->w + 2 * (c)->bw)
@@ -46,6 +47,8 @@ void client_move_resize(struct client *, Display *, int, int, int, int);
 void client_raise(struct client *, Display *);
 void client_select_input(struct client *, Display *);
 void client_set_border(struct client *, Display *, int);
+void client_set_floating(struct client *, Display *, Window, int);
+void client_set_focus(struct client *, Display *, Window, int);
 void client_set_state(struct client *, Display *, long);
 void client_set_ws(struct client *, Display *, unsigned long);
 void client_setup(struct client *, struct config *, struct monitor *,

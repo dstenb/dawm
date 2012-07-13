@@ -7,14 +7,14 @@ static void monitor_update_window_size(struct monitor *);
 static struct client *
 next_tiled(struct client *c)
 {
-	for ( ; c && (c->floating || !ISVISIBLE(c)); c = c->next) ;
+	for ( ; c && !ISTILED(c); c = c->next) ;
 	return c;
 }
 
 static struct client *
 prev_tiled(struct client *c)
 {
-	for ( ; c && (c->floating || !ISVISIBLE(c)); c = c->prev) ;
+	for ( ; c && !ISTILED(c); c = c->prev) ;
 	return c;
 }
 

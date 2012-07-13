@@ -140,6 +140,20 @@ client_set_border(struct client *c, Display *dpy, int bw)
 	XSetWindowBorder(dpy, c->win, color(WinNormBorder));
 }
 
+void
+client_set_focus(struct client *c, Display *dpy, Window root, int focus)
+{
+	if (focus) {
+		XSetWindowBorder(dpy, c->win, color(WinSelBorder));
+		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
+
+		ewmh_root_set_active_window(dpy, root, c->win);
+		send_event(dpy, c->win, atom(WMTakeFocus));
+	} else {
+		XSetWindowBorder(dpy, c->win, color(WinNormBorder));
+	}
+}
+
 /** set the WM_STATE */
 void
 client_set_state(struct client *c, Display *dpy, long state)
