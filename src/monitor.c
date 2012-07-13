@@ -352,19 +352,11 @@ monitor_draw_bar(struct monitor *mon, Display *dpy)
 
 /** set the floating state for the selected client */
 void
-monitor_float_selected(struct monitor *mon, Display *dpy, int f)
+monitor_float_selected(struct monitor *mon, Display *dpy, int floating)
 {
-	int was_floating;
-
 	if (mon->sel) {
-		was_floating = mon->sel->floating ? 1 : 0;
-
-		if ((mon->sel->floating = f ? 1 : 0))
-			client_raise(mon->sel, dpy);
-
-		/* re-arrange if the state have change */
-		if (mon->sel->floating != was_floating)
-			monitor_arrange(mon, dpy);
+		client_set_floating(mon->sel, dpy, floating);
+		monitor_arrange(mon, dpy);
 	}
 }
 

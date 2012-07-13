@@ -47,7 +47,7 @@ void client_move_resize(struct client *, Display *, int, int, int, int);
 void client_raise(struct client *, Display *);
 void client_select_input(struct client *, Display *);
 void client_set_border(struct client *, Display *, int);
-void client_set_floating(struct client *, Display *, Window, int);
+void client_set_floating(struct client *, Display *, int);
 void client_set_focus(struct client *, Display *, Window, int);
 void client_set_state(struct client *, Display *, long);
 void client_set_ws(struct client *, Display *, unsigned long);

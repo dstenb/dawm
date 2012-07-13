@@ -98,11 +98,6 @@ client_move_resize(struct client *c, Display *dpy,
 {
 	XWindowChanges wc;
 
-	c->ox = c->x;
-	c->oy = c->y;
-	c->ow = c->w;
-	c->oh = c->h;
-
 	c->x = wc.x = x;
 	c->y = wc.y = y;
 	c->w = wc.width = MAX(1, w);
@@ -138,6 +133,26 @@ client_set_border(struct client *c, Display *dpy, int bw)
 	wc.border_width = c->bw;
 	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc);
 	XSetWindowBorder(dpy, c->win, color(WinNormBorder));
+}
+
+void
+client_set_floating(struct client *c, Display *dpy, int floating)
+{
+	if (floating) {
+		if (!c->floating)
+			client_move_resize(c, dpy, c->ox, c->oy, c->ow, c->oh);
+		client_raise(c, dpy);
+		c->floating = 1;
+	} else {
+		/* save current size */
+		if(c->floating) {
+			c->ox = c->x;
+			c->oy = c->y;
+			c->ow = c->w;
+			c->oh = c->h;
+		}
+		c->floating = 0;
+	}
 }
 
 void
