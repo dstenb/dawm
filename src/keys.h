@@ -44,37 +44,17 @@ struct key {
 	struct key *next; /* next key in key list */
 };
 
-/* converts a KeyAction to a string, returns NULL if the action is invalid */
 const char *key_action2str(KeyAction);
-
-/* appends two key lists to one, will return the head pointer */
 struct key *key_append(struct key *, struct key *);
-
-/* copies a key struct */
 struct key *key_copy(struct key *);
-
-/* creates a new key struct */
 struct key *key_create(unsigned int, KeySym, KeyAction, char *, struct key *);
-
-/* returns a key list of the default bindings */
 struct key *key_default_keys(void);
-
-/* recursively frees a key list. returns a NULL pointer for convenience */
 struct key *key_free_all(struct key *);
-
-/* grab all keys */
 void key_grab_all(struct key *, Display *, Window);
-
-/* update the Num Lock modifier */
 void key_init(Display *);
-
-/* returns non-zero if the key is pressed */
 int key_pressed(struct key *, Display *, KeyCode, unsigned int);
 
-/* returns the KeyAction responding to the key, returns INVALID if not found */
 KeyAction key_str2action(const char *);
-
-/* returns non-zero if the string describes a modifier */
 int key_str2mod(const char *);
 
 #endif

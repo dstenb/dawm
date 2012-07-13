@@ -11,6 +11,7 @@
 
 static int xerror_dummy(Display *, XErrorEvent *);
 
+/** create a client */
 struct client *
 client_create(Window win, XWindowAttributes *wa)
 {
@@ -33,27 +34,7 @@ client_create(Window win, XWindowAttributes *wa)
 	return c;
 }
 
-void
-client_fix_window_type(struct client *c, Display *dpy)
-{
-	Atom state;
-	Atom *types;
-	unsigned i, n;
-
-	if (ewmh_client_get_state(dpy, c->win, &state))
-		if (state == netatom(NetWMStateFullscreen))
-			die("FULLSCREEN\n");
-
-	if (ewmh_client_get_window_types(dpy, c->win, &types, &n)) {
-		for (i = 0; i < n; i++) {
-			if (types[i] == netatom(NetWMWindowTypeDialog))
-				c->floating = 1;
-		}
-
-		XFree(types);
-	}
-}
-
+/** set focus on the client */
 void
 client_focus(struct client *c, Display *dpy, Window root)
 {
@@ -64,12 +45,14 @@ client_focus(struct client *c, Display *dpy, Window root)
 	send_event(dpy, c->win, atom(WMTakeFocus));
 }
 
+/** free the client */
 void
 client_free(struct client *c)
 {
 	free(c);
 }
 
+/** grab buttons */
 void
 client_grab_buttons(struct client *c, Display *dpy)
 {
@@ -79,6 +62,7 @@ client_grab_buttons(struct client *c, Display *dpy)
 			GrabModeAsync, GrabModeAsync, None, None);
 }
 
+/** kill the client. the removal will be handled in wm_handler_destroynotify */
 void
 client_kill(struct client *c, Display *dpy)
 {
@@ -107,6 +91,7 @@ client_map_window(struct client *c, Display *dpy)
 	XMapWindow(dpy, c->win);
 }
 
+/** move and resize the client */
 void
 client_move_resize(struct client *c, Display *dpy,
 		int x, int y, int w, int h)
@@ -127,6 +112,7 @@ client_move_resize(struct client *c, Display *dpy,
 	XSync(dpy, False);
 }
 
+/** raise the client */
 void
 client_raise(struct client *c, Display *dpy)
 {
@@ -134,12 +120,14 @@ client_raise(struct client *c, Display *dpy)
 		XRaiseWindow(dpy, c->win);
 }
 
+/** set the client's events to listen for */
 void
 client_select_input(struct client *c, Display *dpy)
 {
 	XSelectInput(dpy, c->win, EVENT_MASK);
 }
 
+/** set the border size and color */
 void
 client_set_border(struct client *c, Display *dpy, int bw)
 {
@@ -152,6 +140,7 @@ client_set_border(struct client *c, Display *dpy, int bw)
 	XSetWindowBorder(dpy, c->win, color(WinNormBorder));
 }
 
+/** set the WM_STATE */
 void
 client_set_state(struct client *c, Display *dpy, long state)
 {
@@ -199,7 +188,7 @@ client_setup(struct client *c, struct config *cfg, struct monitor *selmon,
 	client_set_ws(c, dpy, ws);
 	client_set_border(c, dpy, cfg->bw);
 	/* TODO: configureevent */
-	client_fix_window_type(c, dpy);
+	client_update_window_type(c, dpy);
 	/* TODO: fix size & wm hints */
 
 	/* TODO: rule_apply_all(cfg->rules, c, selmon, mons); */
@@ -221,6 +210,7 @@ client_show(struct client *c, Display *dpy, int show)
 		XMoveWindow(dpy, c->win, -2 * WIDTH(c), c->y);
 }
 
+/** remove focus from client */
 void
 client_unfocus(struct client *c, Display *dpy, Window root)
 {
@@ -229,6 +219,7 @@ client_unfocus(struct client *c, Display *dpy, Window root)
 	/* TODO */
 }
 
+/** unmap the client and revert window settings */
 void
 client_unmap(struct client *c, Display *dpy)
 {
@@ -248,6 +239,7 @@ client_unmap(struct client *c, Display *dpy)
 	XUngrabServer(dpy);
 }
 
+/** update the client title */
 void
 client_update_title(struct client *c, Display *dpy)
 {
@@ -255,6 +247,28 @@ client_update_title(struct client *c, Display *dpy)
 					CLIENT_NAME_SIZE)))
 		snprintf(c->name, CLIENT_NAME_SIZE, "unnamed window");
 	error("c->name: %s\n", c->name);
+}
+
+
+void
+client_update_window_type(struct client *c, Display *dpy)
+{
+	Atom state;
+	Atom *types;
+	unsigned i, n;
+
+	if (ewmh_client_get_state(dpy, c->win, &state))
+		if (state == netatom(NetWMStateFullscreen))
+			die("FULLSCREEN\n");
+
+	if (ewmh_client_get_window_types(dpy, c->win, &types, &n)) {
+		for (i = 0; i < n; i++) {
+			if (types[i] == netatom(NetWMWindowTypeDialog))
+				c->floating = 1;
+		}
+
+		XFree(types);
+	}
 }
 
 int

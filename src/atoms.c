@@ -12,6 +12,7 @@ static char *atom_names[LASTAtom] = {
 
 static Atom atoms[LASTAtom];
 
+/** get the atom with the given ID */
 Atom
 atom(AtomID id)
 {
@@ -19,26 +20,12 @@ atom(AtomID id)
 	return atoms[id];
 }
 
+/** initializes all atoms */
 void
 atoms_init(Display *dpy)
 {
 	error("%s\n", __func__);
 	XInternAtoms(dpy, atom_names, ARRSIZE(atom_names), 0, atoms);
-}
-
-int has_wm_protocol(Display *dpy, Window win, Atom prot)
-{
-	int n;
-	int found = 0;
-	Atom *protocols;
-
-	if (XGetWMProtocols(dpy, win, &protocols, &n)) {
-		while (!found && n--)
-			found = protocols[n] == prot;
-		XFree(protocols);
-	}
-
-	return found;
 }
 
 void
@@ -164,7 +151,6 @@ atom_set_utf8array(Display *dpy, Window win, Atom prop,
 {
 	XChangeProperty(dpy, win, prop, atom(UTF8String),
 			8, PropModeReplace, buf, size);
-
 }
 
 void
@@ -172,5 +158,4 @@ atom_set_window(Display *dpy, Window win, Atom prop, Window propwin)
 {
 	XChangeProperty(dpy, win, prop, XA_WINDOW, 32, PropModeReplace,
 			(unsigned char *) &(propwin), 1);
-
 }

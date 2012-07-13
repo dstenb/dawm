@@ -23,7 +23,7 @@ usage(const char *cmd)
 	printf("  -v, --version      print version message.\n");
 	printf("  -c, --config       select a custom configuration file.\n");
 	printf("  -d, --display      select a custom display.\n");
-	printf("  -k, --display      check if the given config file is ok.\n");
+	printf("  -k, --check        check if the given config file is ok.\n");
 }
 
 /* prints a version message */

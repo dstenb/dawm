@@ -29,13 +29,8 @@ struct sysinfo {
 #endif /* __linux__ */
 };
 
-/* returns a pointer to the main sysinfo struct */
 const struct sysinfo *sysinfo(void);
-
-/* initializes the main sysinfo struct */
 void sysinfo_init(void);
-
-/* updates the main sysinfo struct */
 void sysinfo_update(void);
 
 #endif

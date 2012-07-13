@@ -24,37 +24,19 @@
 #define DBG(...)
 #endif
 
-/* prints an error message and exits */
-void die(const char *, ...);
-
-/* prints a debug message (used by DBG) */
 void dbg(const char *, int, const char *, ...);
-
-/* prints an error message */
+void die(const char *, ...);
 void error(const char *, ...);
 
-/* spawn a process in the background */
 void spawn(const char *);
 
-/* concatenates a NULL-terminated list of strings to one string */
 char *strfvs(char **, char);
-
-/* remove all the given characters in the back and front of the string */
 char *strtr(char *, const char *);
-
-/* remove all the given characters from the back of the string */
 char *strtrb(char *, const char *);
-
-/* remove all the given characters in front of the string */
 char *strtrf(char *, const char *);
 
-/* calloc() wrapper that will exit if unable to allocate */
 void *xcalloc(size_t, size_t);
-
-/* malloc() wrapper that will exit if unable to allocate */
 void *xmalloc(size_t);
-
-/* strdup() wrapper that will exit if unable to allocate */
 char *xstrdup(const char *);
 
 #endif

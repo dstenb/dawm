@@ -14,13 +14,8 @@ typedef enum {
 	LASTCursor
 } CursorID;
 
-/* get cursor with the given id */
 Cursor cursor(CursorID);
-
-/* initializes the cursors */
 void cursors_init(Display *);
-
-/* free al the allocated cursors */
 void cursors_free(Display *);
 
 #endif

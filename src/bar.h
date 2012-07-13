@@ -16,16 +16,11 @@ struct bar {
 	int x, y, w, h; /* bar geometry */
 };
 
-/* create a bar */
 struct bar *bar_create(int, int, int, int, int, Display *, Window, int);
-
-/* draw the bar */
 void bar_draw(struct bar *, Display *, const char *str);
-
 void bar_free(struct bar *, Display *);
 
 void bars_init(Display *, Window, int, const char *fontstr);
-
 void bars_free(Display *);
 
 #endif

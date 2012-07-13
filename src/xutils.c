@@ -1,5 +1,23 @@
 #include "xutils.h"
 
+static int has_wm_protocol(Display *, Window, Atom);
+
+int
+has_wm_protocol(Display *dpy, Window win, Atom prot)
+{
+	int n;
+	int found = 0;
+	Atom *protocols;
+
+	if (XGetWMProtocols(dpy, win, &protocols, &n)) {
+		while (!found && n--)
+			found = protocols[n] == prot;
+		XFree(protocols);
+	}
+
+	return found;
+}
+
 long
 get_state(Display *dpy, Window win)
 {

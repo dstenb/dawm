@@ -46,9 +46,7 @@ struct wm {
 };
 
 struct wm *init(struct config *, const char *);
-
 int eventloop(struct wm *);
-
 int destroy(struct wm *);
 
 #endif

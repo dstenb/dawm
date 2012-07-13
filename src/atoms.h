@@ -21,13 +21,8 @@ typedef enum {
 	LASTAtom
 } AtomID;
 
-/* get the atom with the given ID */
 Atom atom(AtomID);
-
-/* initializes all atoms */
 void atoms_init(Display *);
-
-int has_wm_protocol(Display *, Window, Atom);
 
 void atom_append_window(Display *, Window, Atom, Window);
 void atom_delete(Display *, Window, Atom);

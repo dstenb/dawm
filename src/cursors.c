@@ -2,6 +2,7 @@
 
 static Cursor cursors[LASTCursor];
 
+/** get cursor with the given id */
 Cursor
 cursor(CursorID id)
 {
@@ -9,6 +10,7 @@ cursor(CursorID id)
 	return cursors[id];
 }
 
+/** initializes the cursors */
 void
 cursors_init(Display *dpy)
 {
@@ -17,6 +19,7 @@ cursors_init(Display *dpy)
 	cursors[ResizeCursor] = XCreateFontCursor(dpy, XC_sizing);
 }
 
+/** free all the allocated cursors */
 void
 cursors_free(Display *dpy)
 {

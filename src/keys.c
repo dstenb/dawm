@@ -69,6 +69,7 @@ static char *action_str[LASTAction] = {
 
 static unsigned int num_lock = 0;
 
+/** converts a KeyAction to a string, returns NULL if the action is invalid */
 const char *
 key_action2str(KeyAction a)
 {
@@ -76,6 +77,7 @@ key_action2str(KeyAction a)
 }
 
 
+/** appends two key lists to one, will return the head pointer */
 struct key *
 key_append(struct key *klist, struct key *new)
 {
@@ -90,12 +92,14 @@ key_append(struct key *klist, struct key *new)
 	}
 }
 
+/** copies a key struct */
 struct key *
 key_copy(struct key *key)
 {
 	return key_create(key->mod, key->keysym, key->action, key->args, NULL);
 }
 
+/** creates a new key struct */
 struct key *
 key_create(unsigned int mod, KeySym keysym, KeyAction action,
 		char *args, struct key *next)
@@ -111,6 +115,7 @@ key_create(unsigned int mod, KeySym keysym, KeyAction action,
 	return key;
 }
 
+/** returns a key list of the default bindings */
 struct key *
 key_default_keys(void)
 {
@@ -126,6 +131,7 @@ key_default_keys(void)
 	return head;
 }
 
+/** recursively frees a key list. returns a NULL pointer for convenience */
 struct key *
 key_free_all(struct key *key)
 {
@@ -141,6 +147,7 @@ key_free_all(struct key *key)
 	return NULL;
 }
 
+/** grab all keys */
 void
 key_grab_all(struct key *key, Display *dpy, Window root)
 {
@@ -156,6 +163,7 @@ key_grab_all(struct key *key, Display *dpy, Window root)
 	}
 }
 
+/** update the Num Lock modifier */
 void
 key_init(Display *dpy)
 {
@@ -174,6 +182,7 @@ key_init(Display *dpy)
 	XFreeModifiermap(modmap);
 }
 
+/** returns non-zero if the key is pressed */
 int
 key_pressed(struct key *key, Display *dpy, KeyCode code, unsigned int state)
 {
@@ -181,6 +190,8 @@ key_pressed(struct key *key, Display *dpy, KeyCode code, unsigned int state)
 			CLEANMASK(state) == key->mod);
 }
 
+/** returns the KeyAction responding to the key,
+ * returns InvalidAction if not found */
 KeyAction
 key_str2action(const char *str)
 {
@@ -194,6 +205,7 @@ key_str2action(const char *str)
 	return InvalidAction;
 }
 
+/** returns non-zero if the string describes a modifier */
 int
 key_str2mod(const char *str)
 {

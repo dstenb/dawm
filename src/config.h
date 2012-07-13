@@ -22,15 +22,9 @@ struct config {
 	char *colors[LASTColor]; /* color values, in "#XXXXXX" form */
 };
 
-/* create a config struct, will set all the settings to the default values */
 struct config *config_create(void);
-
-/* load settings from a file */
-int config_load(struct config *, const char *);
-
-/* returns the default config path */
 char *config_default_path(void);
-
 void config_free(struct config *);
+int config_load(struct config *, const char *);
 
 #endif

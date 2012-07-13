@@ -216,6 +216,7 @@ show_hide(struct client *c, Display *dpy)
 	}
 }
 
+/** add client to a monitor */
 void
 monitor_add_client(struct monitor *mon, struct client *c)
 {
@@ -223,6 +224,7 @@ monitor_add_client(struct monitor *mon, struct client *c)
 	add_to_stack(mon, c);
 }
 
+/** append a monitor to another monitor list */
 struct monitor *
 monitor_append(struct monitor *mons, struct monitor *new)
 {
@@ -237,6 +239,7 @@ monitor_append(struct monitor *mons, struct monitor *new)
 	}
 }
 
+/** arrange the clients on the monitor */
 void
 monitor_arrange(struct monitor *mon, Display *dpy)
 {
@@ -265,6 +268,7 @@ monitor_arrange(struct monitor *mon, Display *dpy)
 	monitor_restack(mon, dpy);
 }
 
+/** count number of monitors */
 int
 monitor_count(struct monitor *mon)
 {
@@ -274,6 +278,7 @@ monitor_count(struct monitor *mon)
 	return i;
 }
 
+/** creates a monitor */
 struct monitor *
 monitor_create(struct config *cfg, int num, int x, int y, int w, int h,
 		Display *dpy, Window root, int screen)
@@ -345,6 +350,7 @@ monitor_draw_bar(struct monitor *mon, Display *dpy)
 	bar_draw(mon->bar, dpy, buf);
 }
 
+/** set the floating state for the selected client */
 void
 monitor_float_selected(struct monitor *mon, Display *dpy, int f)
 {
@@ -362,6 +368,8 @@ monitor_float_selected(struct monitor *mon, Display *dpy, int f)
 	}
 }
 
+/** focus on the given client. If no client given, the first available
+ * client will be focused */
 void
 monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
 		Window root)
@@ -399,6 +407,7 @@ monitor_free(struct monitor *mon, Display *dpy)
 	return next;
 }
 
+/** remove the given client from the monitor */
 void
 monitor_remove_client(struct monitor *mon, struct client *c)
 {
@@ -441,6 +450,7 @@ monitor_restack(struct monitor *mon, Display *dpy)
 	while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
+/** select the given client, assumes that the client is valid */
 void
 monitor_select_client(struct monitor *mon, struct client *c)
 {
@@ -497,6 +507,7 @@ monitor_set_layout(struct monitor *mon, Display *dpy, int layout)
 	monitor_arrange(mon, dpy);
 }
 
+/** set the current workspace */
 void
 monitor_set_ws(struct monitor *mon, Display *dpy, Window root,
 		unsigned long ws)
@@ -511,6 +522,7 @@ monitor_set_ws(struct monitor *mon, Display *dpy, Window root,
 	ewmh_root_set_current_desktop(dpy, root, mon->num * N_WORKSPACES + ws);
 }
 
+/** show/hide the bar */
 void
 monitor_show_bar(struct monitor *mon, Display *dpy, int show)
 {
@@ -522,6 +534,7 @@ monitor_show_bar(struct monitor *mon, Display *dpy, int show)
 	monitor_draw_bar(mon, dpy);
 }
 
+/** toggle the bar */
 void
 monitor_show_hide(struct monitor *mon, Display *dpy)
 {
@@ -534,6 +547,7 @@ monitor_toggle_bar(struct monitor *mon, Display *dpy)
 	monitor_show_bar(mon, dpy, !mon->bar->showbar);
 }
 
+/** removes focus from the currently selected client */
 void
 monitor_unfocus_selected(struct monitor *mon, Display *dpy, Window root)
 {
@@ -556,6 +570,8 @@ monitor_update_window_size(struct monitor *mon)
 	}
 }
 
+/** searches through all the monitors for the client
+ * that is transient for the given window */
 struct client *
 find_client_by_trans(struct monitor *mon, Display *dpy, Window win)
 {
@@ -565,6 +581,8 @@ find_client_by_trans(struct monitor *mon, Display *dpy, Window win)
 		find_client_by_window(mon, trans) : NULL;
 }
 
+/** searches through all the monitors for the client
+ * corresponding to the given window */
 struct client *
 find_client_by_window(struct monitor *mon, Window win)
 {
@@ -581,6 +599,7 @@ find_client_by_window(struct monitor *mon, Window win)
 	return NULL;
 }
 
+/** returns the monitor that corresponds to the given position */
 struct monitor *
 find_monitor_by_pos(struct monitor *mon, int x, int y)
 {
@@ -589,6 +608,7 @@ find_monitor_by_pos(struct monitor *mon, int x, int y)
 	return mon;
 }
 
+/** returns the monitor that corresponds to the given workspace index */
 struct monitor *
 find_monitor_by_ws(struct monitor *mon, unsigned index)
 {

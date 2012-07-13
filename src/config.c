@@ -17,6 +17,7 @@ static const char *default_colors[LASTColor] = {
 	[WinSelBorder] = "#FF0000"
 };
 
+/** create a config struct, will set all the settings to the default values */
 struct config *
 config_create(void)
 {
@@ -95,6 +96,7 @@ parse_font(struct config *cfg, const char *path, int line,
 	replace_str(&cfg->barfont, xstrdup(font));
 }
 
+/** load settings from a file */
 int
 config_load(struct config *cfg, const char *path)
 {
@@ -140,6 +142,8 @@ config_load(struct config *cfg, const char *path)
 	return 0;
 }
 
+/** returns a pointer to a statically allocated string containing
+ * the default config path */
 char *
 config_default_path(void)
 {
