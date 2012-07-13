@@ -26,6 +26,7 @@ typedef enum {
 	SelectAction,        /* select a client */
 	SetMasterAction,     /* move the client to the master position */
 	SetMasterFactAction, /* set the master size */
+	SetMasterNumAction,  /* set the number of master clients */
 	SetWsAction,         /* set the current workspace */
 	SpawnAction,         /* spawn a program in the background */
 	SwapAction,          /* swap windows */

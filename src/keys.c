@@ -14,6 +14,8 @@ static struct key default_keys[] = {
 	{ MOD_SUPER,       XK_Return, SetMasterAction,     NULL,     NULL },
 	{ MOD_SUPER,       XK_l,      SetMasterFactAction, "+",      NULL },
 	{ MOD_SUPER,       XK_h,      SetMasterFactAction, "-",      NULL },
+	{ MOD_SUPER,       XK_period, SetMasterNumAction,  "+",      NULL },
+	{ MOD_SUPER,       XK_comma,  SetMasterNumAction,  "-",      NULL },
 
 	{ MOD_SUPER,       XK_j,      SelectAction,        "next",   NULL },
 	{ MOD_SUPER,       XK_k,      SelectAction,        "prev",   NULL },
