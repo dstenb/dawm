@@ -38,7 +38,6 @@ struct client {
 };
 
 struct client *client_create(Window, XWindowAttributes *);
-void client_focus(struct client *, Display *, Window);
 void client_free(struct client *);
 void client_grab_buttons(struct client *, Display *);
 void client_kill(struct client *, Display *);
@@ -54,7 +53,6 @@ void client_set_ws(struct client *, Display *, unsigned long);
 void client_setup(struct client *, struct config *, struct monitor *,
 		struct monitor *, Display *, Window, struct client *);
 void client_show(struct client *, Display *, int);
-void client_unfocus(struct client *, Display *, Window);
 void client_unmap(struct client *, Display *);
 void client_update_title(struct client *, Display *);
 void client_update_window_type(struct client *, Display *);

@@ -379,7 +379,7 @@ monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
 		remove_from_stack(mon, c);
 		add_to_stack(mon, c);
 
-		client_focus(c, dpy, root);
+		client_set_focus(c, dpy, root, 1);
 	}
 
 	mon->sel = c;
@@ -424,7 +424,7 @@ monitor_restack(struct monitor *mon, Display *dpy)
 	if (!mon->sel)
 		return;
 	if (mon->sel->floating || !ISARRANGED(mon))
-		XRaiseWindow(dpy, mon->sel->win);
+		client_raise(mon->sel, dpy);
 
 	if (ISARRANGED(mon)) {
 		wc.stack_mode = Below;
@@ -544,7 +544,7 @@ void
 monitor_unfocus_selected(struct monitor *mon, Display *dpy, Window root)
 {
 	if (mon->sel)
-		client_unfocus(mon->sel, dpy, root);
+		client_set_focus(mon->sel, dpy, root, 0);
 }
 
 void

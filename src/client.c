@@ -34,17 +34,6 @@ client_create(Window win, XWindowAttributes *wa)
 	return c;
 }
 
-/** set focus on the client */
-void
-client_focus(struct client *c, Display *dpy, Window root)
-{
-	XSetWindowBorder(dpy, c->win, color(WinSelBorder));
-	XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
-
-	ewmh_root_set_active_window(dpy, root, c->win);
-	send_event(dpy, c->win, atom(WMTakeFocus));
-}
-
 /** free the client */
 void
 client_free(struct client *c)
@@ -111,8 +100,7 @@ client_move_resize(struct client *c, Display *dpy,
 void
 client_raise(struct client *c, Display *dpy)
 {
-	if (c->floating)
-		XRaiseWindow(dpy, c->win);
+	XRaiseWindow(dpy, c->win);
 }
 
 /** set the client's events to listen for */
@@ -224,7 +212,9 @@ client_setup(struct client *c, struct config *cfg, struct monitor *selmon,
 
 	client_select_input(c, dpy);
 	client_grab_buttons(c, dpy);
-	client_raise(c, dpy);
+
+	if (c->floating)
+		client_raise(c, dpy);
 
 	/* add the client to the NetClientList */
 	ewmh_root_client_list_add(dpy, root, c->win);
@@ -237,15 +227,6 @@ client_show(struct client *c, Display *dpy, int show)
 		XMoveWindow(dpy, c->win, c->x, c->y);
 	else
 		XMoveWindow(dpy, c->win, -2 * WIDTH(c), c->y);
-}
-
-/** remove focus from client */
-void
-client_unfocus(struct client *c, Display *dpy, Window root)
-{
-	(void)root;
-	XSetWindowBorder(dpy, c->win, color(WinNormBorder));
-	/* TODO */
 }
 
 /** unmap the client and revert window settings */
