@@ -27,6 +27,7 @@ struct client {
 	int ox, oy, ow, oh;          /* old position and size */
 	int floating;                /* non-zero if floating */
 	int fullscreen;              /* non-zero if fullscreen */
+	int ostate;                  /* old state */
 	int bw;                      /* border size */
 	int obw;                     /* old border size */
 	Window win;                  /* window that belongs to the client */
@@ -39,15 +40,13 @@ struct client {
 
 struct client *client_create(Window, XWindowAttributes *);
 void client_free(struct client *);
-void client_grab_buttons(struct client *, Display *);
 void client_kill(struct client *, Display *);
 void client_map_window(struct client *, Display *);
 void client_move_resize(struct client *, Display *, int, int, int, int);
 void client_raise(struct client *, Display *);
-void client_select_input(struct client *, Display *);
-void client_set_border(struct client *, Display *, int);
 void client_set_floating(struct client *, Display *, int);
 void client_set_focus(struct client *, Display *, Window, int);
+void client_set_fullscreen(struct client *, Display *, int);
 void client_set_state(struct client *, Display *, long);
 void client_set_ws(struct client *, Display *, unsigned long);
 void client_setup(struct client *, struct config *, struct monitor *,

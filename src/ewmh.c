@@ -8,9 +8,9 @@ static char *atom_names[LASTNetAtom] = {
 	"_NET_NUMBER_OF_DESKTOPS",
 	"_NET_DESKTOP_NAMES",
 	"_NET_SUPPORTED",
+	"_NET_WM_STATE_FULLSCREEN",
 	"_NET_WM_NAME",
 	"_NET_WM_STATE",
-	"_NET_WM_STATE_FULLSCREEN",
 	"_NET_WM_WINDOW_TYPE",
 	"_NET_WM_WINDOW_TYPE_DIALOG"
 };
@@ -102,4 +102,10 @@ void
 ewmh_client_set_desktop(Display *dpy, Window win, unsigned long d)
 {
 	atom_set_cardinal(dpy, win, netatom(NetDesktop), d);
+}
+
+void
+ewmh_client_set_state(Display *dpy, Window win, Atom state)
+{
+	atom_set_atom(dpy, win, netatom(NetWMState), state);
 }

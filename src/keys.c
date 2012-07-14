@@ -10,6 +10,7 @@ static struct key default_keys[] = {
 	{ MOD_SHIFT_SUPER, XK_Return, SpawnAction,         "urxvt",  NULL },
 	{ MOD_SUPER,       XK_b,      ToggleBarAction,     NULL,     NULL },
 	{ MOD_SUPER,       XK_t,      ToggleFloatAction,   NULL,     NULL },
+	{ MOD_SUPER,       XK_f,      ToggleFsAction,      NULL,     NULL },
 
 	{ MOD_SUPER,       XK_Return, SetMasterAction,     NULL,     NULL },
 	{ MOD_SUPER,       XK_l,      SetMasterFactAction, "+",      NULL },
@@ -64,7 +65,8 @@ static char *action_str[LASTAction] = {
 	[SetWsAction] = "set_ws",
 	[SpawnAction] = "spawn",
 	[ToggleBarAction] = "toggle_bar",
-	[ToggleFloatAction] = "toggle_float"
+	[ToggleFloatAction] = "toggle_float",
+	[ToggleFsAction] = "toggle_fs"
 };
 
 static unsigned int num_lock = 0;

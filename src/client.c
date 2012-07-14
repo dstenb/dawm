@@ -9,6 +9,9 @@
 
 #define MOVE_RESIZE_MASK (CWX | CWY | CWWidth | CWHeight)
 
+void client_grab_buttons(struct client *, Display *);
+void client_select_input(struct client *, Display *);
+void client_set_border(struct client *, Display *, int);
 static int xerror_dummy(Display *, XErrorEvent *);
 
 /** create a client */
@@ -26,6 +29,7 @@ client_create(Window win, XWindowAttributes *wa)
 	c->name[0] = '\0';
 	c->floating = 0;
 	c->fullscreen = 0;
+	c->ostate = 0;
 	c->prev = NULL;
 	c->next = NULL;
 	c->snext = NULL;
@@ -115,12 +119,14 @@ void
 client_set_border(struct client *c, Display *dpy, int bw)
 {
 	XWindowChanges wc;
+	ColorID cid = WinNormBorder;
 
-	c->bw = bw;
+	if (c->mon)
+		cid = (c == c->mon->sel) ? WinSelBorder : WinNormBorder;
 
-	wc.border_width = c->bw;
+	wc.border_width = c->bw = bw;
 	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc);
-	XSetWindowBorder(dpy, c->win, color(WinNormBorder));
+	XSetWindowBorder(dpy, c->win, color(cid));
 }
 
 void
@@ -154,6 +160,37 @@ client_set_focus(struct client *c, Display *dpy, Window root, int focus)
 		send_event(dpy, c->win, atom(WMTakeFocus));
 	} else {
 		XSetWindowBorder(dpy, c->win, color(WinNormBorder));
+	}
+}
+
+void
+client_set_fullscreen(struct client *c, Display *dpy, int fullscreen)
+{
+	if (fullscreen) {
+		ewmh_client_set_state(dpy, c->win, netatom(NetWMFullscreen));
+
+		c->fullscreen = 1;
+		c->ostate = c->floating;
+		c->floating = 1;
+		c->obw = c->bw;
+
+		c->ox = c->x;
+		c->oy = c->y;
+		c->ow = c->w;
+		c->oh = c->h;
+
+		client_set_border(c, dpy, 0);
+		client_move_resize(c, dpy, c->mon->mx, c->mon->my,
+				c->mon->mw, c->mon->mh);
+		client_raise(c, dpy);
+	} else {
+		ewmh_client_set_state(dpy, c->win, 0);
+
+		c->fullscreen = 0;
+		c->floating = c->ostate;
+
+		client_set_border(c, dpy, c->obw);
+		client_move_resize(c, dpy, c->ox, c->oy, c->ow, c->oh);
 	}
 }
 
@@ -268,7 +305,7 @@ client_update_window_type(struct client *c, Display *dpy)
 	unsigned i, n;
 
 	if (ewmh_client_get_state(dpy, c->win, &state))
-		if (state == netatom(NetWMStateFullscreen))
+		if (state == netatom(NetWMFullscreen))
 			die("FULLSCREEN\n");
 
 	if (ewmh_client_get_window_types(dpy, c->win, &types, &n)) {

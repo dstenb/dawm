@@ -16,9 +16,9 @@ typedef enum {
 	NetDesktops,
 	NetDesktopNames,
 	NetSupported,
+	NetWMFullscreen,
 	NetWMName,
 	NetWMState,
-	NetWMStateFullscreen,
 	NetWMWindowType,
 	NetWMWindowTypeDialog,
 	LASTNetAtom
@@ -47,5 +47,6 @@ int ewmh_client_get_desktop(Display *, Window, unsigned long *);
 int ewmh_client_get_state(Display *, Window, Atom *);
 int ewmh_client_get_window_types(Display *, Window, Atom **, unsigned *);
 void ewmh_client_set_desktop(Display *, Window, unsigned long);
+void ewmh_client_set_state(Display *, Window, Atom);
 
 #endif

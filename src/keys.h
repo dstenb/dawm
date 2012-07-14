@@ -32,6 +32,7 @@ typedef enum {
 	SwapAction,          /* swap windows */
 	ToggleBarAction,     /* show/hide the bar on the current monitor */
 	ToggleFloatAction,   /* float/arrange the selected client */
+	ToggleFsAction,      /*  */
 	LASTAction,
 	InvalidAction = -1
 } KeyAction;
