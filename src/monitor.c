@@ -218,10 +218,15 @@ show_hide(struct client *c, Display *dpy)
 
 /** add client to a monitor */
 void
-monitor_add_client(struct monitor *mon, struct client *c)
+monitor_add_client(struct monitor *mon, struct client *c,
+		Display *dpy, Window root)
 {
 	add_to_clients(mon, c);
 	add_to_stack(mon, c);
+
+	/* TODO: check switch_to_ws rule         v */
+	monitor_select_client(mon, c, dpy, root, 0);
+	monitor_arrange(mon, dpy);
 }
 
 /** append a monitor to another monitor list */
@@ -442,11 +447,26 @@ monitor_restack(struct monitor *mon, Display *dpy)
 	while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
-/** select the given client, assumes that the client is valid */
+/** select the given client and fix focus. the function will do nothing if the
+ * client's workspace differs from the current and switch_to_ws is zero */
 void
-monitor_select_client(struct monitor *mon, struct client *c)
+monitor_select_client(struct monitor *mon, struct client *c,
+		Display *dpy, Window root, int switch_to_ws)
 {
+	assert(c->mon == mon);
+
+	if (mon->selws != c->ws && !switch_to_ws)
+		return;
+
+	monitor_unfocus_selected(mon, dpy, root);
 	mon->sel = c;
+
+	if (mon->selws == c->ws) {
+		monitor_focus(mon, c, dpy, root);
+		monitor_restack(mon, dpy);
+	} else {
+		monitor_set_ws(mon, dpy, root, c->ws);
+	}
 }
 
 void
@@ -454,15 +474,8 @@ monitor_select_next_client(struct monitor *mon, Display *dpy, Window root)
 {
 	struct client *c = NULL;
 
-	if (mon->sel)
-		c = next_visible_client(mon->sel);
-
-	if (c) {
-		monitor_unfocus_selected(mon, dpy, root);
-		monitor_select_client(mon, c);
-		monitor_focus(mon, c, dpy, root);
-		monitor_restack(mon, dpy);
-	}
+	if (mon->sel && (c = next_visible_client(mon->sel)))
+		monitor_select_client(mon, c, dpy, root, 0);
 }
 
 void
@@ -470,15 +483,8 @@ monitor_select_prev_client(struct monitor *mon, Display *dpy, Window root)
 {
 	struct client *c = NULL;
 
-	if (mon->sel)
-		c = prev_visible_client(mon->sel);
-
-	if (c) {
-		monitor_unfocus_selected(mon, dpy, root);
-		monitor_select_client(mon, c);
-		monitor_focus(mon, c, dpy, root);
-		monitor_restack(mon, dpy);
-	}
+	if (mon->sel && (c = prev_visible_client(mon->sel)))
+		monitor_select_client(mon, c, dpy, root, 0);
 }
 
 void

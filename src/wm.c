@@ -138,15 +138,9 @@ create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 	tc = find_client_by_trans(wm->mons, wm->dpy, win);
 
 	client_setup(c, wm->cfg, wm->selmon, wm->mons, wm->dpy, wm->root, tc);
-
-	monitor_add_client(c->mon, c);
-	monitor_unfocus_selected(c->mon, wm->dpy, wm->root);
-	monitor_select_client(c->mon, c);
-
 	client_map_window(c, wm->dpy);
 
-	monitor_arrange(c->mon, wm->dpy);
-	monitor_focus(c->mon, c, wm->dpy, wm->root);
+	monitor_add_client(c->mon, c, wm->dpy, wm->root);
 }
 
 void

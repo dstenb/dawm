@@ -45,7 +45,7 @@ struct monitor {
 	struct monitor *next;       /* next monitor */
 };
 
-void monitor_add_client(struct monitor *, struct client *);
+void monitor_add_client(struct monitor *, struct client *, Display *, Window);
 struct monitor *monitor_append(struct monitor *, struct monitor *);
 void monitor_arrange(struct monitor *, Display *);
 int monitor_count(struct monitor *);
@@ -56,7 +56,8 @@ void monitor_float_selected(struct monitor *, Display *, int);
 void monitor_focus(struct monitor *, struct client *, Display *, Window);
 struct monitor *monitor_free(struct monitor *, Display *);
 void monitor_remove_client(struct monitor *, struct client *);
-void monitor_select_client(struct monitor *, struct client *);
+void monitor_select_client(struct monitor *, struct client *,
+		Display *, Window, int);
 void monitor_select_next_client(struct monitor *, Display *, Window);
 void monitor_select_prev_client(struct monitor *, Display *, Window);
 void monitor_selected_to_master(struct monitor *);
