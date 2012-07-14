@@ -125,6 +125,13 @@ atom_get_cardinal(Display *dpy, Window win, Atom prop, unsigned long *value)
 }
 
 void
+atom_set_atom(Display *dpy, Window win, Atom prop, Atom value)
+{
+	XChangeProperty(dpy, win, prop, XA_ATOM, 32, PropModeReplace,
+			(unsigned char *) &value, 1);
+}
+
+void
 atom_set_atoms(Display *dpy, Window win, Atom prop, Atom *props, unsigned n)
 {
 	XChangeProperty(dpy, win, prop, XA_ATOM, 32, PropModeReplace,
