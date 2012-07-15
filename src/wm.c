@@ -258,10 +258,7 @@ eventloop(struct wm *wm)
 struct wm *
 init(struct config *cfg, const char *cmd)
 {
-	XSetWindowAttributes attr;
-	struct wm *wm;
-
-	wm = xcalloc(1, sizeof(struct wm));
+	struct wm *wm = xcalloc(1, sizeof(struct wm));
 
 	if (!(wm->dpy = XOpenDisplay(NULL)))
 		die("couldn't open display '%s'\n", getenv("DISPLAY"));
@@ -285,11 +282,7 @@ init(struct config *cfg, const char *cmd)
 	bars_init(wm->dpy, wm->root, wm->screen, wm->cfg->barfont);
 
 	/* select events to handle */
-	attr.event_mask = WM_EVENT_MASK;
-	XChangeWindowAttributes(wm->dpy, wm->root, CWEventMask, &attr);
-
-	DBG("wm->width: %i\n", wm->width);
-	DBG("wm->height: %i\n", wm->height);
+	XSelectInput(wm->dpy, wm->root, WM_EVENT_MASK);
 
 	/* setup cursors */
 	cursors_init(wm->dpy);
@@ -468,12 +461,10 @@ void
 handler_destroynotify(struct wm *wm, XEvent *ev)
 {
 	struct client *c;
-	Window win;
 
 	dbg_print(wm, __func__);
 
-	win = ev->xdestroywindow.window;
-	if ((c = find_client_by_window(wm->mons, win)))
+	if ((c = find_client_by_window(wm->mons, ev->xdestroywindow.window)))
 		remove_client(wm, c, 1);
 }
 
@@ -676,7 +667,8 @@ void
 key_handler_kill(struct wm *wm, struct key *key)
 {
 	(void)key;
-	client_kill(wm->selmon->sel, wm->dpy);
+	if (wm->selmon->sel)
+		client_kill(wm->selmon->sel, wm->dpy);
 }
 
 void
@@ -699,6 +691,7 @@ key_handler_quit(struct wm *wm, struct key *key)
 	(void)key;
 	quit(wm, "received exit key command");
 }
+
 void
 key_handler_restart(struct wm *wm, struct key *key)
 {
