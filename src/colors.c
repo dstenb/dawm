@@ -25,7 +25,7 @@ get_color(Display *dpy, int screen, const char *str)
 	return c.pixel;
 }
 
-/* get cursor with the given id */
+/* get color with the given id */
 unsigned long
 color(ColorID id)
 {

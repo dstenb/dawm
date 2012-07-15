@@ -10,6 +10,12 @@ cursor(CursorID id)
 	return cursors[id];
 }
 
+void
+cursor_set(Window win, CursorID id, Display *dpy)
+{
+	XDefineCursor(dpy, win, cursor(id));
+}
+
 /** initializes the cursors */
 void
 cursors_init(Display *dpy)

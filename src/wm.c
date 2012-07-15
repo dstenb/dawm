@@ -293,8 +293,7 @@ init(struct config *cfg, const char *cmd)
 
 	/* setup cursors */
 	cursors_init(wm->dpy);
-	attr.cursor = cursor(NormalCursor);
-	XChangeWindowAttributes(wm->dpy, wm->root, CWCursor, &attr);
+	cursor_set(wm->root, MovementCursor, wm->dpy);
 
 	/* setup key bindings */
 	key_init(wm->dpy);

@@ -45,7 +45,7 @@ bar_create(int topbar, int showbar, int x, int y, int w,
 			DefaultVisual(dpy, screen),
 			EVENT_MASK, &attr);
 
-	XDefineCursor(dpy, bar->win, cursor(NormalCursor));
+	cursor_set(bar->win, NormalCursor, dpy);
 	XMapRaised(dpy, bar->win);
 
 	return bar;

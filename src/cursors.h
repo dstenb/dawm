@@ -15,6 +15,7 @@ typedef enum {
 } CursorID;
 
 Cursor cursor(CursorID);
+void cursor_set(Window, CursorID, Display *);
 void cursors_init(Display *);
 void cursors_free(Display *);
 
