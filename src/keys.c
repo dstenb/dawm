@@ -104,7 +104,7 @@ key_copy(struct key *key)
 /** creates a new key struct */
 struct key *
 key_create(unsigned int mod, KeySym keysym, KeyAction action,
-		char *args, struct key *next)
+		const char *args, struct key *next)
 {
 	struct key *key = xmalloc(sizeof(struct key));
 

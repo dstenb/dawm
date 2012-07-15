@@ -48,7 +48,8 @@ struct key {
 const char *key_action2str(KeyAction);
 struct key *key_append(struct key *, struct key *);
 struct key *key_copy(struct key *);
-struct key *key_create(unsigned int, KeySym, KeyAction, char *, struct key *);
+struct key *key_create(unsigned int, KeySym, KeyAction, const char *,
+		struct key *);
 struct key *key_default_keys(void);
 struct key *key_free_all(struct key *);
 void key_grab_all(struct key *, Display *, Window);
