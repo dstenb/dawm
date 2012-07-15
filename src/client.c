@@ -306,7 +306,7 @@ client_update_window_type(struct client *c, Display *dpy)
 
 	if (ewmh_client_get_state(dpy, c->win, &state))
 		if (state == netatom(NetWMFullscreen))
-			die("FULLSCREEN\n");
+			client_set_fullscreen(c, dpy, 1);
 
 	if (ewmh_client_get_window_types(dpy, c->win, &types, &n)) {
 		for (i = 0; i < n; i++) {
