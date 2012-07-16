@@ -286,7 +286,7 @@ init(struct config *cfg, const char *cmd)
 
 	/* setup cursors */
 	cursors_init(wm->dpy);
-	cursor_set(wm->root, MovementCursor, wm->dpy);
+	cursor_set(wm->root, NormalCursor, wm->dpy);
 
 	/* setup key bindings */
 	key_init(wm->dpy);
