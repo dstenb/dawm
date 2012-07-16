@@ -13,7 +13,21 @@ static struct settings _settings;
 void
 parse_bar(config_t *cfg)
 {
-	/* TODO */
+	config_setting_t *group;
+	const char *str;
+	int b;
+
+	if (!(group = config_lookup(cfg, "bar")))
+		return;
+	if (!config_setting_is_group(group))
+		die("bar: not a group\n", index);
+
+	if (config_setting_lookup_bool(group, "show_bar", &b))
+		_settings.showbar = b;
+	if (config_setting_lookup_bool(group, "top_bar", &b))
+		_settings.topbar = b;
+	if (config_setting_lookup_string(group, "font", &str))
+		replace_str(&_settings.barfont, xstrdup(str));
 }
 
 void
