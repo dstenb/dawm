@@ -27,6 +27,6 @@ struct settings {
 const struct settings *settings(void);
 void settings_init(void);
 void settings_free(void);
-void settings_read(const char *);
+int settings_read(const char *);
 
 #endif

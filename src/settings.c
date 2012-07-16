@@ -3,6 +3,8 @@
 void parse_bar(config_t *);
 void parse_colors(config_t *);
 void parse_key_binding(config_setting_t *);
+void parse_key_bindings_list(config_setting_t *);
+void parse_key_bindings_settings(config_setting_t *);
 void parse_key_bindings(config_t *);
 void parse_rules(config_t *);
 void parse_workspaces(config_t *);
@@ -82,18 +84,43 @@ parse_key_binding(config_setting_t *elem)
 }
 
 void
-parse_key_bindings(config_t *cfg)
+parse_key_bindings_list(config_setting_t *bindings)
 {
 	config_setting_t *list;
 	int i;
 
-	if (!(list = config_lookup(cfg, "bindings")))
+	if (!(list = config_setting_get_member(bindings, "list")))
 		return;
 	if (!config_setting_is_list(list))
-		die("bindings must be a list\n");
+		die("bindings.list not a list\n");
 
 	for (i = 0; i < config_setting_length(list); i++)
 		parse_key_binding(config_setting_get_elem(list, i));
+}
+
+void
+parse_key_bindings_settings(config_setting_t *bindings)
+{
+	int b;
+
+	if (config_setting_lookup_bool(bindings, "unbind_all_default", &b)) {
+		if (b)
+			_settings.keys = key_free_all(_settings.keys);
+	}
+}
+
+void
+parse_key_bindings(config_t *cfg)
+{
+	config_setting_t *bindings;
+
+	if (!(bindings = config_lookup(cfg, "bindings")))
+		return;
+	if (!config_setting_is_group(bindings))
+		die("bindings must be a group\n");
+
+	parse_key_bindings_settings(bindings);
+	parse_key_bindings_list(bindings);
 }
 
 void
@@ -136,14 +163,18 @@ settings_free()
 	free(_settings.barfont);
 }
 
-void
+int
 settings_read(const char *path)
 {
+	FILE *fp;
 	config_t cfg;
+
+	if (!(fp = fopen(path, "r")))
+		return errno;
 
 	config_init(&cfg);
 
-	if (!config_read_file(&cfg, path)) {
+	if (!config_read(&cfg, fp)) {
 		die("%s:%i: %s\n", path, config_error_line(&cfg),
 				config_error_text(&cfg));
 	}
@@ -155,6 +186,9 @@ settings_read(const char *path)
 	parse_workspaces(&cfg);
 
 	config_destroy(&cfg);
+	fclose(fp);
+
+	return 0;
 }
 
 void
