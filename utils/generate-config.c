@@ -3,7 +3,7 @@
 
 #include "settings.h"
 
-#BOOLSTR(b) (b ? "true" : "false")
+#define BOOLSTR(b) (b ? "true" : "false")
 
 void
 print_bar()
