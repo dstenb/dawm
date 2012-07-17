@@ -139,7 +139,7 @@ create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 
 	tc = find_client_by_trans(wm->mons, wm->dpy, win);
 
-	client_setup(c, wm->cfg, wm->selmon, wm->mons, wm->dpy, wm->root, tc);
+	client_setup(c, wm->selmon, wm->mons, wm->dpy, wm->root, tc);
 	client_map_window(c, wm->dpy);
 
 	monitor_add_client(c->mon, c, wm->dpy, wm->root);
@@ -151,9 +151,9 @@ create_monitors(struct wm *wm)
 #if 0
 	/* TODO: test code, to be removed */
 	struct monitor *m;
-	wm->mons = monitor_create(wm->cfg, 0, 0, 0, 1024 / 2, 600, wm->dpy,
+	wm->mons = monitor_create(0, 0, 0, 1024 / 2, 600, wm->dpy,
 			wm->root, wm->screen);
-	m = monitor_create(wm->cfg, 1, 1024 / 2, 0, 1024 / 2, 600, wm->dpy,
+	m = monitor_create(1, 1024 / 2, 0, 1024 / 2, 600, wm->dpy,
 			wm->root, wm->screen);
 	wm->mons = monitor_append(wm->mons, m);
 	wm->selmon = wm->mons;
@@ -169,10 +169,9 @@ create_monitors(struct wm *wm)
 		wm->mons = NULL;
 
 		for (i = 0; i < nmon; i++) {
-			mon = monitor_create(wm->cfg, i, xsi[i].x_org,
-					xsi[i].y_org, xsi[i].width,
-					xsi[i].height, wm->dpy, wm->root,
-					wm->screen);
+			mon = monitor_create(i, xsi[i].x_org, xsi[i].y_org,
+					xsi[i].width, xsi[i].height,
+					wm->dpy, wm->root, wm->screen);
 			wm->mons = monitor_append(wm->mons, mon);
 		}
 
@@ -181,8 +180,8 @@ create_monitors(struct wm *wm)
 	}
 #endif /* XINERAMA */
 
-	wm->selmon = wm->mons = monitor_create(wm->cfg, 0, 0, 0, wm->width,
-			wm->height, wm->dpy, wm->root, wm->screen);
+	wm->selmon = wm->mons = monitor_create(0, 0, 0, wm->width, wm->height,
+			wm->dpy, wm->root, wm->screen);
 }
 
 int
@@ -197,7 +196,6 @@ destroy(struct wm *wm)
 
 	bars_free(wm->dpy);
 	cursors_free(wm->dpy);
-	config_free(wm->cfg);
 
 	XUngrabKey(wm->dpy, AnyKey, AnyModifier, wm->root);
 
@@ -256,7 +254,7 @@ eventloop(struct wm *wm)
 }
 
 struct wm *
-init(struct config *cfg, const char *cmd)
+init(const char *cmd)
 {
 	struct wm *wm = xcalloc(1, sizeof(struct wm));
 
@@ -272,14 +270,13 @@ init(struct config *cfg, const char *cmd)
 	wm->width = DisplayWidth(wm->dpy, wm->screen);
 	wm->height = DisplayHeight(wm->dpy, wm->screen);
 	wm->cmd = cmd;
-	wm->keys = cfg->keys;
-	wm->cfg = cfg;
+	wm->keys = settings()->keys;
 	wm->motion.type = NoMotion;
 
 	sysinfo_init();
 
-	colors_init(cfg->colors, wm->dpy, wm->screen);
-	bars_init(wm->dpy, wm->root, wm->screen, wm->cfg->barfont);
+	colors_init(settings()->colors, wm->dpy, wm->screen);
+	bars_init(wm->dpy, wm->root, wm->screen, settings()->barfont);
 
 	/* select events to handle */
 	XSelectInput(wm->dpy, wm->root, WM_EVENT_MASK);
@@ -909,11 +906,12 @@ restart(struct wm *wm)
 void
 set_environment(struct wm *wm)
 {
-	setenv("BAR_FONT", wm->cfg->barfont, 1);
-	setenv("BAR_NORM_FG", wm->cfg->colors[BarNormFG], 1);
-	setenv("BAR_NORM_BG", wm->cfg->colors[BarNormBG], 1);
-	setenv("BAR_SEL_FG", wm->cfg->colors[BarSelFG], 1);
-	setenv("BAR_SEL_BG", wm->cfg->colors[BarSelBG], 1);
+	(void)wm;
+	setenv("BAR_FONT", settings()->barfont, 1);
+	setenv("BAR_NORM_FG", settings()->colors[BarNormFG], 1);
+	setenv("BAR_NORM_BG", settings()->colors[BarNormBG], 1);
+	setenv("BAR_SEL_FG", settings()->colors[BarSelFG], 1);
+	setenv("BAR_SEL_BG", settings()->colors[BarSelBG], 1);
 }
 
 void

@@ -22,7 +22,7 @@ typedef enum {
 } ColorID;
 
 unsigned long color(ColorID);
-void colors_init(char *[LASTColor], Display *, int);
+void colors_init(char * const[LASTColor], Display *, int);
 const char *color_id2str(ColorID);
 int color_str2id(const char *);
 

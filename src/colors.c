@@ -35,7 +35,7 @@ color(ColorID id)
 
 /* initializes the colors */
 void
-colors_init(char *str[LASTColor], Display *dpy, int screen)
+colors_init(char *const str[LASTColor], Display *dpy, int screen)
 {
 	int i;
 

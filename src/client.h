@@ -7,9 +7,9 @@
 
 #include "atoms.h"
 #include "common.h"
-#include "config.h"
 #include "ewmh.h"
 #include "monitor.h"
+#include "settings.h"
 #include "utils.h"
 #include "xutils.h"
 
@@ -49,8 +49,8 @@ void client_set_focus(struct client *, Display *, Window, int);
 void client_set_fullscreen(struct client *, Display *, int);
 void client_set_state(struct client *, Display *, long);
 void client_set_ws(struct client *, Display *, unsigned long);
-void client_setup(struct client *, struct config *, struct monitor *,
-		struct monitor *, Display *, Window, struct client *);
+void client_setup(struct client *, struct monitor *, struct monitor *,
+		Display *, Window, struct client *);
 void client_show(struct client *, Display *, int);
 void client_unmap(struct client *, Display *);
 void client_update_title(struct client *, Display *);

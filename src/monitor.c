@@ -285,13 +285,13 @@ monitor_count(struct monitor *mon)
 
 /** creates a monitor */
 struct monitor *
-monitor_create(struct config *cfg, int num, int x, int y, int w, int h,
+monitor_create(int num, int x, int y, int w, int h,
 		Display *dpy, Window root, int screen)
 {
 	struct monitor *mon = xcalloc(1, sizeof(struct monitor));
 	int i;
 
-	mon->bar = bar_create(cfg->topbar, cfg->showbar,
+	mon->bar = bar_create(settings()->topbar, settings()->showbar,
 			x, y, w, dpy, root, screen);
 	mon->num = num;
 
@@ -311,8 +311,8 @@ monitor_create(struct config *cfg, int num, int x, int y, int w, int h,
 	for (i = 0; i < N_WORKSPACES; i++) {
 		snprintf(mon->ws[i].name, WS_NAME_SIZE, "%i", (i + 1));
 		mon->ws[i].layout = DEFAULT_LAYOUT;
-		mon->ws[i].nmaster = cfg->nmaster;
-		mon->ws[i].mfact = cfg->mfact;
+		mon->ws[i].nmaster = settings()->nmaster;
+		mon->ws[i].mfact = settings()->mfact;
 	}
 
 	monitor_show_bar(mon, dpy, mon->bar->showbar);

@@ -213,9 +213,8 @@ client_set_ws(struct client *c, Display *dpy, unsigned long ws)
 }
 
 void
-client_setup(struct client *c, struct config *cfg, struct monitor *selmon,
-		struct monitor *mons, Display *dpy, Window root,
-		struct client *trans)
+client_setup(struct client *c, struct monitor *selmon, struct monitor *mons,
+		Display *dpy, Window root, struct client *trans)
 {
 	unsigned long ws;
 
@@ -238,7 +237,7 @@ client_setup(struct client *c, struct config *cfg, struct monitor *selmon,
 	}
 
 	client_set_ws(c, dpy, ws);
-	client_set_border(c, dpy, cfg->bw);
+	client_set_border(c, dpy, settings()->bw);
 	/* TODO: configureevent */
 	client_update_window_type(c, dpy);
 	/* TODO: fix size & wm hints */

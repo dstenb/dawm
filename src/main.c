@@ -3,7 +3,7 @@
 #include <unistd.h>
 
 #include "common.h"
-#include "config.h"
+#include "settings.h"
 #include "utils.h"
 #include "version.h"
 #include "wm.h"
@@ -36,7 +36,6 @@ version(void)
 int
 main(int argc, char **argv)
 {
-	struct config *cfg;
 	struct wm *wm;
 	char *cfg_str = NULL;
 	int i;
@@ -64,10 +63,8 @@ main(int argc, char **argv)
 		}
 	}
 
-	cfg_str = cfg_str ? cfg_str : config_default_path();
-	cfg = config_create();
-	if (config_load(cfg, cfg_str) != 0)
-		error("error loading '%s': %s\n", cfg_str, strerror(errno));
+	settings_init();
+	settings_read(cfg_str ? cfg_str : settings_default_path());
 
 	if (check_config) {
 		printf("%s: configuration file ok!\n", WMNAME);
@@ -76,7 +73,7 @@ main(int argc, char **argv)
 
 	error("starting!\n");
 
-	wm = init(cfg, strfvs(argv, ' '));
+	wm = init(strfvs(argv, ' '));
 	eventloop(wm);
 	destroy(wm);
 

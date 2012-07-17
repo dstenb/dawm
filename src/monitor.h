@@ -7,7 +7,7 @@
 
 #include "bar.h"
 #include "client.h"
-#include "config.h"
+#include "settings.h"
 #include "sysinfo.h"
 
 #define ISARRANGED(M) ((M)->ws[(M)->selws].layout != FloatingLayout)
@@ -49,7 +49,7 @@ void monitor_add_client(struct monitor *, struct client *, Display *, Window);
 struct monitor *monitor_append(struct monitor *, struct monitor *);
 void monitor_arrange(struct monitor *, Display *);
 int monitor_count(struct monitor *);
-struct monitor *monitor_create(struct config *, int, int, int, int, int,
+struct monitor *monitor_create(int, int, int, int, int,
 		Display *, Window, int);
 void monitor_draw_bar(struct monitor *, Display *);
 void monitor_float_selected(struct monitor *, Display *, int);

@@ -12,11 +12,11 @@
 
 #include "atoms.h"
 #include "colors.h"
-#include "config.h"
 #include "cursors.h"
 #include "ewmh.h"
 #include "keys.h"
 #include "monitor.h"
+#include "settings.h"
 #include "sysinfo.h"
 #include "utils.h"
 
@@ -40,12 +40,11 @@ struct wm {
 	struct monitor *mons;   /* monitor list */
 	struct monitor *selmon; /* selected monitor */
 	struct key *keys;       /* key bindings */
-	struct config *cfg;     /* configuration settings */
 	const char *cmd;        /* command used to launch the wm*/
 	struct motion motion;   /* mouse motion info */
 };
 
-struct wm *init(struct config *, const char *);
+struct wm *init(const char *);
 int eventloop(struct wm *);
 int destroy(struct wm *);
 

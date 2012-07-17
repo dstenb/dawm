@@ -10,6 +10,18 @@ void parse_rules(config_t *);
 void parse_workspaces(config_t *);
 void replace_str(char **, char *);
 
+static char default_path[PATH_MAX + 1];
+
+static const char *default_colors[LASTColor] = {
+	[BarBorder] = "#FF0000",
+	[BarNormFG] = "#DDDDDD",
+	[BarNormBG] = "#000000",
+	[BarSelFG] = "#000000",
+	[BarSelBG] = "#0000FF",
+	[WinNormBorder] = "#000000",
+	[WinSelBorder] = "#FF0000"
+};
+
 static struct settings _settings;
 
 void
@@ -143,6 +155,8 @@ const struct settings *settings()
 void
 settings_init()
 {
+	int i;
+
 	_settings.topbar = 1;
 	_settings.showbar = 1;
 	_settings.bw = 1;
@@ -150,6 +164,9 @@ settings_init()
 	_settings.mfact = M_FACT;
 	_settings.nmaster = N_MASTER;
 	_settings.barfont = xstrdup(BAR_FONT);
+
+	for (i = 0; i < LASTColor; i++)
+		_settings.colors[i] = xstrdup(default_colors[i]);
 }
 
 void
@@ -163,14 +180,20 @@ settings_free()
 	free(_settings.barfont);
 }
 
-int
+void
 settings_read(const char *path)
 {
 	FILE *fp;
 	config_t cfg;
 
-	if (!(fp = fopen(path, "r")))
-		return errno;
+	if (!(fp = fopen(path, "r"))) {
+		if (errno == ENOENT) {
+			error("no such file or directory: %s\n", path);
+			return;
+		} else {
+			die("error loading '%s': %s\n", path, strerror(errno));
+		}
+	}
 
 	config_init(&cfg);
 
@@ -187,8 +210,14 @@ settings_read(const char *path)
 
 	config_destroy(&cfg);
 	fclose(fp);
+}
 
-	return 0;
+char *
+settings_default_path(void)
+{
+	snprintf(default_path, sizeof(default_path),
+			"%s/.config/dawm/config", getenv("HOME"));
+	return default_path;
 }
 
 void
