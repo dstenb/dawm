@@ -12,7 +12,8 @@ static char *atom_names[LASTNetAtom] = {
 	"_NET_WM_NAME",
 	"_NET_WM_STATE",
 	"_NET_WM_WINDOW_TYPE",
-	"_NET_WM_WINDOW_TYPE_DIALOG"
+	"_NET_WM_WINDOW_TYPE_DIALOG",
+	"_NET_WM_WINDOW_TYPE_DOCK"
 };
 
 static Atom netatoms[LASTNetAtom];

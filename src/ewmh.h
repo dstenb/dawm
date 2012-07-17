@@ -21,6 +21,7 @@ typedef enum {
 	NetWMState,
 	NetWMWindowType,
 	NetWMWindowTypeDialog,
+	NetWMWindowTypeDock,
 	LASTNetAtom
 } NetAtomID;
 
