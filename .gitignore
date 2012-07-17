@@ -7,4 +7,4 @@ doc/*.png
 doc/search
 *.o
 *.swp
-generate-menu
+generate-config

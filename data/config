@@ -1,50 +1,71 @@
 ### Example configuration for DAWM
 
-### Colors
-#color bar_border #FF0000
-#color bar_norm_fg #DDDDDD
-#color bar_norm_bg #000000
-#color bar_sel_fg #000000
-#color bar_sel_bg #0000FF
-#color win_norm_border #000000
-#color win_sel_border #FF0000
+bar:
+{
+  show_bar = true;
+  top_bar = true;
+  font = "-*-profont-*-*-*-*-10-*-*-*-*-*-*-*";
+}
 
-# The following command will unbind all keys
-#unbind_all
+colors:
+(
+  { name="bar_border" value="#FF0000" },
+  { name="bar_norm_fg" value="#DDDDDD" },
+  { name="bar_norm_bg" value="#000000" },
+  { name="bar_sel_fg" value="#000000" },
+  { name="bar_sel_bg" value="#0000FF" },
+  { name="win_norm_border" value="#000000" },
+  { name="win_sel_border" value="#FF0000" }
+)
 
-### Key bindings
-#bind super+x kill 
-#bind super+shift+q quit 
-#bind super+ctrl+r restart 
-#bind super+Return spawn urxvt
-#bind super+b toggle_bar 
-#bind super+t toggle_float 
-#bind super+l set_mfact +
-#bind super+h set_mfact -
-#bind super+j select next
-#bind super+k select prev
-#bind super+1 set_ws 1
-#bind super+2 set_ws 2
-#bind super+3 set_ws 3
-#bind super+4 set_ws 4
-#bind super+5 set_ws 5
-#bind super+6 set_ws 6
-#bind super+7 set_ws 7
-#bind super+8 set_ws 8
-#bind super+9 set_ws 9
-#bind super+shift+1 move_window 1
-#bind super+shift+2 move_window 2
-#bind super+shift+3 move_window 3
-#bind super+shift+4 move_window 4
-#bind super+shift+5 move_window 5
-#bind super+shift+6 move_window 6
-#bind super+shift+7 move_window 7
-#bind super+shift+8 move_window 8
-#bind super+shift+9 move_window 9
-#bind super+h set_layout horz
-#bind super+v set_layout vert
-#bind super+s set_layout matrix
-#bind super+m set_layout max
-#bind super+n set_layout float
-#bind super+space set_layout next
-#bind super+shift+space set_layout prev
+bindings:
+{
+  /* setting this to true will unbind all the default keybindings
+     (the bindings are described below) */
+  unbind_all_default = false;
+
+  list:
+  (
+    #{ keys="super+x" action="kill" },
+    #{ keys="super+shift+q" action="quit" },
+    #{ keys="super+ctrl+r" action="restart" },
+    #{ keys="super+shift+Return" action="spawn" args="urxvt" },
+    #{ keys="super+b" action="toggle_bar" },
+    #{ keys="super+t" action="toggle_float" },
+    #{ keys="super+f" action="toggle_fs" },
+    #{ keys="super+Return" action="sel_to_master" },
+    #{ keys="super+l" action="set_mfact" args="+" },
+    #{ keys="super+h" action="set_mfact" args="-" },
+    #{ keys="super+period" action="set_n_masters" args="+" },
+    #{ keys="super+comma" action="set_n_masters" args="-" },
+    #{ keys="super+j" action="select" args="next" },
+    #{ keys="super+k" action="select" args="prev" },
+    #{ keys="super+shift+j" action="swap" args="next" },
+    #{ keys="super+shift+k" action="swap" args="prev" },
+    #{ keys="super+1" action="set_ws" args="1" },
+    #{ keys="super+2" action="set_ws" args="2" },
+    #{ keys="super+3" action="set_ws" args="3" },
+    #{ keys="super+4" action="set_ws" args="4" },
+    #{ keys="super+5" action="set_ws" args="5" },
+    #{ keys="super+6" action="set_ws" args="6" },
+    #{ keys="super+7" action="set_ws" args="7" },
+    #{ keys="super+8" action="set_ws" args="8" },
+    #{ keys="super+9" action="set_ws" args="9" },
+    #{ keys="super+shift+1" action="move_window" args="1" },
+    #{ keys="super+shift+2" action="move_window" args="2" },
+    #{ keys="super+shift+3" action="move_window" args="3" },
+    #{ keys="super+shift+4" action="move_window" args="4" },
+    #{ keys="super+shift+5" action="move_window" args="5" },
+    #{ keys="super+shift+6" action="move_window" args="6" },
+    #{ keys="super+shift+7" action="move_window" args="7" },
+    #{ keys="super+shift+8" action="move_window" args="8" },
+    #{ keys="super+shift+9" action="move_window" args="9" },
+    #{ keys="super+h" action="set_layout" args="horz" },
+    #{ keys="super+v" action="set_layout" args="vert" },
+    #{ keys="super+s" action="set_layout" args="matrix" },
+    #{ keys="super+m" action="set_layout" args="max" },
+    #{ keys="super+n" action="set_layout" args="float" },
+    #{ keys="super+space" action="set_layout" args="next" },
+    #{ keys="super+shift+space" action="set_layout" args="prev" }
+  )
+}

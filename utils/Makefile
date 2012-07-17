@@ -1,6 +1,6 @@
-all: generate-menu
+all: generate-config
 
-generate-menu: generate-menu.c ../src/keys.c ../src/utils.c \
-	../src/config.c ../src/colors.c
-	cc generate-menu.c -o generate-menu -I ../src/ ../src/keys.c \
-		../src/utils.c ../src/config.c ../src/colors.c -lX11
+generate-config: generate-config.c ../src/keys.c ../src/utils.c \
+	../src/settings.c ../src/colors.c
+	cc generate-config.c -o generate-config -I ../src/ ../src/keys.c \
+		../src/utils.c ../src/settings.c ../src/colors.c -lX11 -lconfig
