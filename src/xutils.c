@@ -57,3 +57,11 @@ send_event(Display *dpy, Window win, Atom proto)
 		return 0;
 	}
 }
+
+int
+xerror_dummy(Display *dpy, XErrorEvent *ev)
+{
+	(void)dpy;
+	(void)ev;
+	return 0;
+}

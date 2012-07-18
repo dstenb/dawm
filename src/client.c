@@ -14,7 +14,6 @@ void client_select_input(struct client *, Display *);
 void client_set_border(struct client *, Display *, int);
 void client_set_dialog_wtype(struct client *, Display *);
 void client_set_dock_wtype(struct client *, Display *);
-static int xerror_dummy(Display *, XErrorEvent *);
 
 /** create a client */
 struct client *
@@ -59,7 +58,8 @@ client_grab_buttons(struct client *c, Display *dpy)
 			GrabModeAsync, GrabModeAsync, None, None);
 }
 
-/** kill the client. the removal will be handled in wm_handler_destroynotify */
+/** kill the client. the removal and cleanup is handled in
+ * wm_handler_destroynotify */
 void
 client_kill(struct client *c, Display *dpy)
 {
@@ -80,6 +80,7 @@ client_kill(struct client *c, Display *dpy)
 	}
 }
 
+/** maps the window */
 void
 client_map_window(struct client *c, Display *dpy)
 {
@@ -131,6 +132,7 @@ client_set_border(struct client *c, Display *dpy, int bw)
 	XSetWindowBorder(dpy, c->win, color(cid));
 }
 
+/**  */
 void
 client_set_floating(struct client *c, Display *dpy, int floating)
 {
@@ -151,6 +153,7 @@ client_set_floating(struct client *c, Display *dpy, int floating)
 	}
 }
 
+/**  */
 void
 client_set_focus(struct client *c, Display *dpy, Window root, int focus)
 {
@@ -165,6 +168,7 @@ client_set_focus(struct client *c, Display *dpy, Window root, int focus)
 	}
 }
 
+/**  */
 void
 client_set_fullscreen(struct client *c, Display *dpy, int fullscreen)
 {
@@ -207,6 +211,7 @@ client_set_state(struct client *c, Display *dpy, long state)
 			PropModeReplace, (unsigned char *)data, 2);
 }
 
+/**  */
 void
 client_set_ws(struct client *c, Display *dpy, unsigned long ws)
 {
@@ -216,6 +221,7 @@ client_set_ws(struct client *c, Display *dpy, unsigned long ws)
 	ewmh_client_set_desktop(dpy, c->win, c->mon->num * N_WORKSPACES + ws);
 }
 
+/**  */
 void
 client_setup(struct client *c, struct monitor *selmon, struct monitor *mons,
 		Display *dpy, Window root, struct client *trans)
@@ -258,6 +264,7 @@ client_setup(struct client *c, struct monitor *selmon, struct monitor *mons,
 	ewmh_root_client_list_add(dpy, root, c->win);
 }
 
+/**  */
 void
 client_show(struct client *c, Display *dpy, int show)
 {
@@ -297,6 +304,7 @@ client_update_title(struct client *c, Display *dpy)
 	error("c->name: %s\n", c->name);
 }
 
+/**  */
 void
 client_set_dialog_wtype(struct client *c, Display *dpy)
 {
@@ -305,6 +313,7 @@ client_set_dialog_wtype(struct client *c, Display *dpy)
 	c->wtype |= Dialog;
 }
 
+/**  */
 void
 client_set_dock_wtype(struct client *c, Display *dpy)
 {
@@ -315,6 +324,7 @@ client_set_dock_wtype(struct client *c, Display *dpy)
 	}
 }
 
+/**  */
 void
 client_update_window_type(struct client *c, Display *dpy)
 {
@@ -338,12 +348,4 @@ client_update_window_type(struct client *c, Display *dpy)
 
 		XFree(types);
 	}
-}
-
-int
-xerror_dummy(Display *dpy, XErrorEvent *ev)
-{
-	(void)dpy;
-	(void)ev;
-	return 0;
 }

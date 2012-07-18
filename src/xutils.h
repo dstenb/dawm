@@ -14,5 +14,6 @@
 
 long get_state(Display *, Window win);
 int send_event(Display *, Window, Atom);
+int xerror_dummy(Display *, XErrorEvent *);
 
 #endif
