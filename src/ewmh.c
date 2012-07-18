@@ -11,6 +11,8 @@ static char *atom_names[LASTNetAtom] = {
 	"_NET_WM_STATE_FULLSCREEN",
 	"_NET_WM_NAME",
 	"_NET_WM_STATE",
+	"_NET_WM_STRUT",
+	"_NET_WM_STRUT_PARTIAL",
 	"_NET_WM_WINDOW_TYPE",
 	"_NET_WM_WINDOW_TYPE_DIALOG",
 	"_NET_WM_WINDOW_TYPE_DOCK"
@@ -91,6 +93,62 @@ int
 ewmh_client_get_state(Display *dpy, Window win, Atom *state)
 {
 	return atom_get_atom(dpy, win, netatom(NetWMState), state);
+}
+
+int
+ewmh_client_get_strut(Display *dpy, Window win, struct strut_data *sd)
+{
+	unsigned long *values;
+	unsigned n;
+	int ret = 0;
+
+	if (atom_get_cardinals(dpy, win, netatom(NetWMStrut), &values, &n)) {
+		if (n == 4) {
+			sd->left = values[0];
+			sd->right = values[1];
+			sd->top = values[2];
+			sd->bottom = values[3];
+			ret = 1;
+		}
+	}
+
+	if (values)
+		XFree(values);
+
+	return ret;
+}
+
+int
+ewmh_client_get_strut_partial(Display *dpy, Window win, struct strut_data *sd)
+{
+	unsigned long *values;
+	unsigned n;
+	int ret = 0;
+
+	if (atom_get_cardinals(dpy, win, netatom(NetWMStrutPartial),
+				&values, &n)) {
+		if (n == 12) {
+			sd->left = values[0];
+			sd->right = values[1];
+			sd->top = values[2];
+			sd->bottom = values[3];
+			sd->left_start_y = values[4];
+			sd->left_end_y = values[5];
+			sd->right_start_y = values[6];
+			sd->right_end_y = values[7];
+			sd->top_start_x = values[8];
+			sd->top_end_x = values[9];
+			sd->bottom_start_x = values[10];
+			sd->bottom_end_x = values[11];
+			ret = 1;
+		}
+	}
+
+	if (values)
+		XFree(values);
+
+	return ret;
+
 }
 
 int
