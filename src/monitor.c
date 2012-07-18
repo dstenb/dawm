@@ -224,6 +224,9 @@ monitor_add_client(struct monitor *mon, struct client *c,
 	add_to_clients(mon, c);
 	add_to_stack(mon, c);
 
+	if (ISDOCK(c))
+		monitor_update_window_size(mon);
+
 	/* TODO: check switch_to_ws rule         v */
 	monitor_select_client(mon, c, dpy, root, 0);
 	monitor_arrange(mon, dpy);
@@ -556,16 +559,37 @@ monitor_unfocus_selected(struct monitor *mon, Display *dpy, Window root)
 void
 monitor_update_window_size(struct monitor *mon)
 {
-	mon->wy = mon->my;
-	mon->wh = mon->mh;
+	struct client *c;
+	unsigned left = 0;
+	unsigned right = 0;
+	unsigned top = 0;
+	unsigned bottom = 0;
+
+	for (c = mon->clients; c; c = c->next) {
+		if (ISDOCK(c)) {
+			left = MAX(left, c->strut->left);
+			right = MAX(right, c->strut->right);
+			top = MAX(top, c->strut->top);
+			bottom = MAX(bottom, c->strut->bottom);
+		}
+	}
 
 	if (mon->bar->showbar) {
-		mon->wh -= mon->bar->h;
-		mon->bar->y = mon->bar->topbar ? mon->wy : mon->wy + mon->wh;
-		mon->wy = mon->bar->topbar ? mon->wy + mon->bar->h : mon->wy;
+		if (mon->bar->topbar) {
+			top = MAX(top, (unsigned)mon->bar->h);
+			mon->bar->y = mon->my;
+		} else {
+			bottom = MAX(bottom, (unsigned)mon->bar->h);
+			mon->bar->y = mon->my + mon->mh - mon->bar->h;
+		}
 	} else {
 		mon->bar->y = -mon->bar->h;
 	}
+
+	mon->wx = mon->mx + left;
+	mon->wy = mon->my + top;
+	mon->ww = mon->mw - left - right;
+	mon->wh = mon->mh - top - bottom;
 }
 
 /** searches through all the monitors for the client
