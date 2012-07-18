@@ -29,32 +29,32 @@ no_of_tiled_clients(struct client *c)
 }
 
 static struct client *
-next_visible_client(struct client *curr)
+next_selectable_client(struct client *curr)
 {
 	struct monitor *mon = curr->mon;
 	struct client *c;
 
-	for (c = curr->next; c && !ISVISIBLE(c); c = c->next) ;
+	for (c = curr->next; c && !ISSELECTABLE(c); c = c->next) ;
 
 	/* search from the start of the client list */
 	if (!c)
-		for (c = mon->clients; c && !ISVISIBLE(c); c = c->next) ;
+		for (c = mon->clients; c && !ISSELECTABLE(c); c = c->next) ;
 
 	return c;
 }
 
 static struct client *
-prev_visible_client(struct client *curr)
+prev_selectable_client(struct client *curr)
 {
 	struct client *c;
 
 	for (c = curr->prev; c; c = c->prev) {
-		if (ISVISIBLE(c))
+		if (ISSELECTABLE(c))
 			return c;
 	}
 
 	for (c = curr; c; c = c->next) {
-		if (ISVISIBLE(c))
+		if (ISSELECTABLE(c))
 			curr = c;
 	}
 
@@ -376,8 +376,8 @@ monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
 {
 	DBG("%s(%p, %p)\n", __func__, (void *)mon, (void *)c);
 
-	if (!c || !ISVISIBLE(c))
-		for (c = mon->cstack; c && !ISVISIBLE(c); c = c->snext);
+	if (!c || !ISFOCUSABLE(c))
+		for (c = mon->cstack; c && !ISFOCUSABLE(c); c = c->snext);
 	if (mon->sel && mon->sel != c)
 		monitor_unfocus_selected(mon, dpy, root);
 	if (c) {
@@ -458,6 +458,9 @@ monitor_select_client(struct monitor *mon, struct client *c,
 {
 	assert(c->mon == mon);
 
+	if (!ISSELECTABLE(c))
+		return;
+
 	if (mon->selws != c->ws && !switch_to_ws)
 		return;
 
@@ -477,7 +480,7 @@ monitor_select_next_client(struct monitor *mon, Display *dpy, Window root)
 {
 	struct client *c = NULL;
 
-	if (mon->sel && (c = next_visible_client(mon->sel)))
+	if (mon->sel && (c = next_selectable_client(mon->sel)))
 		monitor_select_client(mon, c, dpy, root, 0);
 }
 
@@ -486,7 +489,7 @@ monitor_select_prev_client(struct monitor *mon, Display *dpy, Window root)
 {
 	struct client *c = NULL;
 
-	if (mon->sel && (c = prev_visible_client(mon->sel)))
+	if (mon->sel && (c = prev_selectable_client(mon->sel)))
 		monitor_select_client(mon, c, dpy, root, 0);
 }
 

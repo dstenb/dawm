@@ -16,6 +16,8 @@
 #define CLIENT_NAME_SIZE 128
 
 #define ISDOCK(c)               (c->wtype & Dock)
+#define ISFOCUSABLE(c)          (ISVISIBLE(c) && !ISDOCK(c))
+#define ISSELECTABLE(c)         (ISVISIBLE(c) && !ISDOCK(c))
 #define ISTILED(c)              (!c->floating && ISVISIBLE(c))
 #define ISVISIBLE(c)            (c->ws == c->mon->selws || c->ws == 0xFFFFFFFF)
 
