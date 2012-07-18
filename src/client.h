@@ -15,11 +15,18 @@
 
 #define CLIENT_NAME_SIZE 128
 
+#define ISDOCK(c)               (c->wtype & Dock)
 #define ISTILED(c)              (!c->floating && ISVISIBLE(c))
 #define ISVISIBLE(c)            (c->ws == c->mon->selws || c->ws == 0xFFFFFFFF)
 
 #define WIDTH(c)                ((c)->w + 2 * (c)->bw)
 #define HEIGHT(c)               ((c)->h + 2 * (c)->bw)
+
+typedef enum {
+	Normal = 1 << 0,
+	Dialog = 1 << 1,
+	Dock = 1 << 2
+} ClientType;
 
 struct client {
 	char name[CLIENT_NAME_SIZE]; /* title */
@@ -30,7 +37,9 @@ struct client {
 	int ostate;                  /* old state */
 	int bw;                      /* border size */
 	int obw;                     /* old border size */
+	int wtype;                   /* window type bitmask */
 	Window win;                  /* window that belongs to the client */
+	struct strut_data *strut;    /* strut data */
 	struct monitor *mon;         /* monitor that the client is on */
 	unsigned long ws;            /* workspace that the client is on */
 	struct client *prev;         /* previous client in list */

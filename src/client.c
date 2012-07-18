@@ -12,6 +12,8 @@
 void client_grab_buttons(struct client *, Display *);
 void client_select_input(struct client *, Display *);
 void client_set_border(struct client *, Display *, int);
+void client_set_dialog_wtype(struct client *, Display *);
+void client_set_dock_wtype(struct client *, Display *);
 static int xerror_dummy(Display *, XErrorEvent *);
 
 /** create a client */
@@ -30,10 +32,12 @@ client_create(Window win, XWindowAttributes *wa)
 	c->floating = 0;
 	c->fullscreen = 0;
 	c->ostate = 0;
+	c->wtype = Normal;
 	c->prev = NULL;
 	c->next = NULL;
 	c->snext = NULL;
 	c->win = win;
+	c->strut = xcalloc(1, sizeof(struct strut_data));
 
 	return c;
 }
@@ -293,6 +297,23 @@ client_update_title(struct client *c, Display *dpy)
 	error("c->name: %s\n", c->name);
 }
 
+void
+client_set_dialog_wtype(struct client *c, Display *dpy)
+{
+	(void)dpy;
+	c->floating = 1;
+	c->wtype |= Dialog;
+}
+
+void
+client_set_dock_wtype(struct client *c, Display *dpy)
+{
+	if (ewmh_client_get_strut_partial(dpy, c->win, c->strut) ||
+			ewmh_client_get_strut(dpy, c->win, c->strut)) {
+		c->floating = 1;
+		c->wtype |= Dock;
+	}
+}
 
 void
 client_update_window_type(struct client *c, Display *dpy)
@@ -306,9 +327,13 @@ client_update_window_type(struct client *c, Display *dpy)
 			client_set_fullscreen(c, dpy, 1);
 
 	if (ewmh_client_get_window_types(dpy, c->win, &types, &n)) {
+		c->wtype = Normal;
+
 		for (i = 0; i < n; i++) {
 			if (types[i] == netatom(NetWMWindowTypeDialog))
-				c->floating = 1;
+				client_set_dialog_wtype(c, dpy);
+			else if (types[i] == netatom(NetWMWindowTypeDock))
+				client_set_dock_wtype(c, dpy);
 		}
 
 		XFree(types);
