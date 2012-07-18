@@ -29,6 +29,7 @@ void atom_delete(Display *, Window, Atom);
 int atom_get_atom(Display *, Window, Atom, Atom *);
 int atom_get_atoms(Display *, Window, Atom, Atom **, unsigned *);
 int atom_get_cardinal(Display *, Window, Atom, unsigned long *);
+int atom_get_cardinals(Display *, Window, Atom, unsigned long **, unsigned *);
 int atom_get_string(Display *, Window, Atom, char *, unsigned int);
 void atom_set_atom(Display *, Window, Atom, Atom);
 void atom_set_atoms(Display *, Window, Atom, Atom *, unsigned);

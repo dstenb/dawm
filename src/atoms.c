@@ -68,8 +68,28 @@ atom_get_atoms(Display *dpy, Window win, Atom prop,
 	unsigned long n, r;
 	unsigned char *p;
 
-	if (XGetWindowProperty(dpy, win, prop, 0L, sizeof(Atom), False,
-				XA_ATOM, &a, &f, &n, &r, &p) == Success && p) {
+	if (XGetWindowProperty(dpy, win, prop, 0L, 0x7FFFFFFF, False, XA_ATOM,
+				&a, &f, &n, &r, &p) == Success && p) {
+		*values = (Atom *) p;
+		*n_values = n;
+		return 1;
+	}
+
+	return 0;
+}
+
+int
+atom_get_cardinals(Display *dpy, Window win, Atom prop,
+		unsigned long **values, unsigned *n_values)
+{
+	Atom a;
+	int f;
+	unsigned long n, r;
+	unsigned char *p;
+
+	if (XGetWindowProperty(dpy, win, prop, 0L, 0x7FFFFFFF, False,
+				XA_CARDINAL, &a, &f, &n, &r, &p) == Success
+			&& p) {
 		*values = (Atom *) p;
 		*n_values = n;
 		return 1;
