@@ -397,7 +397,12 @@ handler_clientmessage(struct wm *wm, XEvent *ev)
 		if (cmev->message_type == atom(WMState)) {
 			DBG("%s: WMState\n", __func__);
 		} else if (cmev->message_type == netatom(NetActiveWindow)) {
-			DBG("%s: NetActiveWindow\n", __func__);
+			/* switch to the given client's monitor and workspace
+			 * and set focus on the client when a NetActive event
+			 * occurs. the spec is quite ambiguous about this. this
+			 * behaviour might be changed */
+			set_monitor(wm, c->mon);
+			monitor_select_client(c->mon, c, wm->dpy, wm->root, 1);
 		} else if (cmev->message_type == atom(WMChangeState)) {
 			if (cmev->data.l[0] == IconicState &&
 					cmev->format == 32) {
