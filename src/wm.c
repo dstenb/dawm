@@ -627,9 +627,11 @@ handler_propertynotify_client(struct wm *wm, XPropertyEvent *ev)
 		DBG("normal hints\n");
 	} else if (ev->atom == XA_WM_HINTS) {
 		/* TODO: check for fullscreen and floating */
+		client_update_wm_hints(c, wm->dpy, c == wm->selmon->sel);
 		DBG("hints\n");
 	} else if (ev->atom == netatom(NetWMWindowType)) {
 		/* TODO */
+		client_update_window_type(c, wm->dpy);
 		DBG("window type\n");
 	}
 }

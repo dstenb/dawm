@@ -250,6 +250,7 @@ client_setup(struct client *c, struct monitor *selmon, struct monitor *mons,
 	client_set_border(c, dpy, settings()->bw);
 	/* TODO: configureevent */
 	client_update_window_type(c, dpy);
+	client_update_wm_hints(c, dpy, 1);
 	/* TODO: fix size & wm hints */
 
 	/* TODO: rule_apply_all(cfg->rules, c, selmon, mons); */
@@ -320,8 +321,15 @@ client_set_dock_wtype(struct client *c, Display *dpy)
 	if (ewmh_client_get_strut_partial(dpy, c->win, c->strut) ||
 			ewmh_client_get_strut(dpy, c->win, c->strut)) {
 		c->floating = 1;
+		c->neverfocus = 1;
 		c->wtype |= Dock;
 	}
+}
+
+void
+client_update_size_hints(struct client *c, Display *dpy)
+{
+
 }
 
 /**  */
@@ -347,5 +355,23 @@ client_update_window_type(struct client *c, Display *dpy)
 		}
 
 		XFree(types);
+	}
+}
+
+void
+client_update_wm_hints(struct client *c, Display *dpy, int selected)
+{
+	XWMHints *hints;
+
+	if ((hints = XGetWMHints(dpy, c->win))) {
+		if (selected && hints->flags & XUrgencyHint) {
+			hints->flags &= ~XUrgencyHint;
+			XSetWMHints(dpy, c->win, hints);
+		}
+
+		if (hints->flags & InputHint)
+			c->neverfocus = !hints->input;
+
+		XFree(hints);
 	}
 }
