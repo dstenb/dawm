@@ -12,7 +12,7 @@ static char *atom_names[LASTAtom] = {
 
 static Atom atoms[LASTAtom];
 
-/** get the atom with the given ID */
+/** Get the atom with the given ID */
 Atom
 atom(AtomID id)
 {
@@ -20,7 +20,7 @@ atom(AtomID id)
 	return atoms[id];
 }
 
-/** initializes all atoms */
+/** Initializes all atoms */
 void
 atoms_init(Display *dpy)
 {
@@ -28,6 +28,7 @@ atoms_init(Display *dpy)
 	XInternAtoms(dpy, atom_names, ARRSIZE(atom_names), 0, atoms);
 }
 
+/** Append a Window to the given Window list property */
 void
 atom_append_window(Display *dpy, Window win, Atom prop, Window propwin)
 {
@@ -35,12 +36,14 @@ atom_append_window(Display *dpy, Window win, Atom prop, Window propwin)
 			(unsigned char *) &(propwin), 1);
 }
 
+/** Delete a property */
 void
 atom_delete(Display *dpy, Window win, Atom prop)
 {
 	XDeleteProperty(dpy, win, prop);
 }
 
+/** Get a atom value from the given property */
 int
 atom_get_atom(Display *dpy, Window win, Atom prop, Atom *value)
 {
@@ -59,6 +62,8 @@ atom_get_atom(Display *dpy, Window win, Atom prop, Atom *value)
 	return 0;
 }
 
+/** Get a list of atom values from the given property. The given list should
+ * be freed with XFree() */
 int
 atom_get_atoms(Display *dpy, Window win, Atom prop,
 		Atom **values, unsigned *n_values)
@@ -78,6 +83,8 @@ atom_get_atoms(Display *dpy, Window win, Atom prop,
 	return 0;
 }
 
+/** Get a list of cardinal values from the given property. The given list should
+ * be freed with XFree() */
 int
 atom_get_cardinals(Display *dpy, Window win, Atom prop,
 		unsigned long **values, unsigned *n_values)
@@ -96,8 +103,10 @@ atom_get_cardinals(Display *dpy, Window win, Atom prop,
 	}
 
 	return 0;
+
 }
 
+/** Get a string value from the given property */
 int
 atom_get_string(Display *dpy, Window win, Atom prop,
 		char *str, unsigned int size)
@@ -126,6 +135,7 @@ atom_get_string(Display *dpy, Window win, Atom prop,
 	return 1;
 }
 
+/** Get a cardinal value from the given property */
 int
 atom_get_cardinal(Display *dpy, Window win, Atom prop, unsigned long *value)
 {
@@ -144,6 +154,7 @@ atom_get_cardinal(Display *dpy, Window win, Atom prop, unsigned long *value)
 	return 0;
 }
 
+/** Set the given property to the given atom value */
 void
 atom_set_atom(Display *dpy, Window win, Atom prop, Atom value)
 {
@@ -151,6 +162,7 @@ atom_set_atom(Display *dpy, Window win, Atom prop, Atom value)
 			(unsigned char *) &value, 1);
 }
 
+/** Set the given property to the list of the given atom value */
 void
 atom_set_atoms(Display *dpy, Window win, Atom prop, Atom *props, unsigned n)
 {
@@ -158,6 +170,7 @@ atom_set_atoms(Display *dpy, Window win, Atom prop, Atom *props, unsigned n)
 			(unsigned char *) props, n);
 }
 
+/** Set the given property to the given cardinal value */
 void
 atom_set_cardinal(Display *dpy, Window win, Atom prop, unsigned long value)
 {
@@ -165,6 +178,7 @@ atom_set_cardinal(Display *dpy, Window win, Atom prop, unsigned long value)
 			(unsigned char *) &value, 1);
 }
 
+/** Set the given property to the given string value */
 void
 atom_set_string(Display *dpy, Window win, Atom prop, char *str)
 {
@@ -172,6 +186,7 @@ atom_set_string(Display *dpy, Window win, Atom prop, char *str)
 			(unsigned char *)str, strlen(str));
 }
 
+/** Set the given property to the given UTF-8 array */
 void
 atom_set_utf8array(Display *dpy, Window win, Atom prop,
 		unsigned char *buf, unsigned size)
@@ -180,6 +195,7 @@ atom_set_utf8array(Display *dpy, Window win, Atom prop,
 			8, PropModeReplace, buf, size);
 }
 
+/** Set the given property to the given Window value */
 void
 atom_set_window(Display *dpy, Window win, Atom prop, Window propwin)
 {
