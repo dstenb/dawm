@@ -1,7 +1,32 @@
 #include "rules.h"
 
+int regex_matches(const char *, const char *);
+
 int rule_applicable(struct rule *, const char *, const char *, const char *);
 struct rule *rule_free(struct rule *);
+
+/** POSIX regex wrapper that returns non-zero if the given string matches to
+ * the given regex. The function uses the POSIX Extended syntax. */
+int
+regex_matches(const char *regex, const char *str)
+{
+	regex_t preg;
+	int pregret;
+	int ret = 0;
+	char buf[256];
+
+	if ((pregret = regcomp(&preg, regex, REG_EXTENDED)) == 0) {
+		if (regexec(&preg, str, 0, NULL, 0) == 0)
+			ret = 1;
+	} else {
+		regerror(pregret, &preg, buf, sizeof(buf));
+		error("%s(\"%s\", \"%s\"): %s\n", __func__, regex, str, buf);
+	}
+
+	regfree(&preg);
+
+	return ret;
+}
 
 int
 rule_applicable(struct rule *rule, const char *class, const char *instance,

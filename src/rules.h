@@ -1,19 +1,18 @@
 #ifndef _RULES_H_
 #define _RULES_H_
 
+#include <regex.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/types.h>
 
 #include "client.h"
 #include "utils.h"
 
-/* TODO: implement some sort of regex functionality for
- * class, instance and title */
-
 struct rule {
-	char *class;       /* class name */
-	char *instance;    /* instance name */
-	char *title;       /* client title */
+	char *class;       /* class name regex */
+	char *instance;    /* instance name regex */
+	char *title;       /* client title regex */
 
 	int mn;            /* monitor number, -1 to avoid this rule */
 	unsigned long ws;  /* workspace number */
