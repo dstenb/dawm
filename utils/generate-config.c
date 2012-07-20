@@ -71,6 +71,17 @@ print_keys()
 }
 
 void
+print_rules()
+{
+	printf("rules:\n");
+	printf("{\n");
+	printf("  list:\n");
+	printf("  (\n");
+	printf("  )\n");
+	printf("}\n");
+}
+
+void
 print_workspaces()
 {
 	printf("workspaces:\n");
@@ -89,6 +100,10 @@ main(int argc, char **argv)
 	print_colors();
 	printf("\n");
 	print_keys();
+	printf("\n");
+	print_workspaces();
+	printf("\n");
+	print_rules();
 
 	return 0;
 }
