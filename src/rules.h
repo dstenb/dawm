@@ -24,7 +24,7 @@ struct rule {
 	struct rule *next; /* next rule in rule list */
 };
 
-void rule_apply_all(struct rule *, struct client *);
+void rule_apply_all(struct rule *, struct client *, Display *dpy);
 struct rule *rule_append(struct rule *, struct rule *);
 struct rule *rule_create(const char *, const char *, const char *);
 struct rule *rule_free_all(struct rule *);

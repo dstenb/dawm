@@ -32,14 +32,43 @@ int
 rule_applicable(struct rule *rule, const char *class, const char *instance,
 		const char *title)
 {
-	/* TODO */
-	return 0;
+	return ((!rule->class || regex_matches(rule->class, class))
+		&& (!rule->instance || regex_matches(rule->instance, instance))
+		&& (!rule->title || regex_matches(rule->title, title)));
 }
 
 void
-rule_apply_all(struct rule *rule, struct client *c)
+print_rule(const struct rule *rule)
 {
-	/* TODO */
+	printf("class: '%s'\n", rule->class);
+	printf("instance: '%s'\n", rule->class);
+	printf("title: '%s'\n", rule->title);
+
+}
+
+void
+rule_apply_all(struct rule *rule, struct client *c, Display *dpy)
+{
+	const char *class;
+	const char *instance;
+	const char *title;
+	XClassHint hint = { NULL, NULL};
+
+	XGetClassHint(dpy, c->win, &hint);
+
+	class = hint.res_class ? hint.res_class : "";
+	instance = hint.res_name ? hint.res_name : "";
+	title = c->name;
+
+	for ( ; rule; rule = rule->next) {
+		print_rule(rule);
+
+		if (rule_applicable(rule, class, instance, title)) {
+			printf(":-) !\n");
+		} else {
+			printf(":-( !\n");
+		}
+	}
 }
 
 struct rule *
