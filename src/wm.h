@@ -16,6 +16,7 @@
 #include "ewmh.h"
 #include "keys.h"
 #include "monitor.h"
+#include "rules.h"
 #include "settings.h"
 #include "sysinfo.h"
 #include "utils.h"

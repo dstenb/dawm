@@ -11,17 +11,18 @@
 #include "colors.h"
 #include "common.h"
 #include "keys.h"
+#include "rules.h"
 #include "utils.h"
 
 struct settings {
 	int topbar;              /* non-zero if bars should be in the top */
 	int showbar;             /* non-zero if bars should be shown */
-	int bw;                  /* window border width */
 	struct key *keys;        /* key bindings */
 	float mfact;             /* master size factor [0, 1] */
 	unsigned int nmaster;    /* number of master clients */
 	char *barfont;           /* bar font */
 	char *colors[LASTColor]; /* color values, in "#XXXXXX" form */
+	int bw;
 };
 
 const struct settings *settings(void);

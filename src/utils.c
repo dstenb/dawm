@@ -1,6 +1,6 @@
 #include "utils.h"
 
-/** prints a debug message (used by DBG) */
+/** Prints a debug message (used by DBG) */
 void
 dbg(const char *file, int line, const char *fmt, ...)
 {
@@ -12,7 +12,7 @@ dbg(const char *file, int line, const char *fmt, ...)
 	va_end(val);
 }
 
-/** prints an error message and exits */
+/** Prints an error message and exits */
 void
 die(const char *fmt, ...)
 {
@@ -25,7 +25,7 @@ die(const char *fmt, ...)
 	exit(EXIT_FAILURE);
 }
 
-/** prints an error message */
+/** Prints an error message */
 void
 error(const char *fmt, ...)
 {
@@ -37,7 +37,7 @@ error(const char *fmt, ...)
 	va_end(val);
 }
 
-/** spawn a process in the background */
+/** Spawn a process in the background */
 void
 spawn(const char *cmd)
 {
@@ -47,7 +47,7 @@ spawn(const char *cmd)
 	}
 }
 
-/** concatenates a NULL-terminated list of strings to one string */
+/** Concatenates a NULL-terminated list of strings to one string */
 char *
 strfvs(char **v, char c)
 {
@@ -74,7 +74,30 @@ strfvs(char **v, char c)
 	return s;
 }
 
-/** remove all the given characters in the back and front of the string */
+/** POSIX regex wrapper that returns non-zero if the given string matches to
+ * the given regex. The function uses the POSIX Extended syntax. */
+int
+strmatch(const char *regex, const char *str)
+{
+	regex_t preg;
+	int pregret;
+	int ret = 0;
+	char buf[256];
+
+	if ((pregret = regcomp(&preg, regex, REG_EXTENDED)) == 0) {
+		if (regexec(&preg, str, 0, NULL, 0) == 0)
+			ret = 1;
+	} else {
+		regerror(pregret, &preg, buf, sizeof(buf));
+		error("%s(\"%s\", \"%s\"): %s\n", __func__, regex, str, buf);
+	}
+
+	regfree(&preg);
+
+	return ret;
+}
+
+/** Remove all the given characters in the back and front of the string */
 char *
 strtr(char *s, const char *skip)
 {
@@ -82,7 +105,7 @@ strtr(char *s, const char *skip)
 
 }
 
-/** remove all the given characters from the back of the string */
+/** Remove all the given characters from the back of the string */
 char *
 strtrb(char *s, const char *skip)
 {
@@ -95,7 +118,7 @@ strtrb(char *s, const char *skip)
 	return s;
 }
 
-/** remove all the given characters in front of the string */
+/** Remove all the given characters in front of the string */
 char *
 strtrf(char *s, const char *skip)
 {
@@ -104,7 +127,7 @@ strtrf(char *s, const char *skip)
 	return s;
 }
 
-/** calloc() wrapper that will exit if unable to allocate */
+/** A calloc() wrapper that will exit if unable to allocate */
 void *
 xcalloc(size_t nmemb, size_t size)
 {
@@ -115,7 +138,7 @@ xcalloc(size_t nmemb, size_t size)
 	return data;
 }
 
-/** malloc() wrapper that will exit if unable to allocate */
+/** A malloc() wrapper that will exit if unable to allocate */
 void *
 xmalloc(size_t size)
 {
@@ -126,7 +149,7 @@ xmalloc(size_t size)
 	return data;
 }
 
-/** strdup() wrapper that will exit if unable to allocate */
+/** A strdup() wrapper that will exit if unable to allocate */
 char *
 xstrdup(const char *str)
 {

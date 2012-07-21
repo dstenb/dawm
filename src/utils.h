@@ -1,6 +1,9 @@
 #ifndef _UTILS_H_
 #define _UTILS_H_
 
+#include <sys/types.h>
+
+#include <regex.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,6 +34,7 @@ void error(const char *, ...);
 void spawn(const char *);
 
 char *strfvs(char **, char);
+int strmatch(const char *, const char *);
 char *strtr(char *, const char *);
 char *strtrb(char *, const char *);
 char *strtrf(char *, const char *);

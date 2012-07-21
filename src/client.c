@@ -253,8 +253,6 @@ client_setup(struct client *c, struct monitor *selmon, struct monitor *mons,
 	client_update_wm_hints(c, dpy, 1);
 	/* TODO: fix size & wm hints */
 
-	/* TODO: rule_apply_all(cfg->rules, c, selmon, mons); */
-
 	client_select_input(c, dpy);
 	client_grab_buttons(c, dpy);
 

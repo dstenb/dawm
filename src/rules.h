@@ -1,13 +1,13 @@
 #ifndef _RULES_H_
 #define _RULES_H_
 
-#include <regex.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <sys/types.h>
 
 #include "client.h"
 #include "utils.h"
+
+struct client;
 
 struct rule {
 	char *class;       /* class name regex */
@@ -24,9 +24,10 @@ struct rule {
 	struct rule *next; /* next rule in rule list */
 };
 
-void rule_apply_all(struct rule *, struct client *, Display *dpy);
-struct rule *rule_append(struct rule *, struct rule *);
 struct rule *rule_create(const char *, const char *, const char *);
-struct rule *rule_free_all(struct rule *);
+
+void rules_add(struct rule *);
+void rules_apply(struct client *, Display *);
+void rules_free(void);
 
 #endif

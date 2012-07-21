@@ -193,14 +193,14 @@ get_uptime(long *uptime)
 }
 #endif /* __linux__ */
 
-/** returns a pointer to the main sysinfo struct */
+/** Returns a pointer to the main sysinfo struct */
 const struct sysinfo *
 sysinfo()
 {
 	return &_sysinfo;
 }
 
-/** initializes the main sysinfo struct */
+/** Initializes the main sysinfo struct */
 void
 sysinfo_init()
 {
@@ -211,7 +211,7 @@ sysinfo_init()
 	sysinfo_update();
 }
 
-/** updates the main sysinfo struct */
+/** Updates the main sysinfo struct */
 void
 sysinfo_update()
 {

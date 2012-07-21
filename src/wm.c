@@ -142,6 +142,8 @@ create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 	client_setup(c, wm->selmon, wm->mons, wm->dpy, wm->root, tc);
 	client_map_window(c, wm->dpy);
 
+	rules_apply(c, wm->dpy);
+
 	monitor_add_client(c->mon, c, wm->dpy, wm->root);
 }
 

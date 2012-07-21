@@ -1,75 +1,12 @@
 #include "rules.h"
 
-int regex_matches(const char *, const char *);
+struct rule *rule_append(struct rule *, struct rule *);
+static int rule_applicable(const struct rule *, const char *, const char *,
+		const char *);
+static struct rule *rule_free(struct rule *);
+static void rule_print(const struct rule *);
 
-int rule_applicable(struct rule *, const char *, const char *, const char *);
-struct rule *rule_free(struct rule *);
-
-/** POSIX regex wrapper that returns non-zero if the given string matches to
- * the given regex. The function uses the POSIX Extended syntax. */
-int
-regex_matches(const char *regex, const char *str)
-{
-	regex_t preg;
-	int pregret;
-	int ret = 0;
-	char buf[256];
-
-	if ((pregret = regcomp(&preg, regex, REG_EXTENDED)) == 0) {
-		if (regexec(&preg, str, 0, NULL, 0) == 0)
-			ret = 1;
-	} else {
-		regerror(pregret, &preg, buf, sizeof(buf));
-		error("%s(\"%s\", \"%s\"): %s\n", __func__, regex, str, buf);
-	}
-
-	regfree(&preg);
-
-	return ret;
-}
-
-int
-rule_applicable(struct rule *rule, const char *class, const char *instance,
-		const char *title)
-{
-	return ((!rule->class || regex_matches(rule->class, class))
-		&& (!rule->instance || regex_matches(rule->instance, instance))
-		&& (!rule->title || regex_matches(rule->title, title)));
-}
-
-void
-print_rule(const struct rule *rule)
-{
-	printf("class: '%s'\n", rule->class);
-	printf("instance: '%s'\n", rule->class);
-	printf("title: '%s'\n", rule->title);
-
-}
-
-void
-rule_apply_all(struct rule *rule, struct client *c, Display *dpy)
-{
-	const char *class;
-	const char *instance;
-	const char *title;
-	XClassHint hint = { NULL, NULL};
-
-	XGetClassHint(dpy, c->win, &hint);
-
-	class = hint.res_class ? hint.res_class : "";
-	instance = hint.res_name ? hint.res_name : "";
-	title = c->name;
-
-	for ( ; rule; rule = rule->next) {
-		print_rule(rule);
-
-		if (rule_applicable(rule, class, instance, title)) {
-			printf(":-) !\n");
-		} else {
-			printf(":-( !\n");
-		}
-	}
-}
+static struct rule *_rules = NULL;
 
 struct rule *
 rule_append(struct rule *rlist, struct rule *new)
@@ -83,6 +20,15 @@ rule_append(struct rule *rlist, struct rule *new)
 	} else {
 		return new;
 	}
+}
+
+int
+rule_applicable(const struct rule *rule, const char *class,
+		const char *instance, const char *title)
+{
+	return ((!rule->class || strmatch(rule->class, class))
+		&& (!rule->instance || strmatch(rule->instance, instance))
+		&& (!rule->title || strmatch(rule->title, title)));
 }
 
 struct rule *
@@ -119,10 +65,50 @@ rule_free(struct rule *rule)
 	return next;
 }
 
-struct rule *
-rule_free_all(struct rule *rule)
+void
+rule_print(const struct rule *rule)
 {
-	for ( ; rule; rule = rule_free(rule));
+	printf("%s(): '%s' '%s' '%s'\n", __func__, rule->class,
+			rule->instance, rule->title);
+}
 
-	return NULL;
+void
+rules_add(struct rule *rule)
+{
+	_rules = rule_append(_rules, rule);
+}
+
+void
+rules_apply(struct client *c, Display *dpy)
+{
+	const char *class;
+	const char *instance;
+	struct rule *rule;
+	XClassHint hint = { NULL, NULL};
+
+	XGetClassHint(dpy, c->win, &hint);
+
+	class = hint.res_class ? hint.res_class : "";
+	instance = hint.res_name ? hint.res_name : "";
+
+	printf("%s(): '%s', '%s', '%s'\n", __func__, class, instance, c->name);
+
+	for (rule = _rules ; rule; rule = rule->next) {
+		if (rule_applicable(rule, class, instance, c->name)) {
+			printf(":-) !\n");
+		} else {
+			printf(":-( !\n");
+		}
+	}
+
+	if(hint.res_class)
+		XFree(hint.res_class);
+	if(hint.res_name)
+		XFree(hint.res_name);
+}
+
+void
+rules_free()
+{
+	for ( ; _rules; _rules = rule_free(_rules));
 }

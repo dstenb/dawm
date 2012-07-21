@@ -1,14 +1,16 @@
 #include "settings.h"
 
-void parse_bar(config_t *);
-void parse_colors(config_t *);
-void parse_key_binding(config_setting_t *);
-void parse_key_bindings_list(config_setting_t *);
-void parse_key_bindings_settings(config_setting_t *);
-void parse_key_bindings(config_t *);
-void parse_rules(config_t *);
-void parse_workspaces(config_t *);
-void replace_str(char **, char *);
+static void parse_bar(config_t *);
+static void parse_colors(config_t *);
+static void parse_key_binding(config_setting_t *);
+static void parse_key_bindings_list(config_setting_t *);
+static void parse_key_bindings_settings(config_setting_t *);
+static void parse_key_bindings(config_t *);
+static void parse_rule(config_setting_t *);
+static void parse_rules_list(config_setting_t *);
+static void parse_rules(config_t *);
+static void parse_workspaces(config_t *);
+static void replace_str(char **, char *);
 
 static char default_path[PATH_MAX + 1];
 
@@ -48,6 +50,7 @@ void
 parse_colors(config_t *cfg)
 {
 	/* TODO */
+	(void)cfg;
 }
 
 /* TODO: cleanup */
@@ -136,15 +139,57 @@ parse_key_bindings(config_t *cfg)
 }
 
 void
+parse_rule(config_setting_t *elem)
+{
+	const char *class = NULL;
+	const char *instance = NULL;
+	const char *title = NULL;
+	int index = config_setting_index(elem);
+
+	if (!config_setting_is_group(elem))
+		die("rule %i: not a group\n", index);
+
+	config_setting_lookup_string(elem, "class", &class);
+	config_setting_lookup_string(elem, "instance", &instance);
+	config_setting_lookup_string(elem, "title", &title);
+
+	rules_add(rule_create(class, instance, title));
+}
+
+void
+parse_rules_list(config_setting_t *rules)
+{
+	config_setting_t *list;
+	int i;
+
+	if (!(list = config_setting_get_member(rules, "list")))
+		return;
+	if (!config_setting_is_list(list))
+		die("rules.list not a list\n");
+
+	for (i = 0; i < config_setting_length(list); i++)
+		parse_rule(config_setting_get_elem(list, i));
+
+}
+
+void
 parse_rules(config_t *cfg)
 {
-	/* TODO */
+	config_setting_t *rules;
+
+	if (!(rules = config_lookup(cfg, "rules")))
+		return;
+	if (!config_setting_is_group(rules))
+		die("rules must be a group\n");
+
+	parse_rules_list(rules);
 }
 
 void
 parse_workspaces(config_t *cfg)
 {
 	/* TODO */
+	(void)cfg;
 }
 
 const struct settings *settings()

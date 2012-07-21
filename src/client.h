@@ -9,7 +9,6 @@
 #include "common.h"
 #include "ewmh.h"
 #include "monitor.h"
-#include "settings.h"
 #include "utils.h"
 #include "xutils.h"
 
