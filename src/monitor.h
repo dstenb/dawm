@@ -70,6 +70,7 @@ void monitor_unfocus_selected(struct monitor *, Display *, Window);
 struct client *find_client_by_trans(struct monitor *, Display *, Window);
 struct client *find_client_by_window(struct monitor *, Window);
 
+struct monitor *find_monitor_by_num(struct monitor *, int);
 struct monitor *find_monitor_by_pos(struct monitor *, int, int);
 struct monitor *find_monitor_by_ws(struct monitor *, unsigned);
 

@@ -624,6 +624,14 @@ find_client_by_window(struct monitor *mon, Window win)
 	return NULL;
 }
 
+/** returns the monitor that corresponds to the given monitor number */
+struct monitor *
+find_monitor_by_num(struct monitor *mon, int num)
+{
+	for ( ; mon && mon->num != num; mon = mon->next) ;
+	return mon;
+}
+
 /** returns the monitor that corresponds to the given position */
 struct monitor *
 find_monitor_by_pos(struct monitor *mon, int x, int y)
