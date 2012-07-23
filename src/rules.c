@@ -3,6 +3,7 @@
 struct rule *rule_append(struct rule *, struct rule *);
 static int rule_applicable(const struct rule *, const char *, const char *,
 		const char *);
+static void rule_apply(struct rule *, struct client *, Display *);
 static struct rule *rule_free(struct rule *);
 static void rule_print(const struct rule *);
 
@@ -29,6 +30,15 @@ rule_applicable(const struct rule *rule, const char *class,
 	return ((!rule->class || strmatch(rule->class, class))
 		&& (!rule->instance || strmatch(rule->instance, instance))
 		&& (!rule->title || strmatch(rule->title, title)));
+}
+
+void
+rule_apply(struct rule *rule, struct client *c, Display *dpy)
+{
+	(void)c;
+	(void)dpy;
+
+	rule_print(rule);
 }
 
 struct rule *
@@ -68,7 +78,7 @@ rule_free(struct rule *rule)
 void
 rule_print(const struct rule *rule)
 {
-	printf("%s(): '%s' '%s' '%s'\n", __func__, rule->class,
+	DBG("%s(): '%s' '%s' '%s'\n", __func__, rule->class,
 			rule->instance, rule->title);
 }
 
@@ -91,14 +101,11 @@ rules_apply(struct client *c, Display *dpy)
 	class = hint.res_class ? hint.res_class : "";
 	instance = hint.res_name ? hint.res_name : "";
 
-	printf("%s(): '%s', '%s', '%s'\n", __func__, class, instance, c->name);
+	DBG("%s(): '%s', '%s', '%s'\n", __func__, class, instance, c->name);
 
 	for (rule = _rules ; rule; rule = rule->next) {
-		if (rule_applicable(rule, class, instance, c->name)) {
-			printf(":-) !\n");
-		} else {
-			printf(":-( !\n");
-		}
+		if (rule_applicable(rule, class, instance, c->name))
+			rule_apply(rule, c, dpy);
 	}
 
 	if(hint.res_class)
