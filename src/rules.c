@@ -27,9 +27,11 @@ int
 rule_applicable(const struct rule *rule, const char *class,
 		const char *instance, const char *title)
 {
-	return ((!rule->class || strmatch(rule->class, class))
-		&& (!rule->instance || strmatch(rule->instance, instance))
-		&& (!rule->title || strmatch(rule->title, title)));
+#define MATCHES(r, s) (!(r) || strmatch((r), (s)))
+
+	return MATCHES(rule->match->class, class) &&
+		MATCHES(rule->match->instance, instance) &&
+		MATCHES(rule->match->title, title);
 }
 
 void
@@ -46,17 +48,21 @@ rule_create(const char *class, const char *instance, const char *title)
 {
 	struct rule *rule = xcalloc(1, sizeof(struct rule));
 
-	rule->class = class ? xstrdup(class) : NULL;
-	rule->instance = instance ? xstrdup(instance) : NULL;
-	rule->title = title ? xstrdup(title) : NULL;
+	rule->match = xcalloc(1, sizeof(struct rule_match));
+	rule->settings = xcalloc(1, sizeof(struct rule_settings));
 
-	rule->mn = -1;
-	rule->ws = 0;
-	rule->set_ws = 0;
-	rule->switch_to_ws = 0;
-	rule->floating = 0;
-	rule->fullscreen = 0;
-	rule->ignore_hints = 0;
+	rule->match->class = class ? xstrdup(class) : NULL;
+	rule->match->instance = instance ? xstrdup(instance) : NULL;
+	rule->match->title = title ? xstrdup(title) : NULL;
+
+	rule->settings->mn = -1;
+	rule->settings->ws = 0;
+	rule->settings->set_ws = 0;
+	rule->settings->switch_to_ws = 0;
+	rule->settings->floating = 0;
+	rule->settings->fullscreen = 0;
+	rule->settings->ignore_hints = 0;
+
 	rule->next = NULL;
 
 	return rule;
@@ -67,9 +73,11 @@ rule_free(struct rule *rule)
 {
 	struct rule *next = rule->next;
 
-	free(rule->class);
-	free(rule->instance);
-	free(rule->title);
+	free(rule->match->class);
+	free(rule->match->instance);
+	free(rule->match->title);
+	free(rule->match);
+	free(rule->settings);
 	free(rule);
 
 	return next;
@@ -78,8 +86,8 @@ rule_free(struct rule *rule)
 void
 rule_print(const struct rule *rule)
 {
-	DBG("%s(): '%s' '%s' '%s'\n", __func__, rule->class,
-			rule->instance, rule->title);
+	DBG("%s(): '%s' '%s' '%s'\n", __func__, rule->match->class,
+			rule->match->instance, rule->match->title);
 }
 
 void

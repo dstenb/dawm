@@ -198,6 +198,7 @@ destroy(struct wm *wm)
 
 	bars_free(wm->dpy);
 	cursors_free(wm->dpy);
+	rules_free();
 
 	XUngrabKey(wm->dpy, AnyKey, AnyModifier, wm->root);
 

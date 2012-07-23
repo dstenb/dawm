@@ -1,19 +1,21 @@
 #ifndef _RULES_H_
 #define _RULES_H_
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "client.h"
 #include "utils.h"
 
 struct client;
 
-struct rule {
+struct rule_match {
 	char *class;       /* class name regex */
 	char *instance;    /* instance name regex */
 	char *title;       /* client title regex */
+};
 
+struct rule_settings {
 	int mn;            /* monitor number, -1 to avoid this rule */
 	unsigned long ws;  /* workspace number */
 	int set_ws;        /* set the workspace if set_ws is non-zero*/
@@ -21,7 +23,12 @@ struct rule {
 	int floating;      /* float the client */
 	int fullscreen;    /* put the client in fullscreen mode */
 	int ignore_hints;  /* ignore size hints */
-	struct rule *next; /* next rule in rule list */
+};
+
+struct rule {
+	struct rule_match *match;
+	struct rule_settings *settings;
+	struct rule *next;
 };
 
 struct rule *rule_create(const char *, const char *, const char *);
