@@ -13,7 +13,7 @@ print_bar()
 	printf("  show_bar = %s;\n", BOOLSTR(settings()->showbar));
 	printf("  top_bar = %s;\n", BOOLSTR(settings()->topbar));
 	printf("  font = \"%s\";\n", settings()->barfont);
-	printf("}\n");
+	printf("};\n");
 }
 
 void
@@ -24,10 +24,10 @@ print_colors()
 	printf("colors:\n");
 	printf("(\n");
 	for (i = 0; i < LASTColor; i++)
-		printf("  { name=\"%s\" value=\"%s\" }%s\n",
+		printf("  { name=\"%s\"; value=\"%s\"; }%s\n",
 				color_id2str(i), settings()->colors[i],
 				i < LASTColor - 1 ? "," : "");
-	printf(")\n");
+	printf(");\n");
 }
 
 void
@@ -60,14 +60,14 @@ print_keys()
 
 		stpcpy(p, XKeysymToString(k->keysym));
 
-		printf("    #{ keys=\"%s\" action=\"%s\"", buf,
+		printf("    #{ keys=\"%s\"; action=\"%s\";", buf,
 				key_action2str(k->action));
 		if (k->args)
-			printf(" args=\"%s\"", k->args);
+			printf(" args=\"%s\";", k->args);
 		printf(" }%s\n", k->next ? "," : "");
 	}
-	printf("  )\n");
-	printf("}\n");
+	printf("  );\n");
+	printf("};\n");
 }
 
 void
@@ -77,8 +77,8 @@ print_rules()
 	printf("{\n");
 	printf("  list:\n");
 	printf("  (\n");
-	printf("  )\n");
-	printf("}\n");
+	printf("  );\n");
+	printf("};\n");
 }
 
 void
@@ -86,7 +86,7 @@ print_workspaces()
 {
 	printf("workspaces:\n");
 	printf("{\n");
-	printf("}\n");
+	printf("};\n");
 }
 
 int

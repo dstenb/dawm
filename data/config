@@ -5,18 +5,18 @@ bar:
   show_bar = true;
   top_bar = true;
   font = "-*-profont-*-*-*-*-10-*-*-*-*-*-*-*";
-}
+};
 
 colors:
 (
-  { name="bar_border" value="#FF0000" },
-  { name="bar_norm_fg" value="#DDDDDD" },
-  { name="bar_norm_bg" value="#000000" },
-  { name="bar_sel_fg" value="#000000" },
-  { name="bar_sel_bg" value="#0000FF" },
-  { name="win_norm_border" value="#000000" },
-  { name="win_sel_border" value="#FF0000" }
-)
+  { name="bar_border"; value="#FF0000"; },
+  { name="bar_norm_fg"; value="#DDDDDD"; },
+  { name="bar_norm_bg"; value="#000000"; },
+  { name="bar_sel_fg"; value="#000000"; },
+  { name="bar_sel_bg"; value="#0000FF"; },
+  { name="win_norm_border"; value="#000000"; },
+  { name="win_sel_border"; value="#FF0000"; }
+);
 
 bindings:
 {
@@ -26,46 +26,57 @@ bindings:
 
   list:
   (
-    #{ keys="super+x" action="kill" },
-    #{ keys="super+shift+q" action="quit" },
-    #{ keys="super+ctrl+r" action="restart" },
-    #{ keys="super+shift+Return" action="spawn" args="urxvt" },
-    #{ keys="super+b" action="toggle_bar" },
-    #{ keys="super+t" action="toggle_float" },
-    #{ keys="super+f" action="toggle_fs" },
-    #{ keys="super+Return" action="sel_to_master" },
-    #{ keys="super+l" action="set_mfact" args="+" },
-    #{ keys="super+h" action="set_mfact" args="-" },
-    #{ keys="super+period" action="set_n_masters" args="+" },
-    #{ keys="super+comma" action="set_n_masters" args="-" },
-    #{ keys="super+j" action="select" args="next" },
-    #{ keys="super+k" action="select" args="prev" },
-    #{ keys="super+shift+j" action="swap" args="next" },
-    #{ keys="super+shift+k" action="swap" args="prev" },
-    #{ keys="super+1" action="set_ws" args="1" },
-    #{ keys="super+2" action="set_ws" args="2" },
-    #{ keys="super+3" action="set_ws" args="3" },
-    #{ keys="super+4" action="set_ws" args="4" },
-    #{ keys="super+5" action="set_ws" args="5" },
-    #{ keys="super+6" action="set_ws" args="6" },
-    #{ keys="super+7" action="set_ws" args="7" },
-    #{ keys="super+8" action="set_ws" args="8" },
-    #{ keys="super+9" action="set_ws" args="9" },
-    #{ keys="super+shift+1" action="move_window" args="1" },
-    #{ keys="super+shift+2" action="move_window" args="2" },
-    #{ keys="super+shift+3" action="move_window" args="3" },
-    #{ keys="super+shift+4" action="move_window" args="4" },
-    #{ keys="super+shift+5" action="move_window" args="5" },
-    #{ keys="super+shift+6" action="move_window" args="6" },
-    #{ keys="super+shift+7" action="move_window" args="7" },
-    #{ keys="super+shift+8" action="move_window" args="8" },
-    #{ keys="super+shift+9" action="move_window" args="9" },
-    #{ keys="super+h" action="set_layout" args="horz" },
-    #{ keys="super+v" action="set_layout" args="vert" },
-    #{ keys="super+s" action="set_layout" args="matrix" },
-    #{ keys="super+m" action="set_layout" args="max" },
-    #{ keys="super+n" action="set_layout" args="float" },
-    #{ keys="super+space" action="set_layout" args="next" },
-    #{ keys="super+shift+space" action="set_layout" args="prev" }
-  )
-}
+    #{ keys="super+x"; action="kill"; },
+    #{ keys="super+shift+q"; action="quit"; },
+    #{ keys="super+ctrl+r"; action="restart"; },
+    #{ keys="super+shift+Return"; action="spawn"; args="urxvt"; },
+    #{ keys="super+b"; action="toggle_bar"; },
+    #{ keys="super+t"; action="toggle_float"; },
+    #{ keys="super+f"; action="toggle_fs"; },
+    #{ keys="super+Return"; action="sel_to_master"; },
+    #{ keys="super+l"; action="set_mfact"; args="+"; },
+    #{ keys="super+h"; action="set_mfact"; args="-"; },
+    #{ keys="super+period"; action="set_n_masters"; args="+"; },
+    #{ keys="super+comma"; action="set_n_masters"; args="-"; },
+    #{ keys="super+j"; action="select"; args="next"; },
+    #{ keys="super+k"; action="select"; args="prev"; },
+    #{ keys="super+shift+j"; action="swap"; args="next"; },
+    #{ keys="super+shift+k"; action="swap"; args="prev"; },
+    #{ keys="super+1"; action="set_ws"; args="1"; },
+    #{ keys="super+2"; action="set_ws"; args="2"; },
+    #{ keys="super+3"; action="set_ws"; args="3"; },
+    #{ keys="super+4"; action="set_ws"; args="4"; },
+    #{ keys="super+5"; action="set_ws"; args="5"; },
+    #{ keys="super+6"; action="set_ws"; args="6"; },
+    #{ keys="super+7"; action="set_ws"; args="7"; },
+    #{ keys="super+8"; action="set_ws"; args="8"; },
+    #{ keys="super+9"; action="set_ws"; args="9"; },
+    #{ keys="super+shift+1"; action="move_window"; args="1"; },
+    #{ keys="super+shift+2"; action="move_window"; args="2"; },
+    #{ keys="super+shift+3"; action="move_window"; args="3"; },
+    #{ keys="super+shift+4"; action="move_window"; args="4"; },
+    #{ keys="super+shift+5"; action="move_window"; args="5"; },
+    #{ keys="super+shift+6"; action="move_window"; args="6"; },
+    #{ keys="super+shift+7"; action="move_window"; args="7"; },
+    #{ keys="super+shift+8"; action="move_window"; args="8"; },
+    #{ keys="super+shift+9"; action="move_window"; args="9"; },
+    #{ keys="super+h"; action="set_layout"; args="horz"; },
+    #{ keys="super+v"; action="set_layout"; args="vert"; },
+    #{ keys="super+s"; action="set_layout"; args="matrix"; },
+    #{ keys="super+m"; action="set_layout"; args="max"; },
+    #{ keys="super+n"; action="set_layout"; args="float"; },
+    #{ keys="super+space"; action="set_layout"; args="next"; },
+    #{ keys="super+shift+space"; action="set_layout"; args="prev"; }
+  );
+};
+
+workspaces:
+{
+};
+
+rules:
+{
+  list:
+  (
+  );
+};
