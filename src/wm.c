@@ -9,6 +9,8 @@ static void checkotherwm(struct wm *);
 static void create_client(struct wm *, Window, XWindowAttributes *);
 static void create_monitors(struct wm *);
 static void get_windows(struct wm *);
+static void handler_configurerequest_resize(struct wm *, struct client *,
+		XConfigureRequestEvent *);
 static void handler_propertynotify_client(struct wm *, XPropertyEvent *);
 static void handler_propertynotify_root(struct wm *, XPropertyEvent *);
 static int manageable_window(Display *, Window, XWindowAttributes *, int);
@@ -150,17 +152,6 @@ create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 void
 create_monitors(struct wm *wm)
 {
-#if 0
-	/* TODO: test code, to be removed */
-	struct monitor *m;
-	wm->mons = monitor_create(0, 0, 0, 1024 / 2, 600, wm->dpy,
-			wm->root, wm->screen);
-	m = monitor_create(1, 1024 / 2, 0, 1024 / 2, 600, wm->dpy,
-			wm->root, wm->screen);
-	wm->mons = monitor_append(wm->mons, m);
-	wm->selmon = wm->mons;
-	return;
-#endif
 #ifdef XINERAMA
 	struct monitor *mon;
 	int i, nmon;
@@ -426,6 +417,28 @@ handler_clientmessage(struct wm *wm, XEvent *ev)
 }
 
 void
+handler_configurerequest_resize(struct wm *wm, struct client *c,
+		XConfigureRequestEvent *ev)
+{
+	if (ev->value_mask & CWX)
+		c->x = c->mon->mx + ev->x;
+	if (ev->value_mask & CWY)
+		c->y = c->mon->my + ev->y;
+	if (ev->value_mask & CWWidth)
+		c->w = ev->width;
+	if (ev->value_mask & CWHeight)
+		c->h = ev->height;
+
+	if ((c->x + c->w) > c->mon->mx + c->mon->mw && c->floating)
+		c->x = c->mon->mx + (c->mon->mw / 2 - WIDTH(c) / 2);
+	if ((c->y + c->h) > c->mon->my + c->mon->mh && c->floating)
+		c->y = c->mon->my + (c->mon->mh / 2 - HEIGHT(c) / 2);
+
+	if (ISVISIBLE(c))
+		client_move_resize(c, wm->dpy, c->x, c->y, c->w, c->h);
+}
+
+void
 handler_configurerequest(struct wm *wm, XEvent *ev)
 {
 	XConfigureRequestEvent *crev = &ev->xconfigurerequest;
@@ -438,9 +451,8 @@ handler_configurerequest(struct wm *wm, XEvent *ev)
 			/* TODO: set border size (crev->border_width) */
 			DBG("%s: set window border\n", __func__);
 		} else {
-			/* TODO: set window size if the client is floating or
-			 * non-arranged */
-			DBG("%s: set window size\n", __func__);
+			if (ISRESIZABLE(c))
+				handler_configurerequest_resize(wm, c, crev);
 		}
 	} else {
 		/* TODO: send XConfigureWindow to window */

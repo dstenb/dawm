@@ -16,6 +16,7 @@
 
 #define ISDOCK(c)               (c->wtype & Dock)
 #define ISFOCUSABLE(c)          (ISVISIBLE(c) && !c->neverfocus)
+#define ISRESIZABLE(c)          (c->floating || !ISARRANGED(c->mon))
 #define ISSELECTABLE(c)         (ISVISIBLE(c) && !c->neverfocus)
 #define ISTILED(c)              (!c->floating && ISVISIBLE(c))
 #define ISVISIBLE(c)            (c->ws == c->mon->selws || c->ws == 0xFFFFFFFF)
