@@ -1,15 +1,15 @@
 #include "sysinfo.h"
 
-#ifdef __linux__
+#ifdef SYSINFO_EXTENDED
 static int get_battery(int *, int *);
 static int get_cpu_stats(long *, long *);
 static int get_mem(long *, long *);
 static int get_uptime(long *);
-#endif /* __linux__ */
+#endif /* SYSINFO_EXTENDED */
 
 static struct sysinfo _sysinfo;
 
-#ifdef __linux__
+#ifdef SYSINFO_EXTENDED
 static struct {
 	long u, i;   /* used and idle values */
 	long ou, oi; /* previous used and idle values */
@@ -191,7 +191,7 @@ get_uptime(long *uptime)
 
 
 }
-#endif /* __linux__ */
+#endif /* SYSINFO_EXTENDED */
 
 /** Returns a pointer to the main sysinfo struct */
 const struct sysinfo *
@@ -204,9 +204,9 @@ sysinfo()
 void
 sysinfo_init()
 {
-#ifdef __linux__
+#ifdef SYSINFO_EXTENDED
 	get_cpu_stats(&cpu.ou, &cpu.oi); /* get initial cpu values */
-#endif /* __linux__ */
+#endif /* SYSINFO_EXTENDED */
 
 	sysinfo_update();
 }
@@ -217,7 +217,7 @@ sysinfo_update()
 {
 	_sysinfo.time = time(NULL);
 
-#ifdef __linux__
+#ifdef SYSINFO_EXTENDED
 	/* update the battery value */
 	get_battery(&_sysinfo.bat_level, &_sysinfo.bat_status);
 	get_mem(&_sysinfo.mem_used, &_sysinfo.mem_total);
@@ -231,5 +231,5 @@ sysinfo_update()
 		cpu.ou = cpu.u;
 		cpu.oi = cpu.i;
 	}
-#endif /* __linux__ */
+#endif /* SYSINFO_EXTENDED */
 }

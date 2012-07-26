@@ -334,7 +334,7 @@ monitor_draw_bar(struct monitor *mon, Display *dpy)
 	strftime(timestr, sizeof(timestr), "%y/%m/%d %H:%M",
 			localtime(&i->time));
 
-#ifdef __linux__
+#ifdef SYSINFO_EXTENDED
 	char *batstr;
 
 	if (i->bat_status == Charging)
@@ -353,7 +353,7 @@ monitor_draw_bar(struct monitor *mon, Display *dpy)
 #else
 	snprintf(buf, sizeof(buf), "  %i:%lu  [%s]  %s", mon->num + 1,
 			mon->selws + 1, layoutstr, timestr);
-#endif
+#endif /* SYSINFO_EXTENDED */
 
 	bar_draw(mon->bar, dpy, buf);
 }
