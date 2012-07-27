@@ -496,7 +496,7 @@ handler_enternotify(struct wm *wm, XEvent *ev)
 	if (!(c = find_client_by_window(wm->mons, cev->window)))
 		return;
 
-	monitor_focus(c->mon, c, wm->dpy, wm->root);
+	monitor_select_client(c->mon, c, wm->dpy, wm->root, 0);
 }
 
 void
