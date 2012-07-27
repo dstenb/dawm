@@ -2,7 +2,7 @@
 
 static Cursor cursors[LASTCursor];
 
-/** get cursor with the given id */
+/** Get cursor with the given id */
 Cursor
 cursor(CursorID id)
 {
@@ -16,7 +16,7 @@ cursor_set(Window win, CursorID id, Display *dpy)
 	XDefineCursor(dpy, win, cursor(id));
 }
 
-/** initializes the cursors */
+/** Initializes the cursors */
 void
 cursors_init(Display *dpy)
 {
@@ -25,7 +25,7 @@ cursors_init(Display *dpy)
 	cursors[ResizeCursor] = XCreateFontCursor(dpy, XC_sizing);
 }
 
-/** free all the allocated cursors */
+/** Free all the allocated cursors */
 void
 cursors_free(Display *dpy)
 {
