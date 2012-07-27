@@ -22,6 +22,7 @@ typedef enum {
 	NetWMStrut,
 	NetWMStrutPartial,
 	NetWMWindowType,
+	NetWMWindowTypeDesktop,
 	NetWMWindowTypeDialog,
 	NetWMWindowTypeDock,
 	LASTNetAtom
