@@ -1,5 +1,10 @@
-#include <stdlib.h>
+/* dawm - tiling window manager
+ *
+ * License: See LICENSE file
+ */
+
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include "common.h"
@@ -8,12 +13,23 @@
 #include "version.h"
 #include "wm.h"
 
+static void compiled(void);
 static void usage(const char *);
 static void version(void);
 
 static int check_config = 0;
 
-/* prints an usage message */
+/** Prints a list of compiled features */
+void
+compiled(void)
+{
+	printf("Compiled features:\n");
+#ifdef XINERAMA
+	printf("   Xinerama support\n");
+#endif
+}
+
+/** Prints an usage message */
 void
 usage(const char *cmd)
 {
@@ -26,11 +42,12 @@ usage(const char *cmd)
 	printf("  -k, --check        check if the given config file is ok.\n");
 }
 
-/* prints a version message */
+/** Prints a version message */
 void
 version(void)
 {
-	printf("%s: %s\n", WMNAME, VERSION);
+	printf("%s: %s\n\n", WMNAME, VERSION);
+	compiled();
 }
 
 int
