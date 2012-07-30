@@ -21,7 +21,7 @@ static struct {
 static int initialized = 0;
 
 struct bar *
-bar_create(int topbar, int showbar, int x, int y, int w,
+bar_create(bool topbar, bool showbar, int x, int y, int w,
 		Display *dpy, Window root, int screen)
 {
 	struct bar *bar;

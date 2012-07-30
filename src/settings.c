@@ -202,8 +202,8 @@ settings_init()
 {
 	int i;
 
-	_settings.topbar = 1;
-	_settings.showbar = 1;
+	_settings.topbar = true;
+	_settings.showbar = true;
 	_settings.bw = 1;
 	_settings.keys = key_default_keys();
 	_settings.mfact = M_FACT;

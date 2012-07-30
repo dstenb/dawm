@@ -1,8 +1,9 @@
 #ifndef _CLIENT_H_
 #define _CLIENT_H_
 
-#include <stdlib.h>
+#include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <X11/Xlib.h>
 
 #include "atoms.h"
@@ -34,9 +35,9 @@ struct client {
 	char name[CLIENT_NAME_SIZE]; /* title */
 	int x, y, w, h;              /* current position and size */
 	int ox, oy, ow, oh;          /* old position and size */
-	int floating;                /* non-zero if floating */
-	int fullscreen;              /* non-zero if fullscreen */
-	int neverfocus;              /*    */
+	bool floating;               /* floating state */
+	bool fullscreen;             /* fullscreen state */
+	bool neverfocus;             /*    */
 	int ostate;                  /* old state */
 	int bw;                      /* border size */
 	int obw;                     /* old border size */

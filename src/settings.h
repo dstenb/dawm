@@ -3,6 +3,7 @@
 
 #include <errno.h>
 #include <limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -15,8 +16,8 @@
 #include "utils.h"
 
 struct settings {
-	int topbar;              /* non-zero if bars should be in the top */
-	int showbar;             /* non-zero if bars should be shown */
+	bool topbar;             /* non-zero if bars should be in the top */
+	bool showbar;            /* non-zero if bars should be shown */
 	struct key *keys;        /* key bindings */
 	float mfact;             /* master size factor [0, 1] */
 	unsigned int nmaster;    /* number of master clients */

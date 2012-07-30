@@ -28,8 +28,8 @@ client_create(Window win, XWindowAttributes *wa)
 	c->obw = wa->border_width;
 
 	c->name[0] = '\0';
-	c->floating = 0;
-	c->fullscreen = 0;
+	c->floating = false;
+	c->fullscreen = false;
 	c->ostate = 0;
 	c->wtype = Normal;
 	c->prev = NULL;
@@ -140,7 +140,7 @@ client_set_floating(struct client *c, Display *dpy, int floating)
 		if (!c->floating)
 			client_move_resize(c, dpy, c->ox, c->oy, c->ow, c->oh);
 		client_raise(c, dpy);
-		c->floating = 1;
+		c->floating = true;
 	} else {
 		/* save current size */
 		if(c->floating) {
@@ -149,7 +149,7 @@ client_set_floating(struct client *c, Display *dpy, int floating)
 			c->ow = c->w;
 			c->oh = c->h;
 		}
-		c->floating = 0;
+		c->floating = false;
 	}
 }
 
@@ -175,9 +175,9 @@ client_set_fullscreen(struct client *c, Display *dpy, int fullscreen)
 	if (fullscreen) {
 		ewmh_client_set_state(dpy, c->win, netatom(NetWMFullscreen));
 
-		c->fullscreen = 1;
+		c->fullscreen = true;
 		c->ostate = c->floating;
-		c->floating = 1;
+		c->floating = true;
 		c->obw = c->bw;
 
 		c->ox = c->x;
@@ -192,7 +192,7 @@ client_set_fullscreen(struct client *c, Display *dpy, int fullscreen)
 	} else {
 		ewmh_client_set_state(dpy, c->win, 0);
 
-		c->fullscreen = 0;
+		c->fullscreen = false;
 		c->floating = c->ostate;
 
 		client_set_border(c, dpy, c->obw);
@@ -308,7 +308,7 @@ void
 client_set_dialog_wtype(struct client *c, Display *dpy)
 {
 	(void)dpy;
-	c->floating = 1;
+	c->floating = true;
 	c->wtype |= Dialog;
 }
 
@@ -318,8 +318,8 @@ client_set_dock_wtype(struct client *c, Display *dpy)
 {
 	if (ewmh_client_get_strut_partial(dpy, c->win, c->strut) ||
 			ewmh_client_get_strut(dpy, c->win, c->strut)) {
-		c->floating = 1;
-		c->neverfocus = 1;
+		c->floating = true;
+		c->neverfocus = true;
 		c->wtype |= Dock;
 	}
 }

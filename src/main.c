@@ -3,6 +3,7 @@
  * License: See LICENSE file
  */
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -17,7 +18,9 @@ static void compiled(void);
 static void usage(const char *);
 static void version(void);
 
-static int check_config = 0;
+/* If this is set to true, the window manager will be closed after
+ * the config file have been read */
+static bool check_config = false;
 
 /** Prints a list of compiled features */
 void
@@ -73,7 +76,7 @@ main(int argc, char **argv)
 			cfg_str = argv[i];
 		} else if (STREQ(argv[i], "--check") ||
 				STREQ(argv[i], "-k")) {
-			check_config = 1;
+			check_config = true;
 		} else {
 			usage(argv[0]);
 			exit(EXIT_FAILURE);
@@ -83,10 +86,8 @@ main(int argc, char **argv)
 	settings_init();
 	settings_read(cfg_str ? cfg_str : settings_default_path());
 
-	if (check_config) {
-		printf("%s: configuration file ok!\n", WMNAME);
-		exit(EXIT_SUCCESS);
-	}
+	if (check_config)
+		die("configuration file ok!\n");
 
 	error("starting!\n");
 
