@@ -51,6 +51,7 @@ bindings:
     #{ keys="super+7"; action="set_ws"; args="7"; },
     #{ keys="super+8"; action="set_ws"; args="8"; },
     #{ keys="super+9"; action="set_ws"; args="9"; },
+    #{ keys="super+g"; action="toggle_ws"; },
     #{ keys="super+shift+1"; action="move_window"; args="1"; },
     #{ keys="super+shift+2"; action="move_window"; args="2"; },
     #{ keys="super+shift+3"; action="move_window"; args="3"; },
