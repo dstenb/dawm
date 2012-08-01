@@ -30,6 +30,10 @@ compiled(void)
 #ifdef XINERAMA
 	printf("   Xinerama support\n");
 #endif
+#ifdef XFT
+	printf("   Xft support\n");
+#endif
+
 }
 
 /** Prints an usage message */

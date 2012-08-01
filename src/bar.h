@@ -6,6 +6,10 @@
 #include <stdlib.h>
 #include <X11/Xlib.h>
 
+#ifdef XFT
+#include <X11/Xft/Xft.h>
+#endif /* XFT */
+
 #include "colors.h"
 #include "cursors.h"
 #include "utils.h"
