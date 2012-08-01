@@ -238,7 +238,7 @@ monitor_add_client(struct monitor *mon, struct client *c,
 	add_to_clients(mon, c);
 	add_to_stack(mon, c);
 
-	if (ISDOCK(c))
+	if (ISDOCK(c) && ISVISIBLE(c))
 		monitor_update_window_size(mon);
 
 	/* TODO: check switch_to_ws rule         v */
@@ -430,6 +430,8 @@ monitor_remove_client(struct monitor *mon, struct client *c)
 
 	if (c == mon->sel)
 		mon->sel = mon->clients;
+
+	monitor_update_window_size(mon);
 }
 
 #define RES_MASK (CWSibling | CWStackMode)
@@ -534,7 +536,8 @@ monitor_set_ws(struct monitor *mon, Display *dpy, Window root,
 
 	mon->selws = ws;
 
-	monitor_focus(mon, NULL,dpy, root);
+	monitor_update_window_size(mon);
+	monitor_focus(mon, NULL, dpy, root);
 	monitor_arrange(mon, dpy);
 
 	ewmh_root_set_current_desktop(dpy, root, mon->num * N_WORKSPACES + ws);
@@ -634,6 +637,8 @@ monitor_unfocus_selected(struct monitor *mon, Display *dpy, Window root)
 		client_set_focus(mon->sel, dpy, root, 0);
 }
 
+/** Update the real window size for the given monitor, i.e. the space that
+ * isn't covered by any dock */
 void
 monitor_update_window_size(struct monitor *mon)
 {
@@ -644,7 +649,7 @@ monitor_update_window_size(struct monitor *mon)
 	unsigned bottom = 0;
 
 	for (c = mon->clients; c; c = c->next) {
-		if (ISDOCK(c)) {
+		if (ISDOCK(c) && ISVISIBLE(c)) {
 			left = MAX(left, c->strut->left);
 			right = MAX(right, c->strut->right);
 			top = MAX(top, c->strut->top);
