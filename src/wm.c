@@ -9,6 +9,8 @@ static void checkotherwm(struct wm *);
 static void create_client(struct wm *, Window, XWindowAttributes *);
 static void create_monitors(struct wm *);
 static void get_windows(struct wm *);
+static void handler_clientmessage_client(struct wm *, XClientMessageEvent *);
+static void handler_clientmessage_root(struct wm *, XClientMessageEvent *);
 static void handler_configurerequest_resize(struct wm *, struct client *,
 		XConfigureRequestEvent *);
 static void handler_propertynotify_client(struct wm *, XPropertyEvent *);
@@ -360,8 +362,6 @@ handler_buttonpress(struct wm *wm, XEvent *ev)
 void
 handler_buttonrelease(struct wm *wm, XEvent *ev)
 {
-	(void)ev;
-
 	dbg_print(wm, __func__);
 
 	if (wm->motion.start.button == ev->xbutton.button) {
@@ -373,46 +373,56 @@ handler_buttonrelease(struct wm *wm, XEvent *ev)
 void
 handler_clientmessage(struct wm *wm, XEvent *ev)
 {
-	XClientMessageEvent *cmev = &ev->xclient;
-
 	dbg_print(wm, __func__);
 
-	if (cmev->window == wm->root) {
-		if (cmev->format == 32) {
-			/* TODO: Maybe handle
-			 * net_current_desktop & net_number_of_desktops */
-		}
-	} else {
-		struct client *c;
+	if (ev->xclient.window == wm->root)
+		handler_clientmessage_root(wm, &ev->xclient);
+	else
+		handler_clientmessage_client(wm, &ev->xclient);
+}
 
-		if (!(c = find_client_by_window(wm->mons, cmev->window)))
-			return;
+void
+handler_clientmessage_client(struct wm *wm, XClientMessageEvent *ev)
+{
+	struct client *c;
 
-		if (cmev->message_type == atom(WMState)) {
-			DBG("%s: WMState\n", __func__);
-		} else if (cmev->message_type == netatom(NetActiveWindow)) {
-			/* switch to the given client's monitor and workspace
-			 * and set focus on the client when a NetActive event
-			 * occurs. the spec is quite ambiguous about this. this
-			 * behaviour might be changed */
-			set_monitor(wm, c->mon);
-			monitor_select_client(c->mon, c, wm->dpy, wm->root, 1);
-		} else if (cmev->message_type == atom(WMChangeState)) {
-			if (cmev->data.l[0] == IconicState &&
-					cmev->format == 32) {
-				printf("%s: minimize window\n", __func__);
-				/* TODO: fix minimizing */
-			}
-		} else if (cmev->message_type == netatom(NetDesktop)) {
-			unsigned long ws;
-			DBG("%s: NetDesktop\n", __func__);
-			/* TODO: handle multiple monitors */
-			if ((ws = cmev->data.l[0]) != ALL_WS)
-				ws = ws % N_WORKSPACES;
-			client_set_ws(c, wm->dpy, ws);
-			monitor_focus(c->mon, NULL, wm->dpy, wm->root);
-			monitor_arrange(c->mon, wm->dpy);
+	if (!(c = find_client_by_window(wm->mons, ev->window)))
+		return;
+
+	if (ev->message_type == atom(WMState)) {
+		DBG("%s: WMState\n", __func__);
+	} else if (ev->message_type == netatom(NetActiveWindow)) {
+		/* switch to the given client's monitor and workspace
+		 * and set focus on the client when a NetActive event
+		 * occurs. the spec is quite ambiguous about this. this
+		 * behaviour might be changed */
+		set_monitor(wm, c->mon);
+		monitor_select_client(c->mon, c, wm->dpy, wm->root, 1);
+	} else if (ev->message_type == atom(WMChangeState)) {
+		if (ev->data.l[0] == IconicState && ev->format == 32) {
+			printf("%s: minimize window\n", __func__);
+			/* TODO: fix minimizing */
 		}
+	} else if (ev->message_type == netatom(NetDesktop)) {
+		unsigned long ws;
+		DBG("%s: NetDesktop\n", __func__);
+		/* TODO: handle multiple monitors */
+		if ((ws = ev->data.l[0]) != ALL_WS)
+			ws = ws % N_WORKSPACES;
+		client_set_ws(c, wm->dpy, ws);
+		monitor_focus(c->mon, NULL, wm->dpy, wm->root);
+		monitor_arrange(c->mon, wm->dpy);
+	}
+}
+
+void
+handler_clientmessage_root(struct wm *wm, XClientMessageEvent *ev)
+{
+	(void) wm;
+
+	if (ev->format == 32) {
+		/* TODO: Maybe handle
+		 * net_current_desktop & net_number_of_desktops */
 	}
 }
 
@@ -604,23 +614,18 @@ handler_motionnotify(struct wm *wm, XEvent *ev)
 				mev->x_root, mev->y_root);
 
 		set_monitor(wm, mon);
-
-		return;
 	}
 }
 
 void
 handler_propertynotify(struct wm *wm, XEvent *ev)
 {
-	XPropertyEvent *pev = &ev->xproperty;
-
 	dbg_print(wm, __func__);
 
-	if (pev->window == wm->root)
-		handler_propertynotify_root(wm, pev);
+	if (ev->xproperty.window == wm->root)
+		handler_propertynotify_root(wm, &ev->xproperty);
 	else
-		handler_propertynotify_client(wm, pev);
-
+		handler_propertynotify_client(wm, &ev->xproperty);
 }
 
 void
@@ -731,7 +736,6 @@ key_handler_select(struct wm *wm, struct key *key)
 		} else {
 			error("%s: invalid arg: '%s'", __func__, key->args);
 		}
-
 	}
 }
 
@@ -951,7 +955,6 @@ set_monitor(struct wm *wm, struct monitor *mon)
 void
 update_bars(struct wm *wm)
 {
-	/* TODO: test code, to be removed */
 	struct monitor *mon;
 
 	sysinfo_update();

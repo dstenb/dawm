@@ -613,7 +613,6 @@ monitor_swap_prev_client(struct monitor *mon, Display *dpy)
 	if (!sel || !ISTILED(sel))
 		return;
 
-	/* TODO */
 	if (((c = prev_tiled(sel->prev)) || (c = last_tiled(mon->clients)))
 			&& c != sel) {
 		monitor_swap(mon, sel, c);
