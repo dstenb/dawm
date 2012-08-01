@@ -113,7 +113,7 @@ bars_init_font(Display *dpy, const char *fontstr)
 
 	if(missing) {
 		while(n--)
-			fprintf(stderr, "dwm: missing fontset: %s\n", missing[n]);
+			error("missing fontset: %s\n", missing[n]);
 		XFreeStringList(missing);
 	}
 
