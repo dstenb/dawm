@@ -41,6 +41,7 @@ struct monitor {
 	struct client *cstack;      /* client stack */
 	struct client *sel;         /* selected client */
 	unsigned long selws;        /* selected workspace */
+	unsigned long prevws;       /* previous workspace */
 	struct ws ws[N_WORKSPACES]; /* workspace information */
 	struct monitor *next;       /* next monitor */
 };

@@ -324,6 +324,7 @@ monitor_create(int num, int x, int y, int w, int h,
 	mon->mh = mon->wh = h;
 
 	mon->selws = MIN_WS;
+	mon->prevws = mon->selws;
 
 	for (i = 0; i < N_WORKSPACES; i++) {
 		snprintf(mon->ws[i].name, WS_NAME_SIZE, "%i", (i + 1));
@@ -534,6 +535,7 @@ monitor_set_ws(struct monitor *mon, Display *dpy, Window root,
 {
 	assert(VALID_WORKSPACE(ws));
 
+	mon->prevws = mon->selws;
 	mon->selws = ws;
 
 	monitor_update_window_size(mon);

@@ -59,6 +59,7 @@ static void key_handler_swap(struct wm *, struct key *);
 static void key_handler_togglebar(struct wm *, struct key *);
 static void key_handler_togglefloat(struct wm *, struct key *);
 static void key_handler_togglefs(struct wm *, struct key *);
+static void key_handler_togglews(struct wm *, struct key *);
 
 static int (*xerrxlib) (Display *, XErrorEvent *);
 static void (*event_handler[LASTEvent]) (struct wm *, XEvent *) = {
@@ -94,7 +95,8 @@ static void (*key_handler[LASTAction]) (struct wm *, struct key *) = {
 	[SwapAction] = key_handler_swap,
 	[ToggleBarAction] = key_handler_togglebar,
 	[ToggleFloatAction] = key_handler_togglefloat,
-	[ToggleFsAction] = key_handler_togglefs
+	[ToggleFsAction] = key_handler_togglefs,
+	[ToggleWsAction] = key_handler_togglews
 };
 
 /*#define MONITOR_DBG*/
@@ -870,6 +872,13 @@ key_handler_togglefs(struct wm *wm, struct key *key)
 		if (!fs)
 			monitor_arrange(wm->selmon, wm->dpy);
 	}
+}
+
+void
+key_handler_togglews(struct wm *wm, struct key *key)
+{
+	(void)key;
+	monitor_set_ws(wm->selmon, wm->dpy, wm->root, wm->selmon->prevws);
 }
 
 int

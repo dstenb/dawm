@@ -33,6 +33,7 @@ typedef enum {
 	ToggleBarAction,     /* show/hide the bar on the current monitor */
 	ToggleFloatAction,   /* float/arrange the selected client */
 	ToggleFsAction,      /*  */
+	ToggleWsAction,      /*  */
 	LASTAction,
 	InvalidAction = -1
 } KeyAction;
