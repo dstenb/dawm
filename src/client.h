@@ -20,7 +20,7 @@
 #define ISRESIZABLE(c)          (c->floating || !ISARRANGED(c->mon))
 #define ISSELECTABLE(c)         (ISVISIBLE(c) && !c->neverfocus)
 #define ISTILED(c)              (!c->floating && ISVISIBLE(c))
-#define ISVISIBLE(c)            (c->ws == c->mon->selws || c->ws == 0xFFFFFFFF)
+#define ISVISIBLE(c)            (c->ws == c->mon->selws || c->ws == ALL_WS)
 
 #define WIDTH(c)                ((c)->w + 2 * (c)->bw)
 #define HEIGHT(c)               ((c)->h + 2 * (c)->bw)

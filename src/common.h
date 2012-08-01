@@ -1,6 +1,7 @@
 #ifndef _COMMON_H_
 #define _COMMON_H_
 
+#include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -9,7 +10,7 @@
 #define MIN_WS 0
 #define MAX_WS 8
 #define N_WORKSPACES (MAX_WS - MIN_WS + 1)
-#define ALL_WS 0xFFFFFFFF
+#define ALL_WS ULONG_MAX
 
 #define VALID_WORKSPACE(W) ((W >= MIN_WS && W <= MAX_WS) || W == ALL_WS)
 
