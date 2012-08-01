@@ -2,7 +2,21 @@
 
 static void monitor_restack(struct monitor *, Display *);
 static void monitor_show_hide(struct monitor *, Display *);
+static void monitor_swap(struct monitor *, struct client *, struct client *);
 static void monitor_update_window_size(struct monitor *);
+
+static struct client *
+last_tiled(struct client *curr)
+{
+	struct client *c = NULL;
+
+	for ( ; curr; curr = curr->next) {
+		if (ISTILED(curr))
+			c = curr;
+	}
+
+	return c;
+}
 
 static struct client *
 next_tiled(struct client *c)
@@ -543,6 +557,68 @@ void
 monitor_show_hide(struct monitor *mon, Display *dpy)
 {
 	show_hide(mon->cstack, dpy);
+}
+
+void
+monitor_swap(struct monitor *mon, struct client *c1, struct client *c2)
+{
+	struct client *tmp;
+
+	tmp = c1->next;
+	c1->next = c2->next;
+	c2->next = tmp;
+
+	if (c1->next)
+		c1->next->prev = c1;
+	if (c2->next)
+		c2->next->prev = c2;
+
+	tmp = c1->prev;
+	c1->prev = c2->prev;
+	c2->prev = tmp;
+
+	if (c1->prev)
+		c1->prev->next = c1;
+	else
+		mon->clients = c1;
+
+	if (c2->prev)
+		c2->prev->next = c2;
+	else
+		mon->clients = c2;
+}
+
+void
+monitor_swap_next_client(struct monitor *mon, Display *dpy)
+{
+	struct client *sel = mon->sel;
+	struct client *c = NULL;
+
+	if (!sel || !ISTILED(sel))
+		return;
+
+	if (((c = next_tiled(sel->next)) || (c = next_tiled(mon->clients)))
+			&& c != sel) {
+		monitor_swap(mon, sel, c);
+		monitor_arrange(mon, dpy);
+	}
+}
+
+void
+monitor_swap_prev_client(struct monitor *mon, Display *dpy)
+{
+	struct client *sel = mon->sel;
+	struct client *c = NULL;
+
+	if (!sel || !ISTILED(sel))
+		return;
+
+	/* TODO */
+	if (((c = prev_tiled(sel->prev)) || (c = last_tiled(mon->clients)))
+			&& c != sel) {
+		monitor_swap(mon, sel, c);
+		monitor_arrange(mon, dpy);
+	}
 }
 
 void

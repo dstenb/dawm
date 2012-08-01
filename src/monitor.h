@@ -64,6 +64,8 @@ void monitor_selected_to_master(struct monitor *);
 void monitor_set_layout(struct monitor *, Display *, int);
 void monitor_set_ws(struct monitor *, Display *, Window, unsigned long);
 void monitor_show_bar(struct monitor *, Display *, int);
+void monitor_swap_next_client(struct monitor *, Display *);
+void monitor_swap_prev_client(struct monitor *, Display *);
 void monitor_toggle_bar(struct monitor *, Display *);
 void monitor_unfocus_selected(struct monitor *, Display *, Window);
 

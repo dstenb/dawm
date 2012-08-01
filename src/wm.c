@@ -826,14 +826,13 @@ key_handler_spawn(struct wm *wm, struct key *key)
 void
 key_handler_swap(struct wm *wm, struct key *key)
 {
-	(void)wm;
+	struct monitor *mon = wm->selmon;
 
 	if (key->args) {
-		if (STREQ(key->args, "next")) {
-			/* TODO: monitor_swap_next(wm->selmon); */
-		} else if (STREQ(key->args, "prev")) {
-			/* TODO: monitor_swap_prev(wm->selmon); */
-		}
+		if (STREQ(key->args, "next"))
+			monitor_swap_next_client(mon, wm->dpy);
+		else if (STREQ(key->args, "prev"))
+			monitor_swap_prev_client(mon, wm->dpy);
 	}
 }
 
