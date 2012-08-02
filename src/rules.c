@@ -57,11 +57,11 @@ rule_create(const char *class, const char *instance, const char *title)
 
 	rule->settings->mn = -1;
 	rule->settings->ws = 0;
-	rule->settings->set_ws = 0;
-	rule->settings->switch_to_ws = 0;
-	rule->settings->floating = 0;
-	rule->settings->fullscreen = 0;
-	rule->settings->ignore_hints = 0;
+	rule->settings->set_ws = false;
+	rule->settings->switch_to_ws = false;
+	rule->settings->floating = false;
+	rule->settings->fullscreen = false;
+	rule->settings->ignore_hints = false;
 
 	rule->next = NULL;
 

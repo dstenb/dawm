@@ -18,11 +18,11 @@ struct rule_match {
 struct rule_settings {
 	int mn;            /* monitor number, -1 to avoid this rule */
 	unsigned long ws;  /* workspace number */
-	int set_ws;        /* set the workspace if set_ws is non-zero*/
-	int switch_to_ws;  /* switch to the clients' workspace */
-	int floating;      /* float the client */
-	int fullscreen;    /* put the client in fullscreen mode */
-	int ignore_hints;  /* ignore size hints */
+	bool set_ws;        /* set the workspace if set_ws is non-zero*/
+	bool switch_to_ws;  /* switch to the clients' workspace */
+	bool floating;      /* float the client */
+	bool fullscreen;    /* put the client in fullscreen mode */
+	bool ignore_hints;  /* ignore size hints */
 };
 
 struct rule {
