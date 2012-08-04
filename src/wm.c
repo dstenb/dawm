@@ -743,7 +743,9 @@ key_handler_select(struct wm *wm, struct key *key)
 
 void
 key_handler_setlayout(struct wm *wm, struct key *key)
-{
+{ 
+	/* TODO */
+#if 0
 	int layout = wm->selmon->ws[wm->selmon->selws].layout;
 
 	if (key->args) {
@@ -751,12 +753,8 @@ key_handler_setlayout(struct wm *wm, struct key *key)
 			layout = TileHorzLayout;
 		} else if (STREQ(key->args, "vert")) {
 			layout = TileVertLayout;
-		} else if (STREQ(key->args, "matrix")) {
-			layout = MatrixLayout;
 		} else if (STREQ(key->args, "max")) {
 			layout = MaxLayout;
-		} else if (STREQ(key->args, "float")) {
-			layout = FloatingLayout;
 		} else if (STREQ(key->args, "prev")) {
 			layout = (layout > 0) ? layout - 1 : LASTLayout - 1;
 		} else if (STREQ(key->args, "next")) {
@@ -765,6 +763,7 @@ key_handler_setlayout(struct wm *wm, struct key *key)
 	}
 
 	monitor_set_layout(wm->selmon, wm->dpy, layout);
+#endif
 }
 
 void
@@ -781,7 +780,10 @@ key_handler_setmfact(struct wm *wm, struct key *key)
 {
 	struct monitor *mon = wm->selmon;
 
+
 	if (key->args) {
+	/* TODO */
+#if 0
 		if (STREQ(key->args, "+")) {
 			mon->ws[mon->selws].mfact = MIN(0.99,
 					mon->ws[mon->selws].mfact + M_FACTSTEP);
@@ -789,6 +791,7 @@ key_handler_setmfact(struct wm *wm, struct key *key)
 			mon->ws[mon->selws].mfact = MAX(0.01,
 					mon->ws[mon->selws].mfact - M_FACTSTEP);
 		}
+#endif
 
 		monitor_arrange(wm->selmon, wm->dpy);
 	}
@@ -800,12 +803,15 @@ key_handler_setmnum(struct wm *wm, struct key *key)
 	struct monitor *mon = wm->selmon;
 
 	if (key->args) {
+	/* TODO */
+#if 0
 		if (STREQ(key->args, "+")) {
 			mon->ws[mon->selws].nmaster++;
 		} else if (STREQ(key->args, "-")) {
 			mon->ws[mon->selws].nmaster = MAX(1,
 					mon->ws[mon->selws].nmaster - 1);
 		}
+#endif
 
 		monitor_arrange(wm->selmon, wm->dpy);
 	}

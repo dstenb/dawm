@@ -1,7 +1,7 @@
 include config.mk
 
 SRC = main.c atoms.c bar.c client.c colors.c cursors.c ewmh.c keys.c \
-      monitor.c rules.c settings.c sysinfo.c utils.c wm.c xutils.c
+      monitor.c rules.c settings.c sysinfo.c utils.c wm.c xutils.c layouts.c
 OBJ = ${SRC:.c=.o}
 
 all: options version.h dawm

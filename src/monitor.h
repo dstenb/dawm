@@ -7,29 +7,19 @@
 
 #include "bar.h"
 #include "client.h"
+#include "layouts.h"
 #include "settings.h"
 #include "sysinfo.h"
 
-#define ISARRANGED(M) ((M)->ws[(M)->selws].layout != FloatingLayout)
+#define ISARRANGED(M) (true)
 
 #define WS_NAME_SIZE 32
-
-typedef enum {
-	TileHorzLayout,
-	TileVertLayout,
-	MatrixLayout,
-	FloatingLayout,
-	MaxLayout,
-	LASTLayout
-} LayoutID;
 
 #define DEFAULT_LAYOUT TileHorzLayout
 
 struct ws {
 	char name[WS_NAME_SIZE]; /* workspace name */
-	LayoutID layout;         /* workspace layout id */
-	float mfact;             /* master size factor [0, 1] */
-	int nmaster;             /* number of master clients */
+	struct layout *layout;   /* workspace layout */
 };
 
 struct monitor {

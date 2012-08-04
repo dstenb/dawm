@@ -1,5 +1,6 @@
 #include "monitor.h"
 
+static void monitor_move_clients(struct monitor *, Display *);
 static void monitor_restack(struct monitor *, Display *);
 static void monitor_show_hide(struct monitor *, Display *);
 static void monitor_swap(struct monitor *, struct client *, struct client *);
@@ -73,100 +74,6 @@ prev_selectable_client(struct client *curr)
 	}
 
 	return curr;
-}
-
-static const char *
-layout2str(LayoutID id)
-{
-	static char *arr[] = { "|", "-", "=", " ", "M" };
-
-	return (id < ARRSIZE(arr)) ? arr[id] : "";
-}
-
-static void
-arrange_tilehorz(struct monitor *mon, Display *dpy)
-{
-	struct client *c;
-	unsigned int i, n, h, mw, my, ty;
-
-	float mfact = mon->ws[mon->selws].mfact;
-	unsigned int nmaster = mon->ws[mon->selws].nmaster;
-
-	if ((n = no_of_tiled_clients(mon->clients)) == 0)
-		return;
-
-	if (n > nmaster)
-		mw = nmaster ? mon->ww * mfact : 0;
-	else
-		mw = mon->ww;
-
-	for(i = my = ty = 0, c = next_tiled(mon->clients); c;
-			c = next_tiled(c->next), i++) {
-		if(i < nmaster) {
-			h = (mon->wh - my) / (MIN(n, nmaster) - i);
-			client_move_resize(c, dpy, mon->wx, mon->wy + my,
-					mw - (2*c->bw), h - (2*c->bw));
-			my += HEIGHT(c);
-		}
-		else {
-			h = (mon->wh - ty) / (n - i);
-			client_move_resize(c, dpy, mon->wx + mw, mon->wy + ty,
-					mon->ww - mw - (2*c->bw),
-					h - (2*c->bw));
-			ty += HEIGHT(c);
-		}
-	}
-}
-
-static void
-arrange_tilevert(struct monitor *mon, Display *dpy)
-{
-	struct client *c;
-	unsigned int i, n, w, mh, mx, tx;
-
-	float mfact = mon->ws[mon->selws].mfact;
-	unsigned int nmaster = mon->ws[mon->selws].nmaster;
-
-	if ((n = no_of_tiled_clients(mon->clients)) == 0)
-		return;
-
-	if (n > nmaster)
-		mh = nmaster ? mon->wh *  mfact : 0;
-	else
-		mh = mon->wh;
-
-	for (i = mx = tx = 0, c = next_tiled(mon->clients); c;
-			c = next_tiled(c->next), i++) {
-		if (i < nmaster) {
-			w = (mon->ww - mx) / (MIN(n, nmaster) - i);
-			client_move_resize(c, dpy, mon->wx + mx, mon->wy,
-					w - (2*c->bw), mh - (2*c->bw));
-			mx += WIDTH(c);
-		} else {
-			w = (mon->ww - tx) / (n - i);
-			client_move_resize(c, dpy, mon->wx + tx, mon->wy + mh,
-					w - (2*c->bw), mon->wh - mh - (2*c->bw));
-			tx += WIDTH(c);
-		}
-	}
-}
-
-static void
-arrange_matrix(struct monitor *mon, Display *dpy)
-{
-	(void)mon;
-	(void)dpy;
-}
-
-static void
-arrange_max(struct monitor *mon, Display *dpy)
-{
-	struct client *c;
-
-	for (c = next_tiled(mon->clients); c; c = next_tiled(c->next)) {
-		client_move_resize(c, dpy, mon->wx, mon->wy,
-				mon->ww - (2*c->bw), mon->wh - (2*c->bw));
-	}
 }
 
 static void
@@ -266,27 +173,7 @@ void
 monitor_arrange(struct monitor *mon, Display *dpy)
 {
 	monitor_show_hide(mon, dpy);
-
-	switch(mon->ws[mon->selws].layout) {
-		case TileHorzLayout:
-			arrange_tilehorz(mon, dpy);
-			break;
-		case TileVertLayout:
-			arrange_tilevert(mon, dpy);
-			break;
-		case MatrixLayout:
-			arrange_matrix(mon, dpy);
-			break;
-		case FloatingLayout:
-			/* Don't arrange */
-			break;
-		case MaxLayout:
-			arrange_max(mon, dpy);
-			break;
-		default:
-			break;
-	}
-
+	monitor_move_clients(mon, dpy);
 	monitor_restack(mon, dpy);
 }
 
@@ -328,9 +215,9 @@ monitor_create(int num, int x, int y, int w, int h,
 
 	for (i = 0; i < N_WORKSPACES; i++) {
 		snprintf(mon->ws[i].name, WS_NAME_SIZE, "%i", (i + 1));
-		mon->ws[i].layout = DEFAULT_LAYOUT;
-		mon->ws[i].nmaster = settings()->nmaster;
-		mon->ws[i].mfact = settings()->mfact;
+		mon->ws[i].layout = layout_init(DEFAULT_LAYOUT,
+				mon->mw, mon->mh, mon->ww, mon->wh,
+				settings()->nmaster, settings()->mfact);
 	}
 
 	monitor_show_bar(mon, dpy, mon->bar->showbar);
@@ -344,7 +231,7 @@ monitor_draw_bar(struct monitor *mon, Display *dpy)
 	char buf[512];
 	char timestr[64];
 	const struct sysinfo *i = sysinfo();
-	const char *layoutstr = layout2str(mon->ws[mon->selws].layout);
+	const char *layoutstr = layout_symbol(mon->ws[mon->selws].layout);
 
 	strftime(timestr, sizeof(timestr), "%y/%m/%d %H:%M",
 			localtime(&i->time));
@@ -420,6 +307,31 @@ monitor_free(struct monitor *mon, Display *dpy)
 	free(mon);
 
 	return next;
+}
+
+void
+monitor_move_clients(struct monitor *mon, Display *dpy)
+{
+	struct layout *layout = mon->ws[mon->selws].layout;
+	struct layout_pos *pos;
+	struct client *c;
+	unsigned i;
+	int x, y, w, h;
+
+	/* TODO */
+	layout_set_clients(layout, no_of_tiled_clients(mon->clients));
+
+	for (i = 0, c = next_tiled(mon->clients); c && i < layout->n;
+			c = next_tiled(c->next), i++) {
+		pos = &layout->pos[i];
+
+		x = mon->wx + pos->x;
+		y = mon->wy + pos->y;
+		w = pos->w - (2 * c->bw);
+		h = pos->h - (2 * c->bw);
+
+		client_move_resize(c, dpy, x, y, w, h);
+	}
 }
 
 /** remove the given client from the monitor */
@@ -522,10 +434,13 @@ monitor_selected_to_master(struct monitor *mon)
 void
 monitor_set_layout(struct monitor *mon, Display *dpy, int layout)
 {
+	/* TODO */
+#if 0
 	assert(layout >= 0 && layout < LASTLayout);
 
 	mon->ws[mon->selws].layout = layout;
 	monitor_arrange(mon, dpy);
+#endif
 }
 
 /** set the current workspace */
@@ -675,6 +590,9 @@ monitor_update_window_size(struct monitor *mon)
 	mon->wy = mon->my + top;
 	mon->ww = mon->mw - left - right;
 	mon->wh = mon->mh - top - bottom;
+
+	/* calculate new layout positions */
+	layout_set_geom(mon->ws[mon->selws].layout, mon->ww, mon->wh);
 }
 
 /** searches through all the monitors for the client
