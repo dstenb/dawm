@@ -36,6 +36,8 @@ struct monitor {
 	struct monitor *next;       /* next monitor */
 };
 
+#define monitor_toggle_bar(M, D) monitor_show_bar(M, D, !M->bar->showbar);
+
 void monitor_add_client(struct monitor *, struct client *, Display *, Window);
 struct monitor *monitor_append(struct monitor *, struct monitor *);
 void monitor_arrange(struct monitor *, Display *);
@@ -57,7 +59,6 @@ void monitor_set_ws(struct monitor *, Display *, Window, unsigned long);
 void monitor_show_bar(struct monitor *, Display *, int);
 void monitor_swap_next_client(struct monitor *, Display *);
 void monitor_swap_prev_client(struct monitor *, Display *);
-void monitor_toggle_bar(struct monitor *, Display *);
 void monitor_unfocus_selected(struct monitor *, Display *, Window);
 
 struct client *find_client_by_trans(struct monitor *, Display *, Window);
