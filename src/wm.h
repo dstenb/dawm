@@ -15,6 +15,7 @@
 #include "cursors.h"
 #include "ewmh.h"
 #include "keys.h"
+#include "layouts.h"
 #include "monitor.h"
 #include "rules.h"
 #include "settings.h"

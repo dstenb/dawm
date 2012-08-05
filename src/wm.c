@@ -743,27 +743,23 @@ key_handler_select(struct wm *wm, struct key *key)
 
 void
 key_handler_setlayout(struct wm *wm, struct key *key)
-{ 
-	/* TODO */
-#if 0
-	int layout = wm->selmon->ws[wm->selmon->selws].layout;
+{
+	struct monitor *mon = wm->selmon;
+	int nid, oid;
+
+	oid = mon->ws[wm->selmon->selws].layout->id;
 
 	if (key->args) {
-		if (STREQ(key->args, "horz")) {
-			layout = TileHorzLayout;
-		} else if (STREQ(key->args, "vert")) {
-			layout = TileVertLayout;
-		} else if (STREQ(key->args, "max")) {
-			layout = MaxLayout;
-		} else if (STREQ(key->args, "prev")) {
-			layout = (layout > 0) ? layout - 1 : LASTLayout - 1;
-		} else if (STREQ(key->args, "next")) {
-			layout = (layout < LASTLayout - 1) ? layout + 1 : 0;
-		}
-	}
+		if (STREQ(key->args, "prev"))
+			nid = (oid > 0) ? oid - 1 : LASTLayout - 1;
+		else if (STREQ(key->args, "next"))
+			nid = (oid < LASTLayout - 1) ? oid + 1 : 0;
+		else
+			nid = layout_str2id(key->args);
 
-	monitor_set_layout(wm->selmon, wm->dpy, layout);
-#endif
+		if (nid != -1 && nid != oid)
+			monitor_set_layout(mon, wm->dpy, nid);
+	}
 }
 
 void

@@ -451,15 +451,12 @@ monitor_selected_to_master(struct monitor *mon)
 
 /** Set the layout for the selected workspace */
 void
-monitor_set_layout(struct monitor *mon, Display *dpy, int layout)
+monitor_set_layout(struct monitor *mon, Display *dpy, int id)
 {
-	/* TODO */
-#if 0
-	assert(layout >= 0 && layout < LASTLayout);
+	assert(id >= 0 && id < LASTLayout);
 
-	mon->ws[mon->selws].layout = layout;
+	layout_set(mon->ws[mon->selws].layout, id);
 	monitor_arrange(mon, dpy);
-#endif
 }
 
 /** Set the current workspace */
