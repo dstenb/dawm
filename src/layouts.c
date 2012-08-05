@@ -73,7 +73,7 @@ void
 horz_arrange(struct layout *layout)
 {
 	struct layout_pos *pos;
-	unsigned int mw, my, ty, h;
+	unsigned int mw, my, ty;
 	unsigned int i = 0;
 
 	if (layout->n > layout->nmaster)
@@ -90,11 +90,10 @@ horz_arrange(struct layout *layout)
 				(MIN(layout->n, layout->nmaster) - i);
 			my += pos->h;
 		} else {
-			h = (layout->wh - ty) / (layout->n - i);
 			pos->x = mw;
 			pos->y = ty;
 			pos->w = mw;
-			pos->h = h;
+			pos->h = (layout->wh - ty) / (layout->n - i);
 			ty += pos->h;
 		}
 	}
@@ -151,43 +150,79 @@ horz_nmaster_changed(struct layout *layout, int nmaster)
 void
 vert_arrange(struct layout *layout)
 {
+	struct layout_pos *pos;
+	unsigned int mh, mx, tx;
+	unsigned int i = 0;
 
+	if (layout->n > layout->nmaster)
+		mh = layout->nmaster ? layout->wh * layout->mfact : 0;
+	else
+		mh = layout->wh;
+
+	for (i = mx = tx = 0, pos = layout->pos; i < layout->n; i++, pos++) {
+		if (i < layout->nmaster) {
+			pos->x = mx;
+			pos->y = 0;
+			pos->w = (layout->ww - mx) /
+				(MIN(layout->n, layout->nmaster) - i);
+			pos->h = mh;
+			mx += pos->w;
+		} else {
+			pos->x = tx;
+			pos->y = mh;
+			pos->w = (layout->ww - tx) / (layout->n - i);
+			pos->h = layout->wh - mh;
+			tx += pos->w;
+		}
+	}
 }
 
 void
 vert_client_added(struct layout *layout)
 {
-
+	/* TODO */
+	layout_allocate_pos(layout, layout->n + 1);
+	vert_arrange(layout);
 }
 
 void
 vert_client_removed(struct layout *layout)
 {
-
+	/* TODO */
+	if (layout->n > 0) {
+		layout_allocate_pos(layout, layout->n - 1);
+		vert_arrange(layout);
+	}
 }
 
 void
 vert_clients_changed(struct layout *layout, unsigned n)
 {
-
+	/* TODO */
+	layout_allocate_pos(layout, n);
+	vert_arrange(layout);
 }
 
 void
 vert_geom_changed(struct layout *layout, int ww, int wh)
 {
+	/* TODO: handle width and height diffs instead of re-arranging */
+	layout->ww = ww;
+	layout->wh = wh;
 
+	vert_arrange(layout);
 }
 
 void
 vert_mfact_changed(struct layout *layout, float mfact)
 {
-
+	/* TODO */
 }
 
 void
 vert_nmaster_changed(struct layout *layout, int nmaster)
 {
-
+	/* TODO */
 }
 
 void
