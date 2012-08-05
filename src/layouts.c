@@ -73,8 +73,7 @@ void
 horz_arrange(struct layout *layout)
 {
 	struct layout_pos *pos;
-	unsigned int mw, my, ty;
-	unsigned int i = 0;
+	unsigned int i, mw, my, ty;
 
 	if (layout->n > layout->nmaster)
 		mw = layout->nmaster ? layout->ww * layout->mfact : 0;
@@ -151,8 +150,7 @@ void
 vert_arrange(struct layout *layout)
 {
 	struct layout_pos *pos;
-	unsigned int mh, mx, tx;
-	unsigned int i = 0;
+	unsigned int i, mh, mx, tx;
 
 	if (layout->n > layout->nmaster)
 		mh = layout->nmaster ? layout->wh * layout->mfact : 0;
@@ -232,8 +230,7 @@ max_arrange(struct layout *layout)
 	unsigned int i = 0;
 
 	for (i = 0, pos = layout->pos; i < layout->n; i++, pos++) {
-		pos->x = 0;
-		pos->y = 0;
+		pos->x = pos->y = 0;
 		pos->w = layout->ww;
 		pos->h = layout->wh;
 	}
