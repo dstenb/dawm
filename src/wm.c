@@ -747,7 +747,7 @@ key_handler_setlayout(struct wm *wm, struct key *key)
 	struct monitor *mon = wm->selmon;
 	int nid, oid;
 
-	oid = mon->ws[wm->selmon->selws].layout->id;
+	oid = mon->selws->layout->id;
 
 	if (key->args) {
 		if (STREQ(key->args, "prev"))
@@ -775,7 +775,6 @@ void
 key_handler_setmfact(struct wm *wm, struct key *key)
 {
 	struct monitor *mon = wm->selmon;
-
 
 	if (key->args) {
 	/* TODO */
@@ -880,7 +879,7 @@ void
 key_handler_togglews(struct wm *wm, struct key *key)
 {
 	(void)key;
-	monitor_set_ws(wm->selmon, wm->dpy, wm->root, wm->selmon->prevws);
+	monitor_set_ws(wm->selmon, wm->dpy, wm->root, wm->selmon->prevws_i);
 }
 
 int
@@ -959,7 +958,7 @@ set_monitor(struct wm *wm, struct monitor *mon)
 		monitor_focus(mon, mon->sel, wm->dpy, wm->root);
 
 		ewmh_root_set_current_desktop(wm->dpy, wm->root,
-				mon->num * N_WORKSPACES + mon->selws);
+				mon->num * N_WORKSPACES + mon->selws_i);
 	}
 }
 

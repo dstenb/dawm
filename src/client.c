@@ -235,7 +235,7 @@ client_setup(struct client *c, struct monitor *selmon, struct monitor *mons,
 		ws = trans->ws;
 	} else {
 		c->mon = selmon;
-		ws = selmon->selws;
+		ws = selmon->selws_i;
 
 		/* (try to) get previous desktop value and set the monitor
 		 * and workspace according to that */

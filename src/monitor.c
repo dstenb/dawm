@@ -221,8 +221,9 @@ monitor_create(int num, int x, int y, int w, int h,
 	mon->mw = mon->ww = w;
 	mon->mh = mon->wh = h;
 
-	mon->selws = MIN_WS;
-	mon->prevws = mon->selws;
+	mon->selws_i = MIN_WS;
+	mon->prevws_i = mon->selws_i;
+	mon->selws = &mon->ws[mon->selws_i];
 
 	for (i = 0; i < N_WORKSPACES; i++) {
 		snprintf(mon->ws[i].name, WS_NAME_SIZE, "%i", (i + 1));
@@ -243,7 +244,7 @@ monitor_draw_bar(struct monitor *mon, Display *dpy)
 	char buf[512];
 	char timestr[64];
 	const struct sysinfo *i = sysinfo();
-	const char *layoutstr = layout_symbol(mon->ws[mon->selws].layout);
+	const char *layoutstr = layout_symbol(mon->selws->layout);
 
 	strftime(timestr, sizeof(timestr), "%y/%m/%d %H:%M",
 			localtime(&i->time));
@@ -260,7 +261,7 @@ monitor_draw_bar(struct monitor *mon, Display *dpy)
 
 	snprintf(buf, sizeof(buf), "  %i:%lu  [%s]  %s  UPTIME: %ld:%02ld  "
 			"CPU: %i%c  MEM: %ld/%ldMB  BAT: %s%i%c",
-			mon->num + 1, mon->selws + 1, layoutstr, timestr,
+			mon->num + 1, mon->selws_i + 1, layoutstr, timestr,
 			i->uptime / 3600, (i->uptime / 60) % 60,
 			i->cpu, '%', i->mem_used / 1024, i->mem_total / 1024,
 			batstr, i->bat_level, '%');
@@ -326,7 +327,7 @@ monitor_free(struct monitor *mon, Display *dpy)
 void
 monitor_move_clients(struct monitor *mon, Display *dpy)
 {
-	struct layout *layout = mon->ws[mon->selws].layout;
+	struct layout *layout = mon->selws->layout;
 	struct layout_pos *pos;
 	struct client *c;
 	unsigned i;
@@ -405,13 +406,13 @@ monitor_select_client(struct monitor *mon, struct client *c,
 	if (!ISSELECTABLE(c))
 		return;
 
-	if (mon->selws != c->ws && !switch_to_ws)
+	if (mon->selws_i != c->ws && !switch_to_ws)
 		return;
 
 	monitor_unfocus_selected(mon, dpy, root);
 	mon->sel = c;
 
-	if (mon->selws == c->ws) {
+	if (mon->selws_i == c->ws) {
 		monitor_focus(mon, c, dpy, root);
 		monitor_restack(mon, dpy);
 	} else {
@@ -455,7 +456,7 @@ monitor_set_layout(struct monitor *mon, Display *dpy, int id)
 {
 	assert(id >= 0 && id < LASTLayout);
 
-	layout_set(mon->ws[mon->selws].layout, id);
+	layout_set(mon->selws->layout, id);
 	monitor_arrange(mon, dpy);
 }
 
@@ -466,8 +467,9 @@ monitor_set_ws(struct monitor *mon, Display *dpy, Window root,
 {
 	assert(VALID_WORKSPACE(ws));
 
-	mon->prevws = mon->selws;
-	mon->selws = ws;
+	mon->prevws_i = mon->selws_i;
+	mon->selws_i = ws;
+	mon->selws = &mon->ws[ws];
 
 	monitor_update_window_size(mon);
 	monitor_focus(mon, NULL, dpy, root);
@@ -607,7 +609,7 @@ monitor_update_window_size(struct monitor *mon)
 	mon->wh = mon->mh - top - bottom;
 
 	/* Calculate new layout positions */
-	layout_set_geom(mon->ws[mon->selws].layout, mon->ww, mon->wh);
+	layout_set_geom(mon->selws->layout, mon->ww, mon->wh);
 }
 
 /** Searches through all the monitors for the client
