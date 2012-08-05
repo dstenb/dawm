@@ -47,9 +47,7 @@ static struct key default_keys[] = {
 
 	{ MOD_SUPER,       XK_h,      SetLayoutAction,     "horz",   NULL },
 	{ MOD_SUPER,       XK_v,      SetLayoutAction,     "vert",   NULL },
-	{ MOD_SUPER,       XK_s,      SetLayoutAction,     "matrix", NULL },
 	{ MOD_SUPER,       XK_m,      SetLayoutAction,     "max",    NULL },
-	{ MOD_SUPER,       XK_n,      SetLayoutAction,     "float",  NULL },
 	{ MOD_SUPER,       XK_space,  SetLayoutAction,     "next",   NULL },
 	{ MOD_SHIFT_SUPER, XK_space,  SetLayoutAction,     "prev",   NULL }
 };
