@@ -11,17 +11,65 @@ struct layout_cb {
 	void (*nmaster_changed) (struct layout *, int);
 };
 
-static void
-layout_allocate_pos(struct layout *layout, unsigned n)
-{
-	if (layout->pos)
-		free(layout->pos);
-	layout->pos = xcalloc(n, sizeof(struct layout_pos));
-	layout->n = n;
-}
+void layout_allocate_pos(struct layout *, unsigned);
 
 /* Horizontal layout functions */
-static void
+void horz_arrange(struct layout *);
+void horz_client_added(struct layout *);
+void horz_client_removed(struct layout *);
+void horz_clients_changed(struct layout *, unsigned);
+void horz_geom_changed(struct layout *, int, int);
+void horz_mfact_changed(struct layout *, float);
+void horz_nmaster_changed(struct layout *, int);
+
+/* Vertical layout functions */
+void vert_arrange(struct layout *);
+void vert_client_added(struct layout *);
+void vert_client_removed(struct layout *);
+void vert_clients_changed(struct layout *, unsigned);
+void vert_geom_changed(struct layout *, int, int);
+void vert_mfact_changed(struct layout *, float);
+void vert_nmaster_changed(struct layout *, int);
+
+/* Max layout functions */
+void max_arrange(struct layout *);
+void max_client_added(struct layout *);
+void max_client_removed(struct layout *);
+void max_clients_changed(struct layout *, unsigned);
+void max_geom_changed(struct layout *, int, int);
+
+/** Callbacks */
+static struct layout_cb callbacks[LASTLayout] = {
+	{
+		.arrange = horz_arrange,
+		.client_added = horz_client_added,
+		.client_removed = horz_client_removed,
+		.clients_changed = horz_clients_changed,
+		.geom_changed = horz_geom_changed,
+		.mfact_changed = horz_mfact_changed,
+		.nmaster_changed = horz_nmaster_changed
+	},
+	{
+		.arrange = vert_arrange,
+		.client_added = vert_client_added,
+		.client_removed = vert_client_removed,
+		.clients_changed = vert_clients_changed,
+		.geom_changed = vert_geom_changed,
+		.mfact_changed = vert_mfact_changed,
+		.nmaster_changed = vert_nmaster_changed
+	},
+	{
+		.arrange = max_arrange,
+		.client_added = max_client_added,
+		.client_removed = max_client_removed,
+		.clients_changed = max_clients_changed,
+		.geom_changed = max_geom_changed,
+		.mfact_changed = NULL,
+		.nmaster_changed = NULL
+	}
+};
+
+void
 horz_arrange(struct layout *layout)
 {
 	struct layout_pos *pos;
@@ -33,9 +81,7 @@ horz_arrange(struct layout *layout)
 	else
 		mw = layout->ww;
 
-	for (i = my = ty = 0; i < layout->n; i++) {
-		pos = &layout->pos[i];
-
+	for (i = my = ty = 0, pos = layout->pos; i < layout->n; i++, pos++) {
 		if (i < layout->nmaster) {
 			pos->x = 0;
 			pos->y = my;
@@ -54,7 +100,7 @@ horz_arrange(struct layout *layout)
 	}
 }
 
-static void
+void
 horz_client_added(struct layout *layout)
 {
 	/* TODO */
@@ -62,7 +108,7 @@ horz_client_added(struct layout *layout)
 	horz_arrange(layout);
 }
 
-static void
+void
 horz_client_removed(struct layout *layout)
 {
 	/* TODO */
@@ -72,7 +118,7 @@ horz_client_removed(struct layout *layout)
 	}
 }
 
-static void
+void
 horz_clients_changed(struct layout *layout, unsigned n)
 {
 	/* TODO */
@@ -80,7 +126,7 @@ horz_clients_changed(struct layout *layout, unsigned n)
 	horz_arrange(layout);
 }
 
-static void
+void
 horz_geom_changed(struct layout *layout, int ww, int wh)
 {
 	/* TODO: handle width and height diffs instead of re-arranging */
@@ -90,29 +136,106 @@ horz_geom_changed(struct layout *layout, int ww, int wh)
 	horz_arrange(layout);
 }
 
-static void
+void
 horz_mfact_changed(struct layout *layout, float mfact)
 {
 	/* TODO */
 }
 
-static void
+void
 horz_nmaster_changed(struct layout *layout, int nmaster)
 {
 	/* TODO */
 }
 
-static struct layout_cb callbacks[LASTLayout] = {
-	{
-		.arrange = horz_arrange,
-		.client_added = horz_client_added,
-		.client_removed = horz_client_removed,
-		.clients_changed = horz_clients_changed,
-		.geom_changed = horz_geom_changed,
-		.mfact_changed = horz_mfact_changed,
-		.nmaster_changed = horz_nmaster_changed
+void
+vert_arrange(struct layout *layout)
+{
+
+}
+
+void
+vert_client_added(struct layout *layout)
+{
+
+}
+
+void
+vert_client_removed(struct layout *layout)
+{
+
+}
+
+void
+vert_clients_changed(struct layout *layout, unsigned n)
+{
+
+}
+
+void
+vert_geom_changed(struct layout *layout, int ww, int wh)
+{
+
+}
+
+void
+vert_mfact_changed(struct layout *layout, float mfact)
+{
+
+}
+
+void
+vert_nmaster_changed(struct layout *layout, int nmaster)
+{
+
+}
+
+void
+max_arrange(struct layout *layout)
+{
+	struct layout_pos *pos;
+	unsigned int i = 0;
+
+	for (i = 0, pos = layout->pos; i < layout->n; i++, pos++) {
+		pos->x = 0;
+		pos->y = 0;
+		pos->w = layout->ww;
+		pos->h = layout->wh;
 	}
-};
+}
+
+void
+max_client_added(struct layout *layout)
+{
+	layout_allocate_pos(layout, layout->n + 1);
+	max_arrange(layout);
+}
+
+void
+max_client_removed(struct layout *layout)
+{
+	if (layout->n > 0) {
+		layout_allocate_pos(layout, layout->n - 1);
+		max_arrange(layout);
+	}
+}
+
+void
+max_clients_changed(struct layout *layout, unsigned n)
+{
+	layout_allocate_pos(layout, n);
+	max_arrange(layout);
+}
+
+void
+max_geom_changed(struct layout *layout, int ww, int wh)
+{
+	/* TODO: handle width and height diffs instead of re-arranging */
+	layout->ww = ww;
+	layout->wh = wh;
+
+	max_arrange(layout);
+}
 
 struct layout *
 layout_init(LayoutID id, int mw, int mh, int ww, int wh,
@@ -139,6 +262,15 @@ layout_add_client(struct layout *layout)
 {
 	if (callbacks[layout->id].client_added)
 		callbacks[layout->id].client_added(layout);
+}
+
+void
+layout_allocate_pos(struct layout *layout, unsigned n)
+{
+	if (layout->pos)
+		free(layout->pos);
+	layout->pos = xcalloc(n, sizeof(struct layout_pos));
+	layout->n = n;
 }
 
 void
@@ -197,17 +329,22 @@ layout_set_nmaster(struct layout *layout, unsigned nmaster)
 	layout->nmaster = nmaster;
 }
 
+int
+layout_str2id(const char *str)
+{
+	if (STREQ(str, "horz"))
+		return TileHorzLayout;
+	else if (STREQ(str, "vert"))
+		return TileVertLayout;
+	else if (STREQ(str, "max"))
+		return MaxLayout;
+	return -1;
+}
+
 const char *
 layout_symbol(const struct layout *layout)
 {
-	switch(layout->id) {
-		case TileHorzLayout:
-			return "|";
-		case TileVertLayout:
-			return "-";
-		case MaxLayout:
-			return "M";
-		default:
-			return "";
-	}
+	static const char *symbols[] = { "|", "-", "M" };
+
+	return (layout->id < LASTLayout) ? symbols[layout->id] : "";
 }
