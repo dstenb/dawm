@@ -1,5 +1,16 @@
 #include "layouts.h"
 
+/** Callback struct */
+struct layout_cb {
+	void (*arrange) (struct layout *);
+	void (*client_added) (struct layout *);
+	void (*client_removed) (struct layout *);
+	void (*clients_changed) (struct layout *, unsigned);
+	void (*geom_changed) (struct layout *, int, int);
+	void (*mfact_changed) (struct layout *, float);
+	void (*nmaster_changed) (struct layout *, int);
+};
+
 static void
 layout_allocate_pos(struct layout *layout, unsigned n)
 {
@@ -9,15 +20,7 @@ layout_allocate_pos(struct layout *layout, unsigned n)
 	layout->n = n;
 }
 
-struct layout_cb {
-	void (*arrange) (struct layout *);
-	void (*clients_changed) (struct layout *, unsigned);
-	void (*geom_changed) (struct layout *, int, int);
-	void (*mfact_changed) (struct layout *);
-	void (*nmaster_changed) (struct layout *);
-};
-
-/*** Horizontal layout functions ***/
+/* Horizontal layout functions */
 static void
 horz_arrange(struct layout *layout)
 {
@@ -52,6 +55,24 @@ horz_arrange(struct layout *layout)
 }
 
 static void
+horz_client_added(struct layout *layout)
+{
+	/* TODO */
+	layout_allocate_pos(layout, layout->n + 1);
+	horz_arrange(layout);
+}
+
+static void
+horz_client_removed(struct layout *layout)
+{
+	/* TODO */
+	if (layout->n > 0) {
+		layout_allocate_pos(layout, layout->n - 1);
+		horz_arrange(layout);
+	}
+}
+
+static void
 horz_clients_changed(struct layout *layout, unsigned n)
 {
 	/* TODO */
@@ -70,13 +91,13 @@ horz_geom_changed(struct layout *layout, int ww, int wh)
 }
 
 static void
-horz_mfact_changed(struct layout *layout)
+horz_mfact_changed(struct layout *layout, float mfact)
 {
 	/* TODO */
 }
 
 static void
-horz_nmaster_changed(struct layout *layout)
+horz_nmaster_changed(struct layout *layout, int nmaster)
 {
 	/* TODO */
 }
@@ -84,14 +105,14 @@ horz_nmaster_changed(struct layout *layout)
 static struct layout_cb callbacks[LASTLayout] = {
 	{
 		.arrange = horz_arrange,
+		.client_added = horz_client_added,
+		.client_removed = horz_client_removed,
 		.clients_changed = horz_clients_changed,
 		.geom_changed = horz_geom_changed,
 		.mfact_changed = horz_mfact_changed,
 		.nmaster_changed = horz_nmaster_changed
 	}
 };
-
-
 
 struct layout *
 layout_init(LayoutID id, int mw, int mh, int ww, int wh,
@@ -111,6 +132,20 @@ layout_init(LayoutID id, int mw, int mh, int ww, int wh,
 	layout->id = id;
 
 	return layout;
+}
+
+void
+layout_add_client(struct layout *layout)
+{
+	if (callbacks[layout->id].client_added)
+		callbacks[layout->id].client_added(layout);
+}
+
+void
+layout_remove_client(struct layout *layout)
+{
+	if (callbacks[layout->id].client_removed)
+		callbacks[layout->id].client_removed(layout);
 }
 
 void
@@ -143,21 +178,23 @@ layout_set_geom(struct layout *layout, int ww, int wh)
 void
 layout_set_mfact(struct layout *layout, float mfact)
 {
-#if 0
-	layout->mfact = MAX(0.01, MIN(0.99, mfact));
+	mfact = MAX(0.01, MIN(0.99, mfact));
+
 	if (callbacks[layout->id].mfact_changed)
-		callbacks[layout->id].mfact_changed(layout);
-#endif
+		callbacks[layout->id].mfact_changed(layout, mfact);
+
+	layout->mfact = mfact;
 }
 
 void
 layout_set_nmaster(struct layout *layout, unsigned nmaster)
 {
-#if 0
-	layout->nmaster = MAX(1, MIN(4, nmaster));
+	nmaster = MIN(4, nmaster);
+
 	if (callbacks[layout->id].nmaster_changed)
-		callbacks[layout->id].nmaster_changed(layout);
-#endif
+		callbacks[layout->id].nmaster_changed(layout, nmaster);
+
+	layout->nmaster = nmaster;
 }
 
 const char *
