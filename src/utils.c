@@ -149,6 +149,17 @@ xmalloc(size_t size)
 	return data;
 }
 
+/** A realloc() wrapper that will exit if unable to allocate */
+void *
+xrealloc(void *p, size_t size)
+{
+	void *data;
+
+	if (!(data = realloc(p, size)))
+		die("couldn't realloc %p to %u bytes\n", p, size);
+	return data;
+}
+
 /** A strdup() wrapper that will exit if unable to allocate */
 char *
 xstrdup(const char *str)
