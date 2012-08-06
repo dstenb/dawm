@@ -13,6 +13,10 @@ static void handler_clientmessage_client(struct wm *, XClientMessageEvent *);
 static void handler_clientmessage_root(struct wm *, XClientMessageEvent *);
 static void handler_configurerequest_resize(struct wm *, struct client *,
 		XConfigureRequestEvent *);
+static void handler_motionnotify_move(struct wm *, struct client *,
+		XMotionEvent *);
+static void handler_motionnotify_resize(struct wm *, struct client *,
+		XMotionEvent *);
 static void handler_propertynotify_client(struct wm *, XPropertyEvent *);
 static void handler_propertynotify_root(struct wm *, XPropertyEvent *);
 static int manageable_window(Display *, Window, XWindowAttributes *, int);
@@ -580,9 +584,27 @@ void
 handler_motionnotify(struct wm *wm, XEvent *ev)
 {
 	XMotionEvent *mev = &ev->xmotion;
+	struct monitor *mon;
 	struct client *c;
 
 	if ((c = find_client_by_window(wm->mons, mev->window))) {
+		while(XCheckTypedEvent(wm->dpy, MotionNotify, ev));
+
+		/* TODO: select client */
+
+		if (wm->motion.type == MovementMotion)
+			handler_motionnotify_move(wm, c, mev);
+		else if (wm->motion.type == ResizeMotion)
+			handler_motionnotify_resize(wm, c, mev);
+	} else {
+		mon = find_monitor_by_pos(wm->mons, mev->x_root, mev->y_root);
+		set_monitor(wm, mon);
+	}
+}
+
+void
+handler_motionnotify_move(struct wm *wm, struct client *c, XMotionEvent *ev)
+{
 		int xdiff, ydiff;
 		int x, y, w, h;
 
@@ -590,33 +612,53 @@ handler_motionnotify(struct wm *wm, XEvent *ev)
 		y = c->y;
 		w = c->w;
 		h = c->h;
+		xdiff = ev->x_root - wm->motion.start.x_root;
+		ydiff = ev->y_root - wm->motion.start.y_root;
 
-		while(XCheckTypedEvent(wm->dpy, MotionNotify, ev));
+		x = wm->motion.attr.x + xdiff;
+		y = wm->motion.attr.y + ydiff;
 
-		xdiff = mev->x_root - wm->motion.start.x_root;
-		ydiff = mev->y_root - wm->motion.start.y_root;
+		client_move_resize(c, wm->dpy, x, y, w, h);
+		monitor_float_selected(wm->selmon, wm->dpy, 1);
 
-		if (wm->motion.type == ResizeMotion) {
-			if (!c->floating) { /* TODO: check if the monitor is arranged */
-				w = c->ow;
-				h = c->oh;
-			} else {
-				w = wm->motion.attr.width + xdiff;
-				h = wm->motion.attr.height + ydiff;
-			}
-		} else if (wm->motion.type == MovementMotion) {
-			x = wm->motion.attr.x + xdiff;
-			y = wm->motion.attr.y + ydiff;
+		snprintf(wm->selmon->str, 1024,  "%i %i %i %i "
+				"(xroot: %i, yroot: %i) "
+				"(xdiff: %i, ydiff: %i)\n",
+				x, y, w, h, ev->x_root, ev->y_root,
+				xdiff, ydiff);
+		monitor_draw_bar(wm->selmon, wm->dpy);
+}
+
+void
+handler_motionnotify_resize(struct wm *wm, struct client *c, XMotionEvent *ev)
+{
+		int xdiff, ydiff;
+		int x, y, w, h;
+
+		x = c->x;
+		y = c->y;
+		w = c->w;
+		h = c->h;
+		xdiff = ev->x_root - wm->motion.start.x_root;
+		ydiff = ev->y_root - wm->motion.start.y_root;
+
+		if (!c->floating) { /* TODO: check if the monitor is arranged */
+			w = c->ow;
+			h = c->oh;
+		} else {
+			w = wm->motion.attr.width + xdiff;
+			h = wm->motion.attr.height + ydiff;
 		}
 
 		client_move_resize(c, wm->dpy, x, y, w, h);
 		monitor_float_selected(wm->selmon, wm->dpy, 1);
-	} else {
-		struct monitor *mon = find_monitor_by_pos(wm->mons,
-				mev->x_root, mev->y_root);
 
-		set_monitor(wm, mon);
-	}
+		snprintf(wm->selmon->str, 1024,  "%i %i %i %i "
+				"(xroot: %i, yroot: %i) "
+				"(xdiff: %i, ydiff: %i)\n",
+				x, y, w, h, ev->x_root, ev->y_root,
+				xdiff, ydiff);
+		monitor_draw_bar(wm->selmon, wm->dpy);
 }
 
 void

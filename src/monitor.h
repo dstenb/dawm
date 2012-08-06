@@ -35,6 +35,7 @@ struct monitor {
 	unsigned long prevws_i;     /* previous workspace index */
 	struct ws ws[N_WORKSPACES]; /* workspace information */
 	struct monitor *next;       /* next monitor */
+	char str[1024];
 };
 
 #define monitor_toggle_bar(M, D) monitor_show_bar(M, D, !M->bar->showbar);

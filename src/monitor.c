@@ -259,8 +259,8 @@ monitor_draw_bar(struct monitor *mon, Display *dpy)
 	else
 		batstr = "";
 
-	snprintf(buf, sizeof(buf), "  %i:%lu  [%s]  %s  UPTIME: %ld:%02ld  "
-			"CPU: %i%c  MEM: %ld/%ldMB  BAT: %s%i%c",
+	snprintf(buf, sizeof(buf), "'%s'  %i:%lu  [%s]  %s  UPTIME: %ld:%02ld  "
+			"CPU: %i%c  MEM: %ld/%ldMB  BAT: %s%i%c", mon->str,
 			mon->num + 1, mon->selws_i + 1, layoutstr, timestr,
 			i->uptime / 3600, (i->uptime / 60) % 60,
 			i->cpu, '%', i->mem_used / 1024, i->mem_total / 1024,
