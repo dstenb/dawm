@@ -14,12 +14,6 @@
  * adjustments for monitor offset and border width isn't handled here.
  */
 
-#define layout_dec_mfact(L) layout_set_mfact((L), (L)->mfact - M_FACTSTEP);
-#define layout_inc_mfact(L) layout_set_mfact((L), (L)->mfact + M_FACTSTEP);
-
-#define layout_dec_nmaster(L) layout_set_nmaster(L, (L)->nmaster - 1);
-#define layout_inc_nmaster(L) layout_set_nmaster(L, (L)->nmaster + 1);
-
 typedef enum {
 	TileHorzLayout,
 	TileVertLayout,

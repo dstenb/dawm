@@ -775,19 +775,13 @@ void
 key_handler_setmfact(struct wm *wm, struct key *key)
 {
 	struct monitor *mon = wm->selmon;
+	struct layout *layout = mon->selws->layout;
 
 	if (key->args) {
-	/* TODO */
-#if 0
-		if (STREQ(key->args, "+")) {
-			mon->ws[mon->selws].mfact = MIN(0.99,
-					mon->ws[mon->selws].mfact + M_FACTSTEP);
-		} else if (STREQ(key->args, "-")) {
-			mon->ws[mon->selws].mfact = MAX(0.01,
-					mon->ws[mon->selws].mfact - M_FACTSTEP);
-		}
-#endif
-
+		if (STREQ(key->args, "+"))
+			layout_set_mfact(layout, layout->mfact + M_FACTSTEP);
+		else if (STREQ(key->args, "-"))
+			layout_set_mfact(layout, layout->mfact - M_FACTSTEP);
 		monitor_arrange(wm->selmon, wm->dpy);
 	}
 }
@@ -796,18 +790,13 @@ void
 key_handler_setmnum(struct wm *wm, struct key *key)
 {
 	struct monitor *mon = wm->selmon;
+	struct layout *layout = mon->selws->layout;
 
 	if (key->args) {
-	/* TODO */
-#if 0
-		if (STREQ(key->args, "+")) {
-			mon->ws[mon->selws].nmaster++;
-		} else if (STREQ(key->args, "-")) {
-			mon->ws[mon->selws].nmaster = MAX(1,
-					mon->ws[mon->selws].nmaster - 1);
-		}
-#endif
-
+		if (STREQ(key->args, "+"))
+			layout_set_nmaster(layout, layout->nmaster + 1);
+		else if (STREQ(key->args, "-") && layout->nmaster > 0)
+			layout_set_nmaster(layout, layout->nmaster - 1);
 		monitor_arrange(wm->selmon, wm->dpy);
 	}
 }

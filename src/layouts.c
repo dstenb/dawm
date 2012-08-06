@@ -1,5 +1,8 @@
 #include "layouts.h"
 
+#define MW(N, NM, W, MF) ((N > NM) ? (NM ? (W * MF) : 0) : W)
+#define MH(N, NM, H, MF) ((N > NM) ? (NM ? (H * MF) : 0) : H)
+
 /** Callback struct */
 struct layout_cb {
 	void (*arrange) (struct layout *);
@@ -75,10 +78,7 @@ horz_arrange(struct layout *layout)
 	struct layout_pos *pos;
 	unsigned int i, mw, my, ty;
 
-	if (layout->n > layout->nmaster)
-		mw = layout->nmaster ? layout->ww * layout->mfact : 0;
-	else
-		mw = layout->ww;
+	mw = MW(layout->n, layout->nmaster, layout->ww, layout->mfact);
 
 	for (i = my = ty = 0, pos = layout->pos; i < layout->n; i++, pos++) {
 		if (i < layout->nmaster) {
@@ -91,7 +91,7 @@ horz_arrange(struct layout *layout)
 		} else {
 			pos->x = mw;
 			pos->y = ty;
-			pos->w = mw;
+			pos->w = layout->ww - mw;
 			pos->h = (layout->wh - ty) / (layout->n - i);
 			ty += pos->h;
 		}
@@ -137,7 +137,19 @@ horz_geom_changed(struct layout *layout, int ww, int wh)
 void
 horz_mfact_changed(struct layout *layout, float mfact)
 {
-	/* TODO */
+	struct layout_pos *pos;
+	unsigned int i, mw;
+
+	mw = MW(layout->n, layout->nmaster, layout->ww, mfact);
+
+	for (i = 0, pos = layout->pos; i < layout->n; i++, pos++) {
+		if (i < layout->nmaster) {
+			pos->w = mw;
+		} else {
+			pos->x = mw;
+			pos->w = layout->ww - mw;
+		}
+	}
 }
 
 void
@@ -152,10 +164,7 @@ vert_arrange(struct layout *layout)
 	struct layout_pos *pos;
 	unsigned int i, mh, mx, tx;
 
-	if (layout->n > layout->nmaster)
-		mh = layout->nmaster ? layout->wh * layout->mfact : 0;
-	else
-		mh = layout->wh;
+	mh = MH(layout->n, layout->nmaster, layout->wh, layout->mfact);
 
 	for (i = mx = tx = 0, pos = layout->pos; i < layout->n; i++, pos++) {
 		if (i < layout->nmaster) {
@@ -214,7 +223,19 @@ vert_geom_changed(struct layout *layout, int ww, int wh)
 void
 vert_mfact_changed(struct layout *layout, float mfact)
 {
-	/* TODO */
+	struct layout_pos *pos;
+	unsigned int i, mh;
+
+	mh = MH(layout->n, layout->nmaster, layout->wh, mfact);
+
+	for (i = 0, pos = layout->pos; i < layout->n; i++, pos++) {
+		if (i < layout->nmaster) {
+			pos->h = mh;
+		} else {
+			pos->y = mh;
+			pos->h = layout->wh - mh;
+		}
+	}
 }
 
 void
