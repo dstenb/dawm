@@ -291,8 +291,8 @@ monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
 {
 	DBG("%s(%p, %p)\n", __func__, (void *)mon, (void *)c);
 
-	if (!c || !ISFOCUSABLE(c))
-		for (c = mon->cstack; c && !ISFOCUSABLE(c); c = c->snext);
+	if (!c || !ISVISIBLE(c))
+		for (c = mon->cstack; c && !ISVISIBLE(c); c = c->snext);
 	if (mon->sel && mon->sel != c)
 		monitor_unfocus_selected(mon, dpy, root);
 	if (c) {
@@ -302,7 +302,7 @@ monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
 		remove_from_stack(mon, c);
 		add_to_stack(mon, c);
 
-		client_set_focus(c, dpy, root, 1);
+		client_set_focus(c, dpy, root, true);
 	}
 
 	mon->sel = c;
@@ -566,7 +566,7 @@ void
 monitor_unfocus_selected(struct monitor *mon, Display *dpy, Window root)
 {
 	if (mon->sel)
-		client_set_focus(mon->sel, dpy, root, 0);
+		client_set_focus(mon->sel, dpy, root, false);
 }
 
 /** Update the real window size for the given monitor, i.e. the space that

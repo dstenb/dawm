@@ -124,8 +124,8 @@ client_set_border(struct client *c, Display *dpy, int bw)
 	XWindowChanges wc;
 	ColorID cid = WinNormBorder;
 
-	if (c->mon)
-		cid = (c == c->mon->sel) ? WinSelBorder : WinNormBorder;
+	if (c->mon && c->mon->sel == c && !c->neverfocus)
+		cid = WinSelBorder;
 
 	wc.border_width = c->bw = bw;
 	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc);
@@ -155,11 +155,14 @@ client_set_floating(struct client *c, Display *dpy, int floating)
 
 /**  */
 void
-client_set_focus(struct client *c, Display *dpy, Window root, int focus)
+client_set_focus(struct client *c, Display *dpy, Window root, bool focus)
 {
 	if (focus) {
-		XSetWindowBorder(dpy, c->win, color(WinSelBorder));
-		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
+		if (!c->neverfocus) {
+			XSetWindowBorder(dpy, c->win, color(WinSelBorder));
+			XSetInputFocus(dpy, c->win, RevertToPointerRoot,
+					CurrentTime);
+		}
 
 		ewmh_root_set_active_window(dpy, root, c->win);
 		send_event(dpy, c->win, atom(WMTakeFocus));

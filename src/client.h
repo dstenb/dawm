@@ -16,9 +16,8 @@
 #define CLIENT_NAME_SIZE 128
 
 #define ISDOCK(c)               (c->wtype & Dock)
-#define ISFOCUSABLE(c)          (ISVISIBLE(c) && !c->neverfocus)
 #define ISRESIZABLE(c)          (c->floating || !ISARRANGED(c->mon))
-#define ISSELECTABLE(c)         (ISVISIBLE(c) && !c->neverfocus)
+#define ISSELECTABLE(c)         (ISVISIBLE(c) && !ISDOCK(c))
 #define ISTILED(c)              (!c->floating && ISVISIBLE(c))
 #define ISVISIBLE(c)            (c->ws == c->mon->selws_i || c->ws == ALL_WS)
 
@@ -58,7 +57,7 @@ void client_map_window(struct client *, Display *);
 void client_move_resize(struct client *, Display *, int, int, int, int);
 void client_raise(struct client *, Display *);
 void client_set_floating(struct client *, Display *, int);
-void client_set_focus(struct client *, Display *, Window, int);
+void client_set_focus(struct client *, Display *, Window, bool);
 void client_set_fullscreen(struct client *, Display *, int);
 void client_set_state(struct client *, Display *, long);
 void client_set_ws(struct client *, Display *, unsigned long);
