@@ -326,6 +326,20 @@ layout_allocate_pos(struct layout *layout, unsigned n)
 	layout->n = n;
 }
 
+int
+layout_pos_index(struct layout *layout, int x, int y)
+{
+	struct layout_pos *pos;
+	unsigned int i;
+
+	for (i = 0, pos = layout->pos; i < layout->n; i++, pos++) {
+		if (INSIDE(x, y, pos->x, pos->y, pos->w, pos->h))
+			return i;
+	}
+
+	return -1;
+}
+
 void
 layout_remove_client(struct layout *layout)
 {

@@ -41,15 +41,14 @@ struct layout {
 struct layout *layout_init(LayoutID, int, int, int, int, int, float);
 
 void layout_add_client(struct layout *);
+int layout_pos_index(struct layout *, int, int);
 void layout_remove_client(struct layout *);
 void layout_set(struct layout *, LayoutID);
 void layout_set_clients(struct layout *, unsigned);
 void layout_set_geom(struct layout *, int, int);
 void layout_set_mfact(struct layout *, float);
 void layout_set_nmaster(struct layout *, unsigned);
-
 int layout_str2id(const char *);
-
 const char *layout_symbol(const struct layout *);
 
 #endif
