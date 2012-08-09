@@ -21,6 +21,7 @@
 #include "settings.h"
 #include "sysinfo.h"
 #include "utils.h"
+#include "x11.h"
 
 typedef enum {
 	NoMotion,
@@ -35,10 +36,6 @@ struct motion {
 };
 
 struct wm {
-	Display *dpy;           /* main Display struct */
-	Window root;            /* root window */
-	int screen;             /* screen number */
-	int width, height;      /* total width and height (all monitors) */
 	struct monitor *mons;   /* monitor list */
 	struct monitor *selmon; /* selected monitor */
 	struct key *keys;       /* key bindings */

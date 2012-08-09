@@ -19,7 +19,7 @@ static void handler_motionnotify_resize(struct wm *, struct client *,
 		XMotionEvent *);
 static void handler_propertynotify_client(struct wm *, XPropertyEvent *);
 static void handler_propertynotify_root(struct wm *, XPropertyEvent *);
-static int manageable_window(Display *, Window, XWindowAttributes *, int);
+static int manageable_window(Window, XWindowAttributes *, int);
 static void quit(struct wm *, const char *);
 static void remove_client(struct wm *, struct client *, int);
 static void restart(struct wm *);
@@ -134,10 +134,10 @@ checkotherwm(struct wm *wm)
 {
 	xerrxlib = XSetErrorHandler(xerror_checkotherwm);
 	/* this causes an error if some other window manager is running */
-	XSelectInput(wm->dpy, wm->root, SubstructureRedirectMask);
-	XSync(wm->dpy, False);
+	XSelectInput(dpy, root, SubstructureRedirectMask);
+	XSync(dpy, False);
 	XSetErrorHandler(xerror);
-	XSync(wm->dpy, False);
+	XSync(dpy, False);
 }
 
 void
@@ -147,14 +147,14 @@ create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 
 	c = client_create(win, attr);
 
-	tc = find_client_by_trans(wm->mons, wm->dpy, win);
+	tc = find_client_by_trans(wm->mons, dpy, win);
 
-	client_setup(c, wm->selmon, wm->mons, wm->dpy, wm->root, tc);
-	client_map_window(c, wm->dpy);
+	client_setup(c, wm->selmon, wm->mons, dpy, root, tc);
+	client_map_window(c, dpy);
 
-	rules_apply(c, wm->dpy);
+	rules_apply(c, dpy);
 
-	monitor_add_client(c->mon, c, wm->dpy, wm->root);
+	monitor_add_client(c->mon, c, dpy, root);
 }
 
 void
@@ -164,15 +164,15 @@ create_monitors(struct wm *wm)
 	struct monitor *mon;
 	int i, nmon;
 
-	if (XineramaIsActive(wm->dpy)) {
-		XineramaScreenInfo *xsi = XineramaQueryScreens(wm->dpy, &nmon);
+	if (XineramaIsActive(dpy)) {
+		XineramaScreenInfo *xsi = XineramaQueryScreens(dpy, &nmon);
 
 		wm->mons = NULL;
 
 		for (i = 0; i < nmon; i++) {
 			mon = monitor_create(i, xsi[i].x_org, xsi[i].y_org,
 					xsi[i].width, xsi[i].height,
-					wm->dpy, wm->root, wm->screen);
+					dpy, root, screen);
 			wm->mons = monitor_append(wm->mons, mon);
 		}
 
@@ -181,8 +181,8 @@ create_monitors(struct wm *wm)
 	}
 #endif /* XINERAMA */
 
-	wm->selmon = wm->mons = monitor_create(0, 0, 0, wm->width, wm->height,
-			wm->dpy, wm->root, wm->screen);
+	wm->selmon = wm->mons = monitor_create(0, 0, 0, screen_w, screen_h,
+			dpy, root, screen);
 }
 
 int
@@ -195,19 +195,19 @@ destroy(struct wm *wm)
 			remove_client(wm, mon->cstack, 0);
 	}
 
-	bars_free(wm->dpy);
-	cursors_free(wm->dpy);
+	bars_free(dpy);
+	cursors_free(dpy);
 	rules_free();
 
-	XUngrabKey(wm->dpy, AnyKey, AnyModifier, wm->root);
+	XUngrabKey(dpy, AnyKey, AnyModifier, root);
 
 	while (wm->mons)
-		wm->mons = monitor_free(wm->mons, wm->dpy);
+		wm->mons = monitor_free(wm->mons, dpy);
 
-	XSync(wm->dpy, False);
-	XSetInputFocus(wm->dpy, PointerRoot, RevertToPointerRoot,
+	XSync(dpy, False);
+	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot,
 			CurrentTime);
-	XCloseDisplay(wm->dpy);
+	x11_destroy();
 	free(wm);
 	return 0;
 }
@@ -222,7 +222,7 @@ eventloop(struct wm *wm)
 	int n;
 
 	/* get display fd */
-	xfd = ConnectionNumber(wm->dpy);
+	xfd = ConnectionNumber(dpy);
 
 	tv.tv_sec = BAR_UPDATE_RATE;
 	tv.tv_usec = 0;
@@ -237,8 +237,8 @@ eventloop(struct wm *wm)
 				continue;
 			die("select(): %s\n", strerror(errno));
 		} else if (n > 0) {
-			while (XPending(wm->dpy)) {
-				XNextEvent(wm->dpy, &ev);
+			while (XPending(dpy)) {
+				XNextEvent(dpy, &ev);
 				if (event_handler[ev.type])
 					event_handler[ev.type](wm, &ev);
 			}
@@ -260,49 +260,43 @@ init(const char *cmd)
 {
 	struct wm *wm = xcalloc(1, sizeof(struct wm));
 
-	if (!(wm->dpy = XOpenDisplay(NULL)))
-		die("couldn't open display '%s'\n", getenv("DISPLAY"));
-
-	wm->screen = DefaultScreen(wm->dpy);
-	wm->root = RootWindow(wm->dpy, wm->screen);
+	x11_init();
 
 	/* check if another wm is running */
 	checkotherwm(wm);
 
-	wm->width = DisplayWidth(wm->dpy, wm->screen);
-	wm->height = DisplayHeight(wm->dpy, wm->screen);
 	wm->cmd = cmd;
 	wm->keys = settings()->keys;
 	wm->motion.type = NoMotion;
 
 	sysinfo_init();
 
-	colors_init(settings()->colors, wm->dpy, wm->screen);
-	bars_init(wm->dpy, wm->root, wm->screen, settings()->barfont);
+	colors_init(settings()->colors, dpy, screen);
+	bars_init(dpy, root, screen, settings()->barfont);
 
 	/* select events to handle */
-	XSelectInput(wm->dpy, wm->root, WM_EVENT_MASK);
+	XSelectInput(dpy, root, WM_EVENT_MASK);
 
 	/* setup cursors */
-	cursors_init(wm->dpy);
-	cursor_set(wm->root, NormalCursor, wm->dpy);
+	cursors_init(dpy);
+	cursor_set(root, NormalCursor, dpy);
 
 	/* setup key bindings */
-	key_init(wm->dpy);
-	key_grab_all(wm->keys, wm->dpy, wm->root);
+	key_init(dpy);
+	key_grab_all(wm->keys, dpy, root);
 
 	/* init atoms and ewmh */
-	atoms_init(wm->dpy);
-	ewmh_init(wm->dpy, wm->root);
-	ewmh_root_set_name(wm->dpy, wm->root, WMNAME);
+	atoms_init(dpy);
+	ewmh_init(dpy, root);
+	ewmh_root_set_name(dpy, root, WMNAME);
 
 	/* create monitors */
 	create_monitors(wm);
 
 	/* init ewmh desktop functionality */
-	ewmh_root_set_number_of_desktops(wm->dpy, wm->root,
+	ewmh_root_set_number_of_desktops(dpy, root,
 			monitor_count(wm->mons) * N_WORKSPACES);
-	ewmh_root_set_current_desktop(wm->dpy, wm->root, 0);
+	ewmh_root_set_current_desktop(dpy, root, 0);
 
 	get_windows(wm);
 
@@ -319,15 +313,15 @@ get_windows(struct wm *wm)
 	Window *wins;
 	unsigned int i, n;
 
-	if (XQueryTree(wm->dpy, wm->root, &d1, &d2, &wins, &n)) {
+	if (XQueryTree(dpy, root, &d1, &d2, &wins, &n)) {
 		/* normal windows */
 		for (i = 0; i < n; i++) {
-			if (manageable_window(wm->dpy, wins[i], &attr, 0))
+			if (manageable_window(wins[i], &attr, 0))
 				create_client(wm, wins[i], &attr);
 		}
 		/* transient windows */
 		for (i = 0; i < n; i++) {
-			if (manageable_window(wm->dpy, wins[i], &attr, 1))
+			if (manageable_window(wins[i], &attr, 1))
 				create_client(wm, wins[i], &attr);
 		}
 
@@ -350,12 +344,12 @@ handler_buttonpress(struct wm *wm, XEvent *ev)
 	if (!(c = find_client_by_window(wm->mons, bpev->window)))
 		return;
 
-	XGrabPointer(wm->dpy, ev->xbutton.window, True,
+	XGrabPointer(dpy, ev->xbutton.window, True,
 			PointerMotionMask | ButtonReleaseMask, GrabModeAsync,
 			GrabModeAsync, None, None, CurrentTime);
 
 	/* set start motion data */
-	XGetWindowAttributes(wm->dpy, ev->xbutton.window, &wm->motion.attr);
+	XGetWindowAttributes(dpy, ev->xbutton.window, &wm->motion.attr);
 	wm->motion.start = ev->xbutton;
 
 	/* set the motion type */
@@ -372,7 +366,7 @@ handler_buttonrelease(struct wm *wm, XEvent *ev)
 
 	if (wm->motion.start.button == ev->xbutton.button) {
 		wm->motion.type = NoMotion;
-		XUngrabPointer(wm->dpy, CurrentTime);
+		XUngrabPointer(dpy, CurrentTime);
 	}
 }
 
@@ -381,7 +375,7 @@ handler_clientmessage(struct wm *wm, XEvent *ev)
 {
 	dbg_print(wm, __func__);
 
-	if (ev->xclient.window == wm->root)
+	if (ev->xclient.window == root)
 		handler_clientmessage_root(wm, &ev->xclient);
 	else
 		handler_clientmessage_client(wm, &ev->xclient);
@@ -403,7 +397,7 @@ handler_clientmessage_client(struct wm *wm, XClientMessageEvent *ev)
 		 * occurs. the spec is quite ambiguous about this. this
 		 * behaviour might be changed */
 		set_monitor(wm, c->mon);
-		monitor_select_client(c->mon, c, wm->dpy, wm->root, 1);
+		monitor_select_client(c->mon, c, dpy, root, 1);
 	} else if (ev->message_type == atom(WMChangeState)) {
 		if (ev->data.l[0] == IconicState && ev->format == 32) {
 			printf("%s: minimize window\n", __func__);
@@ -415,9 +409,9 @@ handler_clientmessage_client(struct wm *wm, XClientMessageEvent *ev)
 		/* TODO: handle multiple monitors */
 		if ((ws = ev->data.l[0]) != ALL_WS)
 			ws = ws % N_WORKSPACES;
-		client_set_ws(c, wm->dpy, ws);
-		monitor_focus(c->mon, NULL, wm->dpy, wm->root);
-		monitor_arrange(c->mon, wm->dpy);
+		client_set_ws(c, dpy, ws);
+		monitor_focus(c->mon, NULL, dpy, root);
+		monitor_arrange(c->mon, dpy);
 	}
 }
 
@@ -436,6 +430,8 @@ void
 handler_configurerequest_resize(struct wm *wm, struct client *c,
 		XConfigureRequestEvent *ev)
 {
+	(void)wm;
+
 	if (ev->value_mask & CWX)
 		c->x = c->mon->mx + ev->x;
 	if (ev->value_mask & CWY)
@@ -451,7 +447,7 @@ handler_configurerequest_resize(struct wm *wm, struct client *c,
 		c->y = c->mon->my + (c->mon->mh / 2 - HEIGHT(c) / 2);
 
 	if (ISVISIBLE(c))
-		client_move_resize(c, wm->dpy, c->x, c->y, c->w, c->h);
+		client_move_resize(c, dpy, c->x, c->y, c->w, c->h);
 }
 
 void
@@ -475,7 +471,7 @@ handler_configurerequest(struct wm *wm, XEvent *ev)
 		DBG("%s: send XConfigureWindow\n", __func__);
 	}
 
-	XSync(wm->dpy, False);
+	XSync(dpy, False);
 }
 
 void
@@ -483,7 +479,7 @@ handler_configurenotify(struct wm *wm, XEvent *ev)
 {
 	dbg_print(wm, __func__);
 
-	if (ev->xconfigure.window == wm->root) {
+	if (ev->xconfigure.window == root) {
 		/* restart the WM to make sure that any changes to the
 		 * X server are handled (e.g. resolution change etc.) */
 		restart(wm);
@@ -512,7 +508,7 @@ handler_enternotify(struct wm *wm, XEvent *ev)
 	if (!(c = find_client_by_window(wm->mons, cev->window)))
 		return;
 
-	monitor_select_client(c->mon, c, wm->dpy, wm->root, 0);
+	monitor_select_client(c->mon, c, dpy, root, 0);
 }
 
 void
@@ -532,7 +528,7 @@ handler_focusin(struct wm *wm, XEvent *ev)
 
 	/* reacquire focus from a broken client */
 	if(wm->selmon->sel && fcev->window != wm->selmon->sel->win)
-		monitor_focus(wm->selmon, wm->selmon->sel, wm->dpy, wm->root);
+		monitor_focus(wm->selmon, wm->selmon->sel, dpy, root);
 }
 
 void
@@ -544,7 +540,7 @@ handler_keypress(struct wm *wm, XEvent *ev)
 	dbg_print(wm, __func__);
 
 	for (key = wm->keys; key; key = key->next) {
-		if (key_pressed(key, wm->dpy, kev->keycode, kev->state)) {
+		if (key_pressed(key, dpy, kev->keycode, kev->state)) {
 			if (key->action >= 0 && key->action < LASTAction &&
 					key_handler[key->action]) {
 				key_handler[key->action](wm, key);
@@ -573,7 +569,7 @@ handler_maprequest(struct wm *wm, XEvent *ev)
 
 	dbg_print(wm, __func__);
 
-	if(!XGetWindowAttributes(wm->dpy, mrev->window, &attr) ||
+	if(!XGetWindowAttributes(dpy, mrev->window, &attr) ||
 			attr.override_redirect)
 		return;
 	if(!find_client_by_window(wm->mons, mrev->window))
@@ -588,7 +584,7 @@ handler_motionnotify(struct wm *wm, XEvent *ev)
 	struct client *c;
 
 	if ((c = find_client_by_window(wm->mons, mev->window))) {
-		while(XCheckTypedEvent(wm->dpy, MotionNotify, ev));
+		while(XCheckTypedEvent(dpy, MotionNotify, ev));
 
 		/* TODO: select client */
 
@@ -618,15 +614,15 @@ handler_motionnotify_move(struct wm *wm, struct client *c, XMotionEvent *ev)
 		x = wm->motion.attr.x + xdiff;
 		y = wm->motion.attr.y + ydiff;
 
-		client_move_resize(c, wm->dpy, x, y, w, h);
-		monitor_float_selected(wm->selmon, wm->dpy, 1);
+		client_move_resize(c, dpy, x, y, w, h);
+		monitor_float_selected(wm->selmon, dpy, 1);
 
 		snprintf(wm->selmon->str, 1024,  "%i %i %i %i "
 				"(xroot: %i, yroot: %i) "
 				"(xdiff: %i, ydiff: %i)\n",
 				x, y, w, h, ev->x_root, ev->y_root,
 				xdiff, ydiff);
-		monitor_draw_bar(wm->selmon, wm->dpy);
+		monitor_draw_bar(wm->selmon, dpy);
 }
 
 void
@@ -650,15 +646,15 @@ handler_motionnotify_resize(struct wm *wm, struct client *c, XMotionEvent *ev)
 			h = wm->motion.attr.height + ydiff;
 		}
 
-		client_move_resize(c, wm->dpy, x, y, w, h);
-		monitor_float_selected(wm->selmon, wm->dpy, 1);
+		client_move_resize(c, dpy, x, y, w, h);
+		monitor_float_selected(wm->selmon, dpy, 1);
 
 		snprintf(wm->selmon->str, 1024,  "%i %i %i %i "
 				"(xroot: %i, yroot: %i) "
 				"(xdiff: %i, ydiff: %i)\n",
 				x, y, w, h, ev->x_root, ev->y_root,
 				xdiff, ydiff);
-		monitor_draw_bar(wm->selmon, wm->dpy);
+		monitor_draw_bar(wm->selmon, dpy);
 }
 
 void
@@ -666,7 +662,7 @@ handler_propertynotify(struct wm *wm, XEvent *ev)
 {
 	dbg_print(wm, __func__);
 
-	if (ev->xproperty.window == wm->root)
+	if (ev->xproperty.window == root)
 		handler_propertynotify_root(wm, &ev->xproperty);
 	else
 		handler_propertynotify_client(wm, &ev->xproperty);
@@ -681,7 +677,7 @@ handler_propertynotify_client(struct wm *wm, XPropertyEvent *ev)
 		return;
 
 	if (ev->atom == XA_WM_NAME || ev->atom == netatom(NetWMName)) {
-		client_update_title(c, wm->dpy);
+		client_update_title(c, dpy);
 		/* TODO: redraw the bar */
 	} else if (ev->atom == XA_WM_TRANSIENT_FOR) {
 		/* TODO */
@@ -691,11 +687,11 @@ handler_propertynotify_client(struct wm *wm, XPropertyEvent *ev)
 		DBG("normal hints\n");
 	} else if (ev->atom == XA_WM_HINTS) {
 		/* TODO: check for fullscreen and floating */
-		client_update_wm_hints(c, wm->dpy, c == wm->selmon->sel);
+		client_update_wm_hints(c, dpy, c == wm->selmon->sel);
 		DBG("hints\n");
 	} else if (ev->atom == netatom(NetWMWindowType)) {
 		/* TODO */
-		client_update_window_type(c, wm->dpy);
+		client_update_window_type(c, dpy);
 		DBG("window type\n");
 	}
 }
@@ -725,7 +721,7 @@ handler_unmapnotify(struct wm *wm, XEvent *ev)
 
 	if((c = find_client_by_window(wm->mons, uev->window))) {
 		if(uev->send_event)
-			client_set_state(c, wm->dpy, WithdrawnState);
+			client_set_state(c, dpy, WithdrawnState);
 		else
 			remove_client(wm, c, 0);
 	}
@@ -736,7 +732,7 @@ key_handler_kill(struct wm *wm, struct key *key)
 {
 	(void)key;
 	if (wm->selmon->sel)
-		client_kill(wm->selmon->sel, wm->dpy);
+		client_kill(wm->selmon->sel, dpy);
 }
 
 void
@@ -746,9 +742,9 @@ key_handler_movewindow(struct wm *wm, struct key *key)
 		int ws = atoi(key->args) - 1; /* off-by-one in binding */
 
 		if (VALID_WORKSPACE(ws) && wm->selmon->sel->ws != ALL_WS) {
-			client_set_ws(wm->selmon->sel, wm->dpy, ws);
-			monitor_focus(wm->selmon, NULL, wm->dpy, wm->root);
-			monitor_arrange(wm->selmon, wm->dpy);
+			client_set_ws(wm->selmon->sel, dpy, ws);
+			monitor_focus(wm->selmon, NULL, dpy, root);
+			monitor_arrange(wm->selmon, dpy);
 		}
 	}
 }
@@ -773,10 +769,10 @@ key_handler_select(struct wm *wm, struct key *key)
 	if (key->args) {
 		if (STREQ(key->args, "next")) {
 			monitor_select_next_client(wm->selmon,
-					wm->dpy, wm->root);
+					dpy, root);
 		} else if (STREQ(key->args, "prev")) {
 			monitor_select_prev_client(wm->selmon,
-					wm->dpy, wm->root);
+					dpy, root);
 		} else {
 			error("%s: invalid arg: '%s'", __func__, key->args);
 		}
@@ -800,7 +796,7 @@ key_handler_setlayout(struct wm *wm, struct key *key)
 			nid = layout_str2id(key->args);
 
 		if (nid != -1 && nid != oid)
-			monitor_set_layout(mon, wm->dpy, nid);
+			monitor_set_layout(mon, dpy, nid);
 	}
 }
 
@@ -810,7 +806,7 @@ key_handler_setmaster(struct wm *wm, struct key *key)
 	(void)key;
 
 	monitor_selected_to_master(wm->selmon);
-	monitor_arrange(wm->selmon, wm->dpy);
+	monitor_arrange(wm->selmon, dpy);
 }
 
 void
@@ -824,7 +820,7 @@ key_handler_setmfact(struct wm *wm, struct key *key)
 			layout_set_mfact(layout, layout->mfact + M_FACTSTEP);
 		else if (STREQ(key->args, "-"))
 			layout_set_mfact(layout, layout->mfact - M_FACTSTEP);
-		monitor_arrange(wm->selmon, wm->dpy);
+		monitor_arrange(wm->selmon, dpy);
 	}
 }
 
@@ -839,7 +835,7 @@ key_handler_setmnum(struct wm *wm, struct key *key)
 			layout_set_nmaster(layout, layout->nmaster + 1);
 		else if (STREQ(key->args, "-") && layout->nmaster > 0)
 			layout_set_nmaster(layout, layout->nmaster - 1);
-		monitor_arrange(wm->selmon, wm->dpy);
+		monitor_arrange(wm->selmon, dpy);
 	}
 }
 
@@ -850,7 +846,7 @@ key_handler_setws(struct wm *wm, struct key *key)
 		int ws = atoi(key->args) - 1; /* off-by-one in binding */
 
 		if (ws >= MIN_WS && ws <= MAX_WS)
-			monitor_set_ws(wm->selmon, wm->dpy, wm->root, ws);
+			monitor_set_ws(wm->selmon, dpy, root, ws);
 	}
 }
 
@@ -868,9 +864,9 @@ key_handler_swap(struct wm *wm, struct key *key)
 
 	if (key->args) {
 		if (STREQ(key->args, "next"))
-			monitor_swap_next_client(mon, wm->dpy);
+			monitor_swap_next_client(mon, dpy);
 		else if (STREQ(key->args, "prev"))
-			monitor_swap_prev_client(mon, wm->dpy);
+			monitor_swap_prev_client(mon, dpy);
 	}
 }
 
@@ -878,7 +874,7 @@ void
 key_handler_togglebar(struct wm *wm, struct key *key)
 {
 	(void)key;
-	monitor_toggle_bar(wm->selmon, wm->dpy);
+	monitor_toggle_bar(wm->selmon, dpy);
 }
 
 void
@@ -886,7 +882,7 @@ key_handler_togglefloat(struct wm *wm, struct key *key)
 {
 	(void)key;
 	if (wm->selmon->sel)
-		monitor_float_selected(wm->selmon, wm->dpy,
+		monitor_float_selected(wm->selmon, dpy,
 				!wm->selmon->sel->floating);
 }
 
@@ -899,22 +895,24 @@ key_handler_togglefs(struct wm *wm, struct key *key)
 
 	if (wm->selmon->sel) {
 		fs = !wm->selmon->sel->fullscreen;
-		client_set_fullscreen(wm->selmon->sel, wm->dpy, fs);
+		client_set_fullscreen(wm->selmon->sel, dpy, fs);
 
 		if (!fs)
-			monitor_arrange(wm->selmon, wm->dpy);
+			monitor_arrange(wm->selmon, dpy);
 	}
 }
 
 void
 key_handler_togglews(struct wm *wm, struct key *key)
 {
+	x11_init();
+	x11_destroy();
 	(void)key;
-	monitor_set_ws(wm->selmon, wm->dpy, wm->root, wm->selmon->prevws_i);
+	monitor_set_ws(wm->selmon, dpy, root, wm->selmon->prevws_i);
 }
 
 int
-manageable_window(Display *dpy, Window win, XWindowAttributes *attr,
+manageable_window(Window win, XWindowAttributes *attr,
 		int trans)
 {
 	Window dummy;
@@ -947,12 +945,12 @@ remove_client(struct wm *wm, struct client *c, int destroyed)
 	monitor_remove_client(mon, c);
 
 	if (!destroyed)
-		client_unmap(c, wm->dpy);
+		client_unmap(c, dpy);
 
 	client_free(c);
 
-	monitor_focus(mon, NULL, wm->dpy, wm->root);
-	monitor_arrange(mon, wm->dpy);
+	monitor_focus(mon, NULL, dpy, root);
+	monitor_arrange(mon, dpy);
 
 	update_net_client_list(wm);
 }
@@ -984,11 +982,11 @@ void
 set_monitor(struct wm *wm, struct monitor *mon)
 {
 	if (wm->selmon != mon) {
-		monitor_unfocus_selected(wm->selmon, wm->dpy, wm->root);
+		monitor_unfocus_selected(wm->selmon, dpy, root);
 		wm->selmon = mon;
-		monitor_focus(mon, mon->sel, wm->dpy, wm->root);
+		monitor_focus(mon, mon->sel, dpy, root);
 
-		ewmh_root_set_current_desktop(wm->dpy, wm->root,
+		ewmh_root_set_current_desktop(dpy, root,
 				mon->num * N_WORKSPACES + mon->selws_i);
 	}
 }
@@ -1001,7 +999,7 @@ update_bars(struct wm *wm)
 	sysinfo_update();
 
 	for (mon = wm->mons; mon; mon = mon->next)
-		monitor_draw_bar(mon, wm->dpy);
+		monitor_draw_bar(mon, dpy);
 
 	dbg_print(wm, __func__);
 }
@@ -1012,26 +1010,26 @@ update_net_client_list(struct wm *wm)
 	struct monitor *mon;
 	struct client *c;
 
-	ewmh_root_client_list_clear(wm->dpy, wm->root);
+	ewmh_root_client_list_clear(dpy, root);
 
 	for (mon = wm->mons; mon; mon = mon->next)
 		for (c = mon->clients; c; c = c->next)
-			ewmh_root_client_list_add(wm->dpy, wm->root, c->win);
+			ewmh_root_client_list_add(dpy, root, c->win);
 }
 
 int
-xerror(Display *dpy, XErrorEvent *ee)
+xerror(Display *_dpy, XErrorEvent *ee)
 {
 	error("fatal error: request code=%d, error code=%d\n",
 			ee->request_code, ee->error_code);
 	return 0; /* FIXME: handle/ignore errors in a proper way */
-	return xerrxlib(dpy, ee); /* may call exit */
+	return xerrxlib(_dpy, ee); /* may call exit */
 }
 
 int
-xerror_checkotherwm(Display *dpy, XErrorEvent *ee)
+xerror_checkotherwm(Display *_dpy, XErrorEvent *ee)
 {
-	(void)dpy;
+	(void)_dpy;
 	(void)ee;
 	die("another window manager is running\n");
 	return 0;
