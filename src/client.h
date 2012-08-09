@@ -30,6 +30,15 @@ typedef enum {
 	Dock = 1 << 2
 } ClientType;
 
+struct size_hints {
+	int basew, baseh;
+	int incw, inch;
+	int maxw, maxh;
+	int minw, minh;
+	float mina, maxa;
+	bool fixed;
+};
+
 struct client {
 	char name[CLIENT_NAME_SIZE]; /* title */
 	int x, y, w, h;              /* current position and size */
@@ -42,6 +51,7 @@ struct client {
 	int obw;                     /* old border size */
 	int wtype;                   /* window type bitmask */
 	Window win;                  /* window that belongs to the client */
+	struct size_hints *shints;   /* size hints data */
 	struct strut_data *strut;    /* strut data */
 	struct monitor *mon;         /* monitor that the client is on */
 	unsigned long ws;            /* workspace that the client is on */
@@ -56,9 +66,9 @@ void client_kill(struct client *, Display *);
 void client_map_window(struct client *, Display *);
 void client_move_resize(struct client *, Display *, int, int, int, int);
 void client_raise(struct client *, Display *);
-void client_set_floating(struct client *, Display *, int);
+void client_set_floating(struct client *, Display *, bool);
 void client_set_focus(struct client *, Display *, Window, bool);
-void client_set_fullscreen(struct client *, Display *, int);
+void client_set_fullscreen(struct client *, Display *, bool);
 void client_set_state(struct client *, Display *, long);
 void client_set_ws(struct client *, Display *, unsigned long);
 void client_setup(struct client *, struct monitor *, struct monitor *,
@@ -68,6 +78,6 @@ void client_unmap(struct client *, Display *);
 void client_update_size_hints(struct client *, Display *);
 void client_update_title(struct client *, Display *);
 void client_update_window_type(struct client *, Display *);
-void client_update_wm_hints(struct client *, Display *, int);
+void client_update_wm_hints(struct client *, Display *, bool);
 
 #endif

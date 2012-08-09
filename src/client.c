@@ -1,12 +1,10 @@
 #include "client.h"
 
+/* Mask macros */
 #define BUTTON_MASK (ButtonPressMask | ButtonReleaseMask)
-
 #define BUTTON_MOD MOD_SUPER
-
 #define EVENT_MASK (EnterWindowMask | FocusChangeMask | \
 	PropertyChangeMask | StructureNotifyMask)
-
 #define MOVE_RESIZE_MASK (CWX | CWY | CWWidth | CWHeight)
 
 void client_grab_buttons(struct client *, Display *);
@@ -36,6 +34,8 @@ client_create(Window win, XWindowAttributes *wa)
 	c->next = NULL;
 	c->snext = NULL;
 	c->win = win;
+
+	c->shints = xcalloc(1, sizeof(struct size_hints));
 	c->strut = xcalloc(1, sizeof(struct strut_data));
 
 	return c;
@@ -45,6 +45,8 @@ client_create(Window win, XWindowAttributes *wa)
 void
 client_free(struct client *c)
 {
+	free(c->shints);
+	free(c->strut);
 	free(c);
 }
 
@@ -134,7 +136,7 @@ client_set_border(struct client *c, Display *dpy, int bw)
 
 /**  */
 void
-client_set_floating(struct client *c, Display *dpy, int floating)
+client_set_floating(struct client *c, Display *dpy, bool floating)
 {
 	if (floating) {
 		if (!c->floating)
@@ -173,7 +175,7 @@ client_set_focus(struct client *c, Display *dpy, Window root, bool focus)
 
 /**  */
 void
-client_set_fullscreen(struct client *c, Display *dpy, int fullscreen)
+client_set_fullscreen(struct client *c, Display *dpy, bool fullscreen)
 {
 	if (fullscreen) {
 		ewmh_client_set_state(dpy, c->win, netatom(NetWMFullscreen));
@@ -251,14 +253,14 @@ client_setup(struct client *c, struct monitor *selmon, struct monitor *mons,
 
 	client_set_ws(c, dpy, ws);
 	client_set_border(c, dpy, settings()->bw);
-	/* TODO: configureevent */
 	client_update_window_type(c, dpy);
-	client_update_wm_hints(c, dpy, 1);
-	/* TODO: fix size & wm hints */
-
+	client_update_wm_hints(c, dpy, true);
+	client_update_size_hints(c, dpy);
 	client_select_input(c, dpy);
 	client_grab_buttons(c, dpy);
 
+	if (!c->floating)
+		c->floating = c->shints->fixed;
 	if (c->floating)
 		client_raise(c, dpy);
 
@@ -330,7 +332,54 @@ client_set_dock_wtype(struct client *c, Display *dpy)
 void
 client_update_size_hints(struct client *c, Display *dpy)
 {
+	XSizeHints size;
+	struct size_hints *h = c->shints;
+	long msize;
 
+	/* Reset the data */
+	h->basew = h->baseh = 0;
+	h->incw = h->inch = 0;
+	h->maxw = h->maxh = 0;
+	h->minw = h->minh = 0;
+	h->mina = h->maxa = 0.0;
+	h->fixed = false;
+
+	if (!XGetWMNormalHints(dpy, c->win, &size, &msize))
+		return;
+
+	if (size.flags & PBaseSize) {
+		h->basew = size.base_width;
+		h->baseh = size.base_height;
+	} else if (size.flags & PMinSize) {
+		h->basew = size.min_width;
+		h->baseh = size.min_height;
+	}
+
+	if (size.flags & PResizeInc) {
+		h->incw = size.width_inc;
+		h->inch = size.height_inc;
+	}
+
+	if (size.flags & PMaxSize) {
+		h->maxw = size.max_width;
+		h->maxh = size.max_height;
+	}
+
+	if (size.flags & PMinSize) {
+		h->minw = size.min_width;
+		h->minh = size.min_height;
+	} else if (size.flags & PBaseSize) {
+		h->minw = size.base_width;
+		h->minh = size.base_height;
+	}
+
+	if (size.flags & PAspect) {
+		h->mina = (float) size.min_aspect.y / size.min_aspect.x;
+		h->maxa = (float) size.max_aspect.x / size.max_aspect.y;
+	}
+
+	h->fixed = (h->maxw && h->minw && h->maxh && h->minh
+			&& h->maxw == h->minw && h->maxh == h->minh);
 }
 
 /**  */
@@ -343,7 +392,7 @@ client_update_window_type(struct client *c, Display *dpy)
 
 	if (ewmh_client_get_state(dpy, c->win, &state))
 		if (state == netatom(NetWMFullscreen))
-			client_set_fullscreen(c, dpy, 1);
+			client_set_fullscreen(c, dpy, true);
 
 	if (ewmh_client_get_window_types(dpy, c->win, &types, &n)) {
 		c->wtype = Normal;
@@ -360,7 +409,7 @@ client_update_window_type(struct client *c, Display *dpy)
 }
 
 void
-client_update_wm_hints(struct client *c, Display *dpy, int selected)
+client_update_wm_hints(struct client *c, Display *dpy, bool selected)
 {
 	XWMHints *hints;
 
