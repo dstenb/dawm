@@ -406,13 +406,13 @@ monitor_select_client(struct monitor *mon, struct client *c,
 	if (!ISSELECTABLE(c))
 		return;
 
-	if (mon->selws_i != c->ws && !switch_to_ws)
+	if (mon->selws_i != c->ws && c->ws != ALL_WS && !switch_to_ws)
 		return;
 
 	monitor_unfocus_selected(mon, dpy, root);
 	mon->sel = c;
 
-	if (mon->selws_i == c->ws) {
+	if (mon->selws_i == c->ws || c->ws == ALL_WS) {
 		monitor_focus(mon, c, dpy, root);
 		monitor_restack(mon, dpy);
 	} else {
