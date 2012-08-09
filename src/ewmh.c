@@ -38,61 +38,61 @@ ewmh_init(void)
 	XInternAtoms(dpy, atom_names, ARRSIZE(atom_names), 0, netatoms);
 
 	/* set supported atoms */
-	atom_set_atoms(dpy, root, netatom(NetSupported), netatoms, n_netatoms);
+	atom_set_atoms(root, netatom(NetSupported), netatoms, n_netatoms);
 }
 
 void
 ewmh_root_client_list_add(Window win)
 {
-	atom_append_window(dpy, root, netatom(NetClientList), win);
+	atom_append_window(root, netatom(NetClientList), win);
 }
 
 void
 ewmh_root_client_list_clear(void)
 {
-	atom_delete(dpy, root, netatom(NetClientList));
+	atom_delete(root, netatom(NetClientList));
 }
 
 void
 ewmh_root_set_active_window(Window win)
 {
-	atom_set_window(dpy, root, netatom(NetActiveWindow), win);
+	atom_set_window(root, netatom(NetActiveWindow), win);
 }
 
 void
 ewmh_root_set_current_desktop(unsigned long n)
 {
-	atom_set_cardinal(dpy, root, netatom(NetCurrentDesktop), n);
+	atom_set_cardinal(root, netatom(NetCurrentDesktop), n);
 }
 
 void
 ewmh_root_set_name(char *name)
 {
-	atom_set_string(dpy, root, netatom(NetWMName), name);
+	atom_set_string(root, netatom(NetWMName), name);
 }
 
 void
 ewmh_root_set_number_of_desktops(unsigned long n)
 {
-	atom_set_cardinal(dpy, root, netatom(NetDesktops), n);
+	atom_set_cardinal(root, netatom(NetDesktops), n);
 }
 
 void
 ewmh_root_set_desktop_names(unsigned char *names, unsigned n)
 {
-	atom_set_utf8array(dpy, root, netatom(NetDesktopNames), names, n);
+	atom_set_utf8array(root, netatom(NetDesktopNames), names, n);
 }
 
 int
 ewmh_client_get_desktop(Window win, unsigned long *d)
 {
-	return atom_get_cardinal(dpy, win, netatom(NetDesktop), d);
+	return atom_get_cardinal(win, netatom(NetDesktop), d);
 }
 
 int
 ewmh_client_get_state(Window win, Atom *state)
 {
-	return atom_get_atom(dpy, win, netatom(NetWMState), state);
+	return atom_get_atom(win, netatom(NetWMState), state);
 }
 
 int
@@ -102,7 +102,7 @@ ewmh_client_get_strut(Window win, struct strut_data *sd)
 	unsigned n;
 	int ret = 0;
 
-	if (atom_get_cardinals(dpy, win, netatom(NetWMStrut), &values, &n)) {
+	if (atom_get_cardinals(win, netatom(NetWMStrut), &values, &n)) {
 		if (n == 4) {
 			sd->left = values[0];
 			sd->right = values[1];
@@ -125,7 +125,7 @@ ewmh_client_get_strut_partial(Window win, struct strut_data *sd)
 	unsigned n;
 	int ret = 0;
 
-	if (atom_get_cardinals(dpy, win, netatom(NetWMStrutPartial),
+	if (atom_get_cardinals(win, netatom(NetWMStrutPartial),
 				&values, &n)) {
 		if (n == 12) {
 			sd->left = values[0];
@@ -154,17 +154,17 @@ ewmh_client_get_strut_partial(Window win, struct strut_data *sd)
 int
 ewmh_client_get_window_types(Window win, Atom **t, unsigned *n)
 {
-	return atom_get_atoms(dpy, win, netatom(NetWMWindowType), t, n);
+	return atom_get_atoms(win, netatom(NetWMWindowType), t, n);
 }
 
 void
 ewmh_client_set_desktop(Window win, unsigned long d)
 {
-	atom_set_cardinal(dpy, win, netatom(NetDesktop), d);
+	atom_set_cardinal(win, netatom(NetDesktop), d);
 }
 
 void
 ewmh_client_set_state(Window win, Atom state)
 {
-	atom_set_atom(dpy, win, netatom(NetWMState), state);
+	atom_set_atom(win, netatom(NetWMState), state);
 }
