@@ -9,6 +9,7 @@
 #include <X11/Xutil.h>
 
 #include "utils.h"
+#include "x11.h"
 
 typedef enum {
 	WMChangeState,
@@ -22,20 +23,20 @@ typedef enum {
 } AtomID;
 
 Atom atom(AtomID);
-void atoms_init(Display *);
+void atoms_init(void);
 
-void atom_append_window(Display *, Window, Atom, Window);
-void atom_delete(Display *, Window, Atom);
-int atom_get_atom(Display *, Window, Atom, Atom *);
-int atom_get_atoms(Display *, Window, Atom, Atom **, unsigned *);
-int atom_get_cardinal(Display *, Window, Atom, unsigned long *);
-int atom_get_cardinals(Display *, Window, Atom, unsigned long **, unsigned *);
-int atom_get_string(Display *, Window, Atom, char *, unsigned int);
-void atom_set_atom(Display *, Window, Atom, Atom);
-void atom_set_atoms(Display *, Window, Atom, Atom *, unsigned);
-void atom_set_cardinal(Display *, Window, Atom, unsigned long);
-void atom_set_string(Display *, Window, Atom, char *);
-void atom_set_utf8array(Display *, Window, Atom, unsigned char *, unsigned);
-void atom_set_window(Display *, Window, Atom, Window);
+void atom_append_window(Window, Atom, Window);
+void atom_delete(Window, Atom);
+int atom_get_atom(Window, Atom, Atom *);
+int atom_get_atoms(Window, Atom, Atom **, unsigned *);
+int atom_get_cardinal(Window, Atom, unsigned long *);
+int atom_get_cardinals(Window, Atom, unsigned long **, unsigned *);
+int atom_get_string(Window, Atom, char *, unsigned int);
+void atom_set_atom(Window, Atom, Atom);
+void atom_set_atoms(Window, Atom, Atom *, unsigned);
+void atom_set_cardinal(Window, Atom, unsigned long);
+void atom_set_string(Window, Atom, char *);
+void atom_set_utf8array(Window, Atom, unsigned char *, unsigned);
+void atom_set_window(Window, Atom, Window);
 
 #endif

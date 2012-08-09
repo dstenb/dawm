@@ -22,7 +22,7 @@ atom(AtomID id)
 
 /** Initializes all atoms */
 void
-atoms_init(Display *dpy)
+atoms_init(void)
 {
 	error("%s\n", __func__);
 	XInternAtoms(dpy, atom_names, ARRSIZE(atom_names), 0, atoms);
@@ -30,7 +30,7 @@ atoms_init(Display *dpy)
 
 /** Append a Window to the given Window list property */
 void
-atom_append_window(Display *dpy, Window win, Atom prop, Window propwin)
+atom_append_window(Window win, Atom prop, Window propwin)
 {
 	XChangeProperty(dpy, win, prop, XA_WINDOW, 32, PropModeAppend,
 			(unsigned char *) &(propwin), 1);
@@ -38,14 +38,14 @@ atom_append_window(Display *dpy, Window win, Atom prop, Window propwin)
 
 /** Delete a property */
 void
-atom_delete(Display *dpy, Window win, Atom prop)
+atom_delete(Window win, Atom prop)
 {
 	XDeleteProperty(dpy, win, prop);
 }
 
 /** Get a atom value from the given property */
 int
-atom_get_atom(Display *dpy, Window win, Atom prop, Atom *value)
+atom_get_atom(Window win, Atom prop, Atom *value)
 {
 	Atom a;
 	int f;
@@ -65,8 +65,7 @@ atom_get_atom(Display *dpy, Window win, Atom prop, Atom *value)
 /** Get a list of atom values from the given property. The given list should
  * be freed with XFree() */
 int
-atom_get_atoms(Display *dpy, Window win, Atom prop,
-		Atom **values, unsigned *n_values)
+atom_get_atoms(Window win, Atom prop, Atom **values, unsigned *n_values)
 {
 	Atom a;
 	int f;
@@ -86,19 +85,17 @@ atom_get_atoms(Display *dpy, Window win, Atom prop,
 /** Get a list of cardinal values from the given property. The given list should
  * be freed with XFree() */
 int
-atom_get_cardinals(Display *dpy, Window win, Atom prop,
-		unsigned long **values, unsigned *n_values)
+atom_get_cardinals(Window win, Atom prop, unsigned long **values, unsigned *n)
 {
 	Atom a;
 	int f;
-	unsigned long n, r;
+	unsigned long r;
 	unsigned char *p;
 
 	if (XGetWindowProperty(dpy, win, prop, 0L, 0x7FFFFFFF, False,
-				XA_CARDINAL, &a, &f, &n, &r, &p) == Success
+				XA_CARDINAL, &a, &f, n, &r, &p) == Success
 			&& p) {
 		*values = (Atom *) p;
-		*n_values = n;
 		return 1;
 	}
 
@@ -108,8 +105,7 @@ atom_get_cardinals(Display *dpy, Window win, Atom prop,
 
 /** Get a string value from the given property */
 int
-atom_get_string(Display *dpy, Window win, Atom prop,
-		char *str, unsigned int size)
+atom_get_string(Window win, Atom prop, char *str, unsigned int size)
 {
 	char **list = NULL;
 	int n;
@@ -137,7 +133,7 @@ atom_get_string(Display *dpy, Window win, Atom prop,
 
 /** Get a cardinal value from the given property */
 int
-atom_get_cardinal(Display *dpy, Window win, Atom prop, unsigned long *value)
+atom_get_cardinal(Window win, Atom prop, unsigned long *value)
 {
 	Atom a;
 	int f;
@@ -156,7 +152,7 @@ atom_get_cardinal(Display *dpy, Window win, Atom prop, unsigned long *value)
 
 /** Set the given property to the given atom value */
 void
-atom_set_atom(Display *dpy, Window win, Atom prop, Atom value)
+atom_set_atom(Window win, Atom prop, Atom value)
 {
 	XChangeProperty(dpy, win, prop, XA_ATOM, 32, PropModeReplace,
 			(unsigned char *) &value, 1);
@@ -164,7 +160,7 @@ atom_set_atom(Display *dpy, Window win, Atom prop, Atom value)
 
 /** Set the given property to the list of the given atom value */
 void
-atom_set_atoms(Display *dpy, Window win, Atom prop, Atom *props, unsigned n)
+atom_set_atoms(Window win, Atom prop, Atom *props, unsigned n)
 {
 	XChangeProperty(dpy, win, prop, XA_ATOM, 32, PropModeReplace,
 			(unsigned char *) props, n);
@@ -172,7 +168,7 @@ atom_set_atoms(Display *dpy, Window win, Atom prop, Atom *props, unsigned n)
 
 /** Set the given property to the given cardinal value */
 void
-atom_set_cardinal(Display *dpy, Window win, Atom prop, unsigned long value)
+atom_set_cardinal(Window win, Atom prop, unsigned long value)
 {
 	XChangeProperty(dpy, win, prop, XA_CARDINAL, 32, PropModeReplace,
 			(unsigned char *) &value, 1);
@@ -180,7 +176,7 @@ atom_set_cardinal(Display *dpy, Window win, Atom prop, unsigned long value)
 
 /** Set the given property to the given string value */
 void
-atom_set_string(Display *dpy, Window win, Atom prop, char *str)
+atom_set_string(Window win, Atom prop, char *str)
 {
 	XChangeProperty(dpy, win, prop, XA_STRING, 8, PropModeReplace,
 			(unsigned char *)str, strlen(str));
@@ -188,7 +184,7 @@ atom_set_string(Display *dpy, Window win, Atom prop, char *str)
 
 /** Set the given property to the given UTF-8 array */
 void
-atom_set_utf8array(Display *dpy, Window win, Atom prop,
+atom_set_utf8array(Window win, Atom prop,
 		unsigned char *buf, unsigned size)
 {
 	XChangeProperty(dpy, win, prop, atom(UTF8String),
@@ -197,7 +193,7 @@ atom_set_utf8array(Display *dpy, Window win, Atom prop,
 
 /** Set the given property to the given Window value */
 void
-atom_set_window(Display *dpy, Window win, Atom prop, Window propwin)
+atom_set_window(Window win, Atom prop, Window propwin)
 {
 	XChangeProperty(dpy, win, prop, XA_WINDOW, 32, PropModeReplace,
 			(unsigned char *) &(propwin), 1);
