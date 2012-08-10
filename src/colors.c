@@ -1,6 +1,6 @@
 #include "colors.h"
 
-static unsigned long get_color(Display *, int, const char *);
+static unsigned long get_color(const char *);
 
 static unsigned long colors[LASTColor];
 
@@ -15,7 +15,7 @@ static const char *colorstr[] = {
 };
 
 unsigned long
-get_color(Display *dpy, int screen, const char *str)
+get_color(const char *str)
 {
 	Colormap cmap = DefaultColormap(dpy, screen);
 	XColor c;
@@ -35,12 +35,12 @@ color(ColorID id)
 
 /* initializes the colors */
 void
-colors_init(char *const str[LASTColor], Display *dpy, int screen)
+colors_init(char *const str[LASTColor])
 {
 	int i;
 
 	for (i = 0; i < LASTColor; i++)
-		colors[i] = get_color(dpy, screen, str[i]);
+		colors[i] = get_color(str[i]);
 }
 
 const char *

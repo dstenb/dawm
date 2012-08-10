@@ -8,6 +8,7 @@
 #include <X11/Xlib.h>
 
 #include "utils.h"
+#include "x11.h"
 
 typedef enum {
 	BarBorder,
@@ -22,7 +23,7 @@ typedef enum {
 } ColorID;
 
 unsigned long color(ColorID);
-void colors_init(char * const[LASTColor], Display *, int);
+void colors_init(char * const[LASTColor]);
 const char *color_id2str(ColorID);
 int color_str2id(const char *);
 
