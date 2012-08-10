@@ -10,6 +10,7 @@
 #include "layouts.h"
 #include "settings.h"
 #include "sysinfo.h"
+#include "x11.h"
 
 #define ISARRANGED(M) (true)
 
@@ -38,32 +39,30 @@ struct monitor {
 	char str[1024];
 };
 
-#define monitor_toggle_bar(M, D) monitor_show_bar(M, D, !M->bar->showbar);
+#define monitor_toggle_bar(M) monitor_show_bar(M, !M->bar->showbar);
 
-void monitor_add_client(struct monitor *, struct client *, Display *, Window);
+void monitor_add_client(struct monitor *, struct client *);
 struct monitor *monitor_append(struct monitor *, struct monitor *);
-void monitor_arrange(struct monitor *, Display *);
+void monitor_arrange(struct monitor *);
 int monitor_count(struct monitor *);
-struct monitor *monitor_create(int, int, int, int, int,
-		Display *, Window, int);
-void monitor_draw_bar(struct monitor *, Display *);
-void monitor_float_selected(struct monitor *, Display *, int);
-void monitor_focus(struct monitor *, struct client *, Display *, Window);
-struct monitor *monitor_free(struct monitor *, Display *);
+struct monitor *monitor_create(int, int, int, int, int);
+void monitor_draw_bar(struct monitor *);
+void monitor_float_selected(struct monitor *, int);
+void monitor_focus(struct monitor *, struct client *);
+struct monitor *monitor_free(struct monitor *);
 void monitor_remove_client(struct monitor *, struct client *);
-void monitor_select_client(struct monitor *, struct client *,
-		Display *, Window, int);
-void monitor_select_next_client(struct monitor *, Display *, Window);
-void monitor_select_prev_client(struct monitor *, Display *, Window);
+void monitor_select_client(struct monitor *, struct client *, int);
+void monitor_select_next_client(struct monitor *);
+void monitor_select_prev_client(struct monitor *);
 void monitor_selected_to_master(struct monitor *);
-void monitor_set_layout(struct monitor *, Display *, int);
-void monitor_set_ws(struct monitor *, Display *, Window, unsigned long);
-void monitor_show_bar(struct monitor *, Display *, int);
-void monitor_swap_next_client(struct monitor *, Display *);
-void monitor_swap_prev_client(struct monitor *, Display *);
-void monitor_unfocus_selected(struct monitor *, Display *, Window);
+void monitor_set_layout(struct monitor *, int);
+void monitor_set_ws(struct monitor *, unsigned long);
+void monitor_show_bar(struct monitor *, int);
+void monitor_swap_next_client(struct monitor *);
+void monitor_swap_prev_client(struct monitor *);
+void monitor_unfocus_selected(struct monitor *);
 
-struct client *find_client_by_trans(struct monitor *, Display *, Window);
+struct client *find_client_by_trans(struct monitor *, Window);
 struct client *find_client_by_window(struct monitor *, Window);
 
 struct monitor *find_monitor_by_num(struct monitor *, int);

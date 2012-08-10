@@ -1,8 +1,8 @@
 #include "monitor.h"
 
-static void monitor_move_clients(struct monitor *, Display *);
-static void monitor_restack(struct monitor *, Display *);
-static void monitor_show_hide(struct monitor *, Display *);
+static void monitor_move_clients(struct monitor *);
+static void monitor_restack(struct monitor *);
+static void monitor_show_hide(struct monitor *);
 static void monitor_swap(struct monitor *, struct client *, struct client *);
 static void monitor_update_window_size(struct monitor *);
 
@@ -135,23 +135,22 @@ remove_from_stack(struct monitor *mon, struct client *c)
 
 /** Recursive show/hide client function */
 static void
-show_hide(struct client *c, Display *dpy)
+show_hide(struct client *c)
 {
 	if (c) {
 		if (ISVISIBLE(c)) {
-			client_show(c, dpy, 1);
-			show_hide(c->snext, dpy);
+			client_show(c, 1);
+			show_hide(c->snext);
 		} else {
-			show_hide(c->snext, dpy);
-			client_show(c, dpy, 0);
+			show_hide(c->snext);
+			client_show(c, 0);
 		}
 	}
 }
 
 /** Add client to a monitor */
 void
-monitor_add_client(struct monitor *mon, struct client *c,
-		Display *dpy, Window root)
+monitor_add_client(struct monitor *mon, struct client *c)
 {
 	add_to_clients(mon, c);
 	add_to_stack(mon, c);
@@ -160,8 +159,8 @@ monitor_add_client(struct monitor *mon, struct client *c,
 		monitor_update_window_size(mon);
 
 	/* TODO: check switch_to_ws rule         v */
-	monitor_select_client(mon, c, dpy, root, 0);
-	monitor_arrange(mon, dpy);
+	monitor_select_client(mon, c, 0);
+	monitor_arrange(mon);
 }
 
 /** Append a monitor to another monitor list */
@@ -181,11 +180,11 @@ monitor_append(struct monitor *mons, struct monitor *new)
 
 /** Arrange the clients on the monitor */
 void
-monitor_arrange(struct monitor *mon, Display *dpy)
+monitor_arrange(struct monitor *mon)
 {
-	monitor_show_hide(mon, dpy);
-	monitor_move_clients(mon, dpy);
-	monitor_restack(mon, dpy);
+	monitor_show_hide(mon);
+	monitor_move_clients(mon);
+	monitor_restack(mon);
 }
 
 /** Count number of monitors */
@@ -200,14 +199,12 @@ monitor_count(struct monitor *mon)
 
 /** Creates a monitor */
 struct monitor *
-monitor_create(int num, int x, int y, int w, int h,
-		Display *dpy, Window root, int screen)
+monitor_create(int num, int x, int y, int w, int h)
 {
 	struct monitor *mon = xcalloc(1, sizeof(struct monitor));
 	int i;
 
-	mon->bar = bar_create(settings()->topbar, settings()->showbar,
-			x, y, w, dpy, root, screen);
+	mon->bar = bar_create(settings()->topbar, settings()->showbar, x, y, w);
 	mon->num = num;
 
 	mon->clients = NULL;
@@ -232,14 +229,14 @@ monitor_create(int num, int x, int y, int w, int h,
 				settings()->nmaster, settings()->mfact);
 	}
 
-	monitor_show_bar(mon, dpy, mon->bar->showbar);
+	monitor_show_bar(mon, mon->bar->showbar);
 
 	return mon;
 }
 
 /** Draws the text on the bar */
 void
-monitor_draw_bar(struct monitor *mon, Display *dpy)
+monitor_draw_bar(struct monitor *mon)
 {
 	char buf[512];
 	char timestr[64];
@@ -270,31 +267,30 @@ monitor_draw_bar(struct monitor *mon, Display *dpy)
 			mon->selws + 1, layoutstr, timestr);
 #endif /* SYSINFO_EXTENDED */
 
-	bar_draw(mon->bar, dpy, buf);
+	bar_draw(mon->bar, buf);
 }
 
 /** Set the floating state for the selected client */
 void
-monitor_float_selected(struct monitor *mon, Display *dpy, int floating)
+monitor_float_selected(struct monitor *mon, int floating)
 {
 	if (mon->sel) {
-		client_set_floating(mon->sel, dpy, floating);
-		monitor_arrange(mon, dpy);
+		client_set_floating(mon->sel, floating);
+		monitor_arrange(mon);
 	}
 }
 
 /** Focus on the given client. If no client given, the first available
  * client will be focused */
 void
-monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
-		Window root)
+monitor_focus(struct monitor *mon, struct client *c)
 {
 	DBG("%s(%p, %p)\n", __func__, (void *)mon, (void *)c);
 
 	if (!c || !ISVISIBLE(c))
 		for (c = mon->cstack; c && !ISVISIBLE(c); c = c->snext);
 	if (mon->sel && mon->sel != c)
-		monitor_unfocus_selected(mon, dpy, root);
+		monitor_unfocus_selected(mon);
 	if (c) {
 		/* TODO: fix support for multiple monitors */
 
@@ -302,22 +298,22 @@ monitor_focus(struct monitor *mon, struct client *c, Display *dpy,
 		remove_from_stack(mon, c);
 		add_to_stack(mon, c);
 
-		client_set_focus(c, dpy, root, true);
+		client_set_focus(c, true);
 	}
 
 	mon->sel = c;
 
 	/* TODO draw bar */
-	monitor_draw_bar(mon, dpy);
+	monitor_draw_bar(mon);
 }
 
 /** Frees the given monitor */
 struct monitor *
-monitor_free(struct monitor *mon, Display *dpy)
+monitor_free(struct monitor *mon)
 {
 	struct monitor *next = mon->next;
 
-	bar_free(mon->bar, dpy);
+	bar_free(mon->bar);
 	free(mon);
 
 	return next;
@@ -325,7 +321,7 @@ monitor_free(struct monitor *mon, Display *dpy)
 
 /** Move the tiled clients to the places given by the layout */
 void
-monitor_move_clients(struct monitor *mon, Display *dpy)
+monitor_move_clients(struct monitor *mon)
 {
 	struct layout *layout = mon->selws->layout;
 	struct layout_pos *pos;
@@ -345,7 +341,7 @@ monitor_move_clients(struct monitor *mon, Display *dpy)
 		w = pos->w - (2 * c->bw);
 		h = pos->h - (2 * c->bw);
 
-		client_move_resize(c, dpy, x, y, w, h);
+		client_move_resize(c, x, y, w, h);
 	}
 }
 
@@ -366,18 +362,18 @@ monitor_remove_client(struct monitor *mon, struct client *c)
 
 /** Restack all of the monitor's clients */
 void
-monitor_restack(struct monitor *mon, Display *dpy)
+monitor_restack(struct monitor *mon)
 {
 	struct client *c;
 	XEvent ev;
 	XWindowChanges wc;
 
-	monitor_draw_bar(mon, dpy);
+	monitor_draw_bar(mon);
 
 	if (!mon->sel)
 		return;
 	if (mon->sel->floating || !ISARRANGED(mon))
-		client_raise(mon->sel, dpy);
+		client_raise(mon->sel);
 
 	if (ISARRANGED(mon)) {
 		wc.stack_mode = Below;
@@ -398,8 +394,7 @@ monitor_restack(struct monitor *mon, Display *dpy)
 /** Select the given client and fix focus. The function will do nothing if the
  * client's workspace differs from the current and switch_to_ws is zero */
 void
-monitor_select_client(struct monitor *mon, struct client *c,
-		Display *dpy, Window root, int switch_to_ws)
+monitor_select_client(struct monitor *mon, struct client *c, int switch_to_ws)
 {
 	assert(c->mon == mon);
 
@@ -409,35 +404,35 @@ monitor_select_client(struct monitor *mon, struct client *c,
 	if (mon->selws_i != c->ws && c->ws != ALL_WS && !switch_to_ws)
 		return;
 
-	monitor_unfocus_selected(mon, dpy, root);
+	monitor_unfocus_selected(mon);
 	mon->sel = c;
 
 	if (mon->selws_i == c->ws || c->ws == ALL_WS) {
-		monitor_focus(mon, c, dpy, root);
-		monitor_restack(mon, dpy);
+		monitor_focus(mon, c);
+		monitor_restack(mon);
 	} else {
-		monitor_set_ws(mon, dpy, root, c->ws);
+		monitor_set_ws(mon, c->ws);
 	}
 }
 
 /** Selects the next valid client in the client list */
 void
-monitor_select_next_client(struct monitor *mon, Display *dpy, Window root)
+monitor_select_next_client(struct monitor *mon)
 {
 	struct client *c = NULL;
 
 	if (mon->sel && (c = next_selectable_client(mon->sel)))
-		monitor_select_client(mon, c, dpy, root, 0);
+		monitor_select_client(mon, c, 0);
 }
 
 /** Selects the prevous valid client in the client list */
 void
-monitor_select_prev_client(struct monitor *mon, Display *dpy, Window root)
+monitor_select_prev_client(struct monitor *mon)
 {
 	struct client *c = NULL;
 
 	if (mon->sel && (c = prev_selectable_client(mon->sel)))
-		monitor_select_client(mon, c, dpy, root, 0);
+		monitor_select_client(mon, c, 0);
 }
 
 /** Moves the selected client to the master position */
@@ -452,18 +447,17 @@ monitor_selected_to_master(struct monitor *mon)
 
 /** Set the layout for the selected workspace */
 void
-monitor_set_layout(struct monitor *mon, Display *dpy, int id)
+monitor_set_layout(struct monitor *mon, int id)
 {
 	assert(id >= 0 && id < LASTLayout);
 
 	layout_set(mon->selws->layout, id);
-	monitor_arrange(mon, dpy);
+	monitor_arrange(mon);
 }
 
 /** Set the current workspace */
 void
-monitor_set_ws(struct monitor *mon, Display *dpy, Window root,
-		unsigned long ws)
+monitor_set_ws(struct monitor *mon, unsigned long ws)
 {
 	assert(VALID_WORKSPACE(ws));
 
@@ -472,29 +466,29 @@ monitor_set_ws(struct monitor *mon, Display *dpy, Window root,
 	mon->selws = &mon->ws[ws];
 
 	monitor_update_window_size(mon);
-	monitor_focus(mon, NULL, dpy, root);
-	monitor_arrange(mon, dpy);
+	monitor_focus(mon, NULL);
+	monitor_arrange(mon);
 
-	ewmh_root_set_current_desktop(dpy, root, mon->num * N_WORKSPACES + ws);
+	ewmh_root_set_current_desktop(mon->num * N_WORKSPACES + ws);
 }
 
 /** Show/hide the bar */
 void
-monitor_show_bar(struct monitor *mon, Display *dpy, int show)
+monitor_show_bar(struct monitor *mon, int show)
 {
 	mon->bar->showbar = show ? 1 : 0;
 	monitor_update_window_size(mon);
 	XMoveResizeWindow(dpy, mon->bar->win, mon->wx, mon->bar->y,
 			mon->ww, mon->bar->h);
-	monitor_arrange(mon, dpy);
-	monitor_draw_bar(mon, dpy);
+	monitor_arrange(mon);
+	monitor_draw_bar(mon);
 }
 
 /** Show/hide the clients */
 void
-monitor_show_hide(struct monitor *mon, Display *dpy)
+monitor_show_hide(struct monitor *mon)
 {
-	show_hide(mon->cstack, dpy);
+	show_hide(mon->cstack);
 }
 
 /** Swap the two clients */
@@ -529,7 +523,7 @@ monitor_swap(struct monitor *mon, struct client *c1, struct client *c2)
 
 /** Swaps the currently selected client with the next tiled client */
 void
-monitor_swap_next_client(struct monitor *mon, Display *dpy)
+monitor_swap_next_client(struct monitor *mon)
 {
 	struct client *sel = mon->sel;
 	struct client *c = NULL;
@@ -540,13 +534,13 @@ monitor_swap_next_client(struct monitor *mon, Display *dpy)
 	if (((c = next_tiled(sel->next)) || (c = next_tiled(mon->clients)))
 			&& c != sel) {
 		monitor_swap(mon, sel, c);
-		monitor_arrange(mon, dpy);
+		monitor_arrange(mon);
 	}
 }
 
 /** Swaps the currently selected client with the previous tiled client */
 void
-monitor_swap_prev_client(struct monitor *mon, Display *dpy)
+monitor_swap_prev_client(struct monitor *mon)
 {
 	struct client *sel = mon->sel;
 	struct client *c = NULL;
@@ -557,16 +551,16 @@ monitor_swap_prev_client(struct monitor *mon, Display *dpy)
 	if (((c = prev_tiled(sel->prev)) || (c = last_tiled(mon->clients)))
 			&& c != sel) {
 		monitor_swap(mon, sel, c);
-		monitor_arrange(mon, dpy);
+		monitor_arrange(mon);
 	}
 }
 
 /** Removes focus from the currently selected client */
 void
-monitor_unfocus_selected(struct monitor *mon, Display *dpy, Window root)
+monitor_unfocus_selected(struct monitor *mon)
 {
 	if (mon->sel)
-		client_set_focus(mon->sel, dpy, root, false);
+		client_set_focus(mon->sel, false);
 }
 
 /** Update the real window size for the given monitor, i.e. the space that
@@ -615,7 +609,7 @@ monitor_update_window_size(struct monitor *mon)
 /** Searches through all the monitors for the client
  * that is transient for the given window */
 struct client *
-find_client_by_trans(struct monitor *mon, Display *dpy, Window win)
+find_client_by_trans(struct monitor *mon, Window win)
 {
 	Window trans = None;
 
