@@ -7,6 +7,8 @@
 #include <X11/cursorfont.h>
 #include <X11/Xlib.h>
 
+#include "x11.h"
+
 typedef enum {
 	NormalCursor,
 	MovementCursor,
@@ -15,8 +17,8 @@ typedef enum {
 } CursorID;
 
 Cursor cursor(CursorID);
-void cursor_set(Window, CursorID, Display *);
-void cursors_init(Display *);
-void cursors_free(Display *);
+void cursor_set(Window, CursorID);
+void cursors_init(void);
+void cursors_free(void);
 
 #endif

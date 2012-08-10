@@ -11,14 +11,14 @@ cursor(CursorID id)
 }
 
 void
-cursor_set(Window win, CursorID id, Display *dpy)
+cursor_set(Window win, CursorID id)
 {
 	XDefineCursor(dpy, win, cursor(id));
 }
 
 /** Initializes the cursors */
 void
-cursors_init(Display *dpy)
+cursors_init(void)
 {
 	cursors[NormalCursor] = XCreateFontCursor(dpy, XC_left_ptr);
 	cursors[MovementCursor] = XCreateFontCursor(dpy, XC_fleur);
@@ -27,7 +27,7 @@ cursors_init(Display *dpy)
 
 /** Free all the allocated cursors */
 void
-cursors_free(Display *dpy)
+cursors_free(void)
 {
 	int i;
 
