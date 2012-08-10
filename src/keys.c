@@ -154,7 +154,7 @@ key_free_all(struct key *key)
 
 /** grab all keys */
 void
-key_grab_all(struct key *key, Display *dpy, Window root)
+key_grab_all(struct key *key)
 {
 	int i;
 	unsigned int mod[] = { 0, LockMask, num_lock, num_lock | LockMask };
@@ -170,7 +170,7 @@ key_grab_all(struct key *key, Display *dpy, Window root)
 
 /** update the Num Lock modifier */
 void
-key_init(Display *dpy)
+key_init(void)
 {
 	unsigned int i, j;
 	XModifierKeymap *modmap;
@@ -189,7 +189,7 @@ key_init(Display *dpy)
 
 /** returns non-zero if the key is pressed */
 int
-key_pressed(struct key *key, Display *dpy, KeyCode code, unsigned int state)
+key_pressed(struct key *key, KeyCode code, unsigned int state)
 {
 	return ((XKeysymToKeycode(dpy, key->keysym) == code) &&
 			CLEANMASK(state) == key->mod);

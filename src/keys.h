@@ -8,6 +8,7 @@
 #include <X11/Xlib.h>
 
 #include "utils.h"
+#include "x11.h"
 
 #define MOD_ALT   Mod1Mask
 #define MOD_CTRL  ControlMask
@@ -53,9 +54,9 @@ struct key *key_create(unsigned int, KeySym, KeyAction, const char *,
 		struct key *);
 struct key *key_default_keys(void);
 struct key *key_free_all(struct key *);
-void key_grab_all(struct key *, Display *, Window);
-void key_init(Display *);
-int key_pressed(struct key *, Display *, KeyCode, unsigned int);
+void key_grab_all(struct key *);
+void key_init(void);
+int key_pressed(struct key *, KeyCode, unsigned int);
 
 KeyAction key_str2action(const char *);
 int key_str2mod(const char *);
