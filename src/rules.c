@@ -3,7 +3,7 @@
 struct rule *rule_append(struct rule *, struct rule *);
 static int rule_applicable(const struct rule *, const char *, const char *,
 		const char *);
-static void rule_apply(struct rule *, struct client *, Display *);
+static void rule_apply(struct rule *, struct client *);
 static struct rule *rule_free(struct rule *);
 static void rule_print(const struct rule *);
 
@@ -35,7 +35,7 @@ rule_applicable(const struct rule *rule, const char *class,
 }
 
 void
-rule_apply(struct rule *rule, struct client *c, Display *dpy)
+rule_apply(struct rule *rule, struct client *c)
 {
 	(void)c;
 	(void)dpy;
@@ -97,7 +97,7 @@ rules_add(struct rule *rule)
 }
 
 void
-rules_apply(struct client *c, Display *dpy)
+rules_apply(struct client *c)
 {
 	const char *class;
 	const char *instance;
@@ -113,7 +113,7 @@ rules_apply(struct client *c, Display *dpy)
 
 	for (rule = _rules ; rule; rule = rule->next) {
 		if (rule_applicable(rule, class, instance, c->name))
-			rule_apply(rule, c, dpy);
+			rule_apply(rule, c);
 	}
 
 	if(hint.res_class)

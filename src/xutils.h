@@ -11,9 +11,10 @@
 
 #include "atoms.h"
 #include "utils.h"
+#include "x11.h"
 
-long get_state(Display *, Window win);
-int send_event(Display *, Window, Atom);
+long get_state(Window win);
+int send_event(Window, Atom);
 int xerror_dummy(Display *, XErrorEvent *);
 
 #endif

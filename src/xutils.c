@@ -1,9 +1,9 @@
 #include "xutils.h"
 
-static int has_wm_protocol(Display *, Window, Atom);
+static int has_wm_protocol(Window, Atom);
 
 int
-has_wm_protocol(Display *dpy, Window win, Atom prot)
+has_wm_protocol(Window win, Atom prot)
 {
 	int n;
 	int found = 0;
@@ -19,7 +19,7 @@ has_wm_protocol(Display *dpy, Window win, Atom prot)
 }
 
 long
-get_state(Display *dpy, Window win)
+get_state(Window win)
 {
 	int format;
 	long result = -1;
@@ -38,11 +38,11 @@ get_state(Display *dpy, Window win)
 }
 
 int
-send_event(Display *dpy, Window win, Atom proto)
+send_event(Window win, Atom proto)
 {
 	XEvent ev;
 
-	if (has_wm_protocol(dpy, win, proto)) {
+	if (has_wm_protocol(win, proto)) {
 		ev.type = ClientMessage;
 		ev.xclient.window = win;
 		ev.xclient.message_type = atom(WMProtocols);
@@ -59,9 +59,9 @@ send_event(Display *dpy, Window win, Atom proto)
 }
 
 int
-xerror_dummy(Display *dpy, XErrorEvent *ev)
+xerror_dummy(Display *_dpy, XErrorEvent *ev)
 {
-	(void)dpy;
+	(void)_dpy;
 	(void)ev;
 	return 0;
 }

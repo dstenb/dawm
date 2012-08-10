@@ -6,6 +6,7 @@
 
 #include "client.h"
 #include "utils.h"
+#include "x11.h"
 
 struct client;
 
@@ -34,7 +35,7 @@ struct rule {
 struct rule *rule_create(const char *, const char *, const char *);
 
 void rules_add(struct rule *);
-void rules_apply(struct client *, Display *);
+void rules_apply(struct client *);
 void rules_free(void);
 
 #endif

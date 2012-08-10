@@ -89,13 +89,14 @@ atom_get_cardinals(Window win, Atom prop, unsigned long **values, unsigned *n)
 {
 	Atom a;
 	int f;
-	unsigned long r;
+	unsigned long _n, r;
 	unsigned char *p;
 
 	if (XGetWindowProperty(dpy, win, prop, 0L, 0x7FFFFFFF, False,
-				XA_CARDINAL, &a, &f, n, &r, &p) == Success
+				XA_CARDINAL, &a, &f, &_n, &r, &p) == Success
 			&& p) {
 		*values = (Atom *) p;
+		*n = _n;
 		return 1;
 	}
 
