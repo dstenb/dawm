@@ -13,6 +13,7 @@
 #include "colors.h"
 #include "cursors.h"
 #include "utils.h"
+#include "x11.h"
 
 struct bar {
 	Window win;     /* bar window */
@@ -21,11 +22,11 @@ struct bar {
 	int x, y, w, h; /* bar geometry */
 };
 
-struct bar *bar_create(bool, bool, int, int, int, Display *, Window, int);
-void bar_draw(struct bar *, Display *, const char *str);
-void bar_free(struct bar *, Display *);
+struct bar *bar_create(bool, bool, int, int, int);
+void bar_draw(struct bar *, const char *str);
+void bar_free(struct bar *);
 
-void bars_init(Display *, Window, int, const char *fontstr);
-void bars_free(Display *);
+void bars_init(const char *fontstr);
+void bars_free(void);
 
 #endif

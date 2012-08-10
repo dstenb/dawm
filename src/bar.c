@@ -2,8 +2,8 @@
 
 #define EVENT_MASK (CWOverrideRedirect | CWBackPixmap | CWEventMask)
 
-static void bars_init_dc(Display *, Window, int);
-static void bars_init_font(Display *, const char *);
+static void bars_init_dc(void);
+static void bars_init_font(const char *);
 
 static struct {
 	Drawable drawable;
@@ -21,8 +21,7 @@ static struct {
 static int initialized = 0;
 
 struct bar *
-bar_create(bool topbar, bool showbar, int x, int y, int w,
-		Display *dpy, Window root, int screen)
+bar_create(bool topbar, bool showbar, int x, int y, int w)
 {
 	struct bar *bar;
 	XSetWindowAttributes attr = {
@@ -45,14 +44,14 @@ bar_create(bool topbar, bool showbar, int x, int y, int w,
 			DefaultVisual(dpy, screen),
 			EVENT_MASK, &attr);
 
-	cursor_set(bar->win, NormalCursor, dpy);
+	cursor_set(bar->win, NormalCursor);
 	XMapRaised(dpy, bar->win);
 
 	return bar;
 }
 
 static void
-bar_draw_text(struct bar *bar, Display *dpy, const char *str, int len)
+bar_draw_text(struct bar *bar, const char *str, int len)
 {
 	int x = (font.height) / 2;
 	int y = (bar->h / 2) - (font.height / 2) + font.ascent;
@@ -68,17 +67,17 @@ bar_draw_text(struct bar *bar, Display *dpy, const char *str, int len)
 }
 
 void
-bar_draw(struct bar *bar, Display *dpy, const char *str)
+bar_draw(struct bar *bar, const char *str)
 {
 	XSetForeground(dpy, dc.gc, color(BarNormBG));
 	XFillRectangle(dpy, dc.drawable, dc.gc, 0, 0, bar->w, bar->h);
-	bar_draw_text(bar, dpy, str, strlen(str));
+	bar_draw_text(bar, str, strlen(str));
 	XCopyArea(dpy, dc.drawable, bar->win, dc.gc, 0, 0, bar->w, bar->h, 0, 0);
 	XSync(dpy, False);
 }
 
 void
-bar_free(struct bar *bar, Display *dpy)
+bar_free(struct bar *bar)
 {
 	XUnmapWindow(dpy, bar->win);
 	XDestroyWindow(dpy, bar->win);
@@ -86,17 +85,17 @@ bar_free(struct bar *bar, Display *dpy)
 }
 
 void
-bars_init(Display *dpy, Window root, int screen, const char *fontstr)
+bars_init(const char *fontstr)
 {
 	if (!initialized) {
-		bars_init_font(dpy, fontstr);
-		bars_init_dc(dpy, root, screen);
+		bars_init_font(fontstr);
+		bars_init_dc();
 		initialized = 1;
 	}
 }
 
 void
-bars_init_dc(Display *dpy, Window root, int screen)
+bars_init_dc(void)
 {
 	dc.drawable = XCreatePixmap(dpy, root, DisplayWidth(dpy, screen),
 			font.height, DefaultDepth(dpy, screen));
@@ -104,7 +103,7 @@ bars_init_dc(Display *dpy, Window root, int screen)
 }
 
 void
-bars_init_font(Display *dpy, const char *fontstr)
+bars_init_font(const char *fontstr)
 {
 	char *def, **missing;
 	int n;
@@ -142,7 +141,7 @@ bars_init_font(Display *dpy, const char *fontstr)
 }
 
 void
-bars_free(Display *dpy)
+bars_free(void)
 {
 	if (initialized) {
 		if (font.set)
