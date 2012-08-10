@@ -7,11 +7,11 @@
 	PropertyChangeMask | StructureNotifyMask)
 #define MOVE_RESIZE_MASK (CWX | CWY | CWWidth | CWHeight)
 
-void client_grab_buttons(struct client *, Display *);
-void client_select_input(struct client *, Display *);
-void client_set_border(struct client *, Display *, int);
-void client_set_dialog_wtype(struct client *, Display *);
-void client_set_dock_wtype(struct client *, Display *);
+void client_grab_buttons(struct client *);
+void client_select_input(struct client *);
+void client_set_border(struct client *, int);
+void client_set_dialog_wtype(struct client *);
+void client_set_dock_wtype(struct client *);
 
 /** create a client */
 struct client *
@@ -52,7 +52,7 @@ client_free(struct client *c)
 
 /** grab buttons */
 void
-client_grab_buttons(struct client *c, Display *dpy)
+client_grab_buttons(struct client *c)
 {
 	XGrabButton(dpy, 1, BUTTON_MOD, c->win, True, ButtonPressMask,
 			GrabModeAsync, GrabModeAsync, None, None);
@@ -63,11 +63,11 @@ client_grab_buttons(struct client *c, Display *dpy)
 /** kill the client. the removal and cleanup is handled in
  * wm_handler_destroynotify */
 void
-client_kill(struct client *c, Display *dpy)
+client_kill(struct client *c)
 {
 	int (*xerror) (Display *, XErrorEvent *);
 
-	if (!send_event(dpy, c->win, atom(WMDelete))) {
+	if (!send_event(c->win, atom(WMDelete))) {
 		XGrabServer(dpy);
 
 		xerror = XSetErrorHandler(xerror_dummy);
@@ -84,14 +84,14 @@ client_kill(struct client *c, Display *dpy)
 
 /** maps the window */
 void
-client_map_window(struct client *c, Display *dpy)
+client_map_window(struct client *c)
 {
 	XMapWindow(dpy, c->win);
 }
 
 /** move and resize the client */
 void
-client_move_resize(struct client *c, Display *dpy,
+client_move_resize(struct client *c,
 		int x, int y, int w, int h)
 {
 	XWindowChanges wc;
@@ -107,21 +107,21 @@ client_move_resize(struct client *c, Display *dpy,
 
 /** raise the client */
 void
-client_raise(struct client *c, Display *dpy)
+client_raise(struct client *c)
 {
 	XRaiseWindow(dpy, c->win);
 }
 
 /** set the client's events to listen for */
 void
-client_select_input(struct client *c, Display *dpy)
+client_select_input(struct client *c)
 {
 	XSelectInput(dpy, c->win, EVENT_MASK);
 }
 
 /** set the border size and color */
 void
-client_set_border(struct client *c, Display *dpy, int bw)
+client_set_border(struct client *c, int bw)
 {
 	XWindowChanges wc;
 	ColorID cid = WinNormBorder;
@@ -136,12 +136,12 @@ client_set_border(struct client *c, Display *dpy, int bw)
 
 /**  */
 void
-client_set_floating(struct client *c, Display *dpy, bool floating)
+client_set_floating(struct client *c, bool floating)
 {
 	if (floating) {
 		if (!c->floating)
-			client_move_resize(c, dpy, c->ox, c->oy, c->ow, c->oh);
-		client_raise(c, dpy);
+			client_move_resize(c, c->ox, c->oy, c->ow, c->oh);
+		client_raise(c);
 		c->floating = true;
 	} else {
 		/* save current size */
@@ -157,7 +157,7 @@ client_set_floating(struct client *c, Display *dpy, bool floating)
 
 /**  */
 void
-client_set_focus(struct client *c, Display *dpy, Window root, bool focus)
+client_set_focus(struct client *c, bool focus)
 {
 	if (focus) {
 		if (!c->neverfocus) {
@@ -166,8 +166,8 @@ client_set_focus(struct client *c, Display *dpy, Window root, bool focus)
 					CurrentTime);
 		}
 
-		ewmh_root_set_active_window(dpy, root, c->win);
-		send_event(dpy, c->win, atom(WMTakeFocus));
+		ewmh_root_set_active_window(c->win);
+		send_event(c->win, atom(WMTakeFocus));
 	} else {
 		XSetWindowBorder(dpy, c->win, color(WinNormBorder));
 	}
@@ -175,10 +175,10 @@ client_set_focus(struct client *c, Display *dpy, Window root, bool focus)
 
 /**  */
 void
-client_set_fullscreen(struct client *c, Display *dpy, bool fullscreen)
+client_set_fullscreen(struct client *c, bool fullscreen)
 {
 	if (fullscreen) {
-		ewmh_client_set_state(dpy, c->win, netatom(NetWMFullscreen));
+		ewmh_client_set_state(c->win, netatom(NetWMFullscreen));
 
 		c->fullscreen = true;
 		c->ostate = c->floating;
@@ -190,24 +190,24 @@ client_set_fullscreen(struct client *c, Display *dpy, bool fullscreen)
 		c->ow = c->w;
 		c->oh = c->h;
 
-		client_set_border(c, dpy, 0);
-		client_move_resize(c, dpy, c->mon->mx, c->mon->my,
+		client_set_border(c, 0);
+		client_move_resize(c, c->mon->mx, c->mon->my,
 				c->mon->mw, c->mon->mh);
-		client_raise(c, dpy);
+		client_raise(c);
 	} else {
-		ewmh_client_set_state(dpy, c->win, 0);
+		ewmh_client_set_state(c->win, 0);
 
 		c->fullscreen = false;
 		c->floating = c->ostate;
 
-		client_set_border(c, dpy, c->obw);
-		client_move_resize(c, dpy, c->ox, c->oy, c->ow, c->oh);
+		client_set_border(c, c->obw);
+		client_move_resize(c, c->ox, c->oy, c->ow, c->oh);
 	}
 }
 
 /** set the WM_STATE */
 void
-client_set_state(struct client *c, Display *dpy, long state)
+client_set_state(struct client *c, long state)
 {
 	long data[] = { state, None };
 
@@ -218,22 +218,22 @@ client_set_state(struct client *c, Display *dpy, long state)
 
 /**  */
 void
-client_set_ws(struct client *c, Display *dpy, unsigned long ws)
+client_set_ws(struct client *c, unsigned long ws)
 {
 	assert(VALID_WORKSPACE(ws));
 
 	c->ws = ws;
-	ewmh_client_set_desktop(dpy, c->win, c->mon->num * N_WORKSPACES + ws);
+	ewmh_client_set_desktop(c->win, c->mon->num * N_WORKSPACES + ws);
 }
 
 /**  */
 void
 client_setup(struct client *c, struct monitor *selmon, struct monitor *mons,
-		Display *dpy, Window root, struct client *trans)
+		struct client *trans)
 {
 	unsigned long ws;
 
-	client_update_title(c, dpy);
+	client_update_title(c);
 
 	if (trans) {
 		c->mon = trans->mon;
@@ -244,33 +244,33 @@ client_setup(struct client *c, struct monitor *selmon, struct monitor *mons,
 
 		/* (try to) get previous desktop value and set the monitor
 		 * and workspace according to that */
-		if (ewmh_client_get_desktop(dpy, c->win, &ws) && ws != ALL_WS) {
+		if (ewmh_client_get_desktop(c->win, &ws) && ws != ALL_WS) {
 			if (find_monitor_by_ws(mons, ws))
 				c->mon = find_monitor_by_ws(mons, ws);
 			ws = ws % N_WORKSPACES;
 		}
 	}
 
-	client_set_ws(c, dpy, ws);
-	client_set_border(c, dpy, settings()->bw);
-	client_update_window_type(c, dpy);
-	client_update_wm_hints(c, dpy, true);
-	client_update_size_hints(c, dpy);
-	client_select_input(c, dpy);
-	client_grab_buttons(c, dpy);
+	client_set_ws(c, ws);
+	client_set_border(c, settings()->bw);
+	client_update_window_type(c);
+	client_update_wm_hints(c, true);
+	client_update_size_hints(c);
+	client_select_input(c);
+	client_grab_buttons(c);
 
 	if (!c->floating)
 		c->floating = c->shints->fixed;
 	if (c->floating)
-		client_raise(c, dpy);
+		client_raise(c);
 
 	/* add the client to the NetClientList */
-	ewmh_root_client_list_add(dpy, root, c->win);
+	ewmh_root_client_list_add(c->win);
 }
 
 /**  */
 void
-client_show(struct client *c, Display *dpy, int show)
+client_show(struct client *c, int show)
 {
 	if (show)
 		XMoveWindow(dpy, c->win, c->x, c->y);
@@ -280,7 +280,7 @@ client_show(struct client *c, Display *dpy, int show)
 
 /** unmap the client and revert window settings */
 void
-client_unmap(struct client *c, Display *dpy)
+client_unmap(struct client *c)
 {
 	int (*xerror) (Display *, XErrorEvent *);
 	XWindowChanges wc;
@@ -291,7 +291,7 @@ client_unmap(struct client *c, Display *dpy)
 	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc); /* restore border */
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 
-	client_set_state(c, dpy, WithdrawnState);
+	client_set_state(c, WithdrawnState);
 
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
@@ -300,9 +300,9 @@ client_unmap(struct client *c, Display *dpy)
 
 /** update the client title */
 void
-client_update_title(struct client *c, Display *dpy)
+client_update_title(struct client *c)
 {
-	if (!(atom_get_string(dpy, c->win, atom(WMName), c->name,
+	if (!(atom_get_string(c->win, atom(WMName), c->name,
 					CLIENT_NAME_SIZE)))
 		snprintf(c->name, CLIENT_NAME_SIZE, "unnamed window");
 	error("c->name: %s\n", c->name);
@@ -310,7 +310,7 @@ client_update_title(struct client *c, Display *dpy)
 
 /**  */
 void
-client_set_dialog_wtype(struct client *c, Display *dpy)
+client_set_dialog_wtype(struct client *c)
 {
 	(void)dpy;
 	c->floating = true;
@@ -319,10 +319,10 @@ client_set_dialog_wtype(struct client *c, Display *dpy)
 
 /**  */
 void
-client_set_dock_wtype(struct client *c, Display *dpy)
+client_set_dock_wtype(struct client *c)
 {
-	if (ewmh_client_get_strut_partial(dpy, c->win, c->strut) ||
-			ewmh_client_get_strut(dpy, c->win, c->strut)) {
+	if (ewmh_client_get_strut_partial(c->win, c->strut) ||
+			ewmh_client_get_strut(c->win, c->strut)) {
 		c->floating = true;
 		c->neverfocus = true;
 		c->wtype |= Dock;
@@ -330,7 +330,7 @@ client_set_dock_wtype(struct client *c, Display *dpy)
 }
 
 void
-client_update_size_hints(struct client *c, Display *dpy)
+client_update_size_hints(struct client *c)
 {
 	XSizeHints size;
 	struct size_hints *h = c->shints;
@@ -384,24 +384,24 @@ client_update_size_hints(struct client *c, Display *dpy)
 
 /**  */
 void
-client_update_window_type(struct client *c, Display *dpy)
+client_update_window_type(struct client *c)
 {
 	Atom state;
 	Atom *types;
 	unsigned i, n;
 
-	if (ewmh_client_get_state(dpy, c->win, &state))
+	if (ewmh_client_get_state(c->win, &state))
 		if (state == netatom(NetWMFullscreen))
-			client_set_fullscreen(c, dpy, true);
+			client_set_fullscreen(c, true);
 
-	if (ewmh_client_get_window_types(dpy, c->win, &types, &n)) {
+	if (ewmh_client_get_window_types(c->win, &types, &n)) {
 		c->wtype = Normal;
 
 		for (i = 0; i < n; i++) {
 			if (types[i] == netatom(NetWMWindowTypeDialog))
-				client_set_dialog_wtype(c, dpy);
+				client_set_dialog_wtype(c);
 			else if (types[i] == netatom(NetWMWindowTypeDock))
-				client_set_dock_wtype(c, dpy);
+				client_set_dock_wtype(c);
 		}
 
 		XFree(types);
@@ -409,7 +409,7 @@ client_update_window_type(struct client *c, Display *dpy)
 }
 
 void
-client_update_wm_hints(struct client *c, Display *dpy, bool selected)
+client_update_wm_hints(struct client *c, bool selected)
 {
 	XWMHints *hints;
 

@@ -62,22 +62,22 @@ struct client {
 
 struct client *client_create(Window, XWindowAttributes *);
 void client_free(struct client *);
-void client_kill(struct client *, Display *);
-void client_map_window(struct client *, Display *);
-void client_move_resize(struct client *, Display *, int, int, int, int);
-void client_raise(struct client *, Display *);
-void client_set_floating(struct client *, Display *, bool);
-void client_set_focus(struct client *, Display *, Window, bool);
-void client_set_fullscreen(struct client *, Display *, bool);
-void client_set_state(struct client *, Display *, long);
-void client_set_ws(struct client *, Display *, unsigned long);
-void client_setup(struct client *, struct monitor *, struct monitor *,
-		Display *, Window, struct client *);
-void client_show(struct client *, Display *, int);
-void client_unmap(struct client *, Display *);
-void client_update_size_hints(struct client *, Display *);
-void client_update_title(struct client *, Display *);
-void client_update_window_type(struct client *, Display *);
-void client_update_wm_hints(struct client *, Display *, bool);
+void client_kill(struct client *);
+void client_map_window(struct client *);
+void client_move_resize(struct client *, int, int, int, int);
+void client_raise(struct client *);
+void client_set_floating(struct client *, bool);
+void client_set_focus(struct client *, bool);
+void client_set_fullscreen(struct client *, bool);
+void client_set_state(struct client *, long);
+void client_set_ws(struct client *, unsigned long);
+void client_setup(struct client *, struct monitor *,
+		struct monitor *, struct client *);
+void client_show(struct client *, int);
+void client_unmap(struct client *);
+void client_update_size_hints(struct client *);
+void client_update_title(struct client *);
+void client_update_window_type(struct client *);
+void client_update_wm_hints(struct client *, bool);
 
 #endif
