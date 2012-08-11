@@ -36,6 +36,10 @@ DAWM can be made to autorun programs by executing the file
 $HOME/.config/dawm/autorun. This file can be a shell script.
 The file must have the executable flag set.
 
+The file can be created with the following command:
+
+    echo "#! /bin/sh" > ~/.config/dawm/autorun && chmod +x ~/.config/dawm/autorun
+
 License
 ------------
 See the LICENSE file.
