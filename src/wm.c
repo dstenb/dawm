@@ -395,7 +395,7 @@ handler_clientmessage_client(struct wm *wm, XClientMessageEvent *ev)
 		 * occurs. the spec is quite ambiguous about this. this
 		 * behaviour might be changed */
 		set_monitor(wm, c->mon);
-		monitor_select_client(c->mon, c, 1);
+		monitor_select_client(c->mon, c, true);
 	} else if (ev->message_type == atom(WMChangeState)) {
 		if (ev->data.l[0] == IconicState && ev->format == 32) {
 			printf("%s: minimize window\n", __func__);
@@ -506,7 +506,7 @@ handler_enternotify(struct wm *wm, XEvent *ev)
 	if (!(c = find_client_by_window(wm->mons, cev->window)))
 		return;
 
-	monitor_select_client(c->mon, c, 0);
+	monitor_select_client(c->mon, c, false);
 }
 
 void
@@ -613,7 +613,7 @@ handler_motionnotify_move(struct wm *wm, struct client *c, XMotionEvent *ev)
 		y = wm->motion.attr.y + ydiff;
 
 		client_move_resize(c, x, y, w, h);
-		monitor_float_selected(wm->selmon, 1);
+		monitor_float_selected(wm->selmon, true);
 
 		snprintf(wm->selmon->str, 1024,  "%i %i %i %i "
 				"(xroot: %i, yroot: %i) "
@@ -645,7 +645,7 @@ handler_motionnotify_resize(struct wm *wm, struct client *c, XMotionEvent *ev)
 		}
 
 		client_move_resize(c, x, y, w, h);
-		monitor_float_selected(wm->selmon, 1);
+		monitor_float_selected(wm->selmon, true);
 
 		snprintf(wm->selmon->str, 1024,  "%i %i %i %i "
 				"(xroot: %i, yroot: %i) "

@@ -159,7 +159,7 @@ monitor_add_client(struct monitor *mon, struct client *c)
 		monitor_update_window_size(mon);
 
 	/* TODO: check switch_to_ws rule         v */
-	monitor_select_client(mon, c, 0);
+	monitor_select_client(mon, c, false);
 	monitor_arrange(mon);
 }
 
@@ -272,7 +272,7 @@ monitor_draw_bar(struct monitor *mon)
 
 /** Set the floating state for the selected client */
 void
-monitor_float_selected(struct monitor *mon, int floating)
+monitor_float_selected(struct monitor *mon, bool floating)
 {
 	if (mon->sel) {
 		client_set_floating(mon->sel, floating);
@@ -394,7 +394,7 @@ monitor_restack(struct monitor *mon)
 /** Select the given client and fix focus. The function will do nothing if the
  * client's workspace differs from the current and switch_to_ws is zero */
 void
-monitor_select_client(struct monitor *mon, struct client *c, int switch_to_ws)
+monitor_select_client(struct monitor *mon, struct client *c, bool switch_to_ws)
 {
 	assert(c->mon == mon);
 
@@ -422,7 +422,7 @@ monitor_select_next_client(struct monitor *mon)
 	struct client *c = NULL;
 
 	if (mon->sel && (c = next_selectable_client(mon->sel)))
-		monitor_select_client(mon, c, 0);
+		monitor_select_client(mon, c, false);
 }
 
 /** Selects the prevous valid client in the client list */
@@ -432,7 +432,7 @@ monitor_select_prev_client(struct monitor *mon)
 	struct client *c = NULL;
 
 	if (mon->sel && (c = prev_selectable_client(mon->sel)))
-		monitor_select_client(mon, c, 0);
+		monitor_select_client(mon, c, false);
 }
 
 /** Moves the selected client to the master position */
@@ -474,7 +474,7 @@ monitor_set_ws(struct monitor *mon, unsigned long ws)
 
 /** Show/hide the bar */
 void
-monitor_show_bar(struct monitor *mon, int show)
+monitor_show_bar(struct monitor *mon, bool show)
 {
 	mon->bar->showbar = show ? 1 : 0;
 	monitor_update_window_size(mon);
