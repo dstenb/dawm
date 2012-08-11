@@ -3,6 +3,8 @@
  * License: See LICENSE file
  */
 
+#include <sys/stat.h>
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,6 +16,7 @@
 #include "version.h"
 #include "wm.h"
 
+static void autorun(void);
 static void compiled(void);
 static void usage(const char *);
 static void version(void);
@@ -21,6 +24,28 @@ static void version(void);
 /* If this is set to true, the window manager will be closed after
  * the config file have been read */
 static bool check_config = false;
+
+/** (Tries) to execute the autorun file */
+void
+autorun(void)
+{
+	struct stat st;
+	char path[PATH_MAX];
+	char *home;
+
+	if (!(home = getenv("HOME")))
+		return;
+
+	snprintf(path, sizeof(path), "%s/.config/dawm/autorun", home);
+
+	if (stat(path, &st) != 0)
+		return;
+
+	/* See if the file is executable before using spawn() to avoid
+	 * unwanted error messages from the shell */
+	if (S_ISREG(st.st_mode) && (st.st_mode & S_IXUSR))
+		spawn(path);
+}
 
 /** Prints a list of compiled features */
 void
@@ -86,6 +111,8 @@ main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		}
 	}
+
+	autorun();
 
 	settings_init();
 	settings_read(cfg_str ? cfg_str : settings_default_path());

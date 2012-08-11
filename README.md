@@ -26,9 +26,15 @@ The documentation can be built with the following command:
 
 Configuration
 ------------
-DAWM's configuration file is located in $HOME/.config/dawm/config.
+DAWM's configuration file is $HOME/.config/dawm/config.
 
 An example configuration file can be found in data/config.
+
+Autorun
+------------
+DAWM can be made to autorun programs by executing the file
+$HOME/.config/dawm/autorun. This file can be a shell script.
+The file must have the executable flag set.
 
 License
 ------------
