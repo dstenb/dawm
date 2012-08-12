@@ -4,6 +4,7 @@ static bool initialized = false;
 
 Display *dpy;
 Window root;
+int dpy_fd;
 int screen;
 int screen_w;
 int screen_h;
@@ -17,6 +18,7 @@ x11_init(void)
 
 		screen = DefaultScreen(dpy);
 		root = RootWindow(dpy, screen);
+		dpy_fd = ConnectionNumber(dpy);
 		screen_w = DisplayWidth(dpy, screen);
 		screen_h = DisplayHeight(dpy, screen);
 

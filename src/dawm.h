@@ -87,6 +87,7 @@
 /* Global XLib variables (see x11.c) */
 extern Display *dpy;
 extern Window root;
+extern int dpy_fd;
 extern int screen;
 extern int screen_w;
 extern int screen_h;

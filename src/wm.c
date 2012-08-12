@@ -216,21 +216,16 @@ eventloop(struct wm *wm)
 	XEvent ev;
 	struct timeval tv;
 	fd_set fds;
-	int xfd;
 	int n;
-
-	/* get display fd */
-	xfd = ConnectionNumber(dpy);
 
 	tv.tv_sec = BAR_UPDATE_RATE;
 	tv.tv_usec = 0;
 
 	for (;;) {
-
 		FD_ZERO(&fds);
-		FD_SET(xfd, &fds);
+		FD_SET(dpy_fd, &fds);
 
-		if ((n = select(xfd + 1, &fds, NULL, NULL, &tv)) < 0) {
+		if ((n = select(dpy_fd + 1, &fds, NULL, NULL, &tv)) < 0) {
 			if (errno == EINTR) /* interrupt during select() */
 				continue;
 			die("select(): %s\n", strerror(errno));
