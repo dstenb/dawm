@@ -84,6 +84,10 @@
 #define MOD_CTRL_SUPER  (MOD_CTRL | MOD_SUPER)
 #define MOD_SHIFT_SUPER (MOD_SHIFT | MOD_SUPER)
 
+/* EWMH constants */
+#define NET_WM_STATE_ADD 1
+#define NET_WM_STATE_TOGGLE 2
+
 /* Global XLib variables (see x11.c) */
 extern Display *dpy;
 extern Window root;
