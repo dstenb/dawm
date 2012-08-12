@@ -1,4 +1,4 @@
-#include "settings.h"
+#include "dawm.h"
 
 static void parse_bar(config_t *);
 static void parse_colors(config_t *);

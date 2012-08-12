@@ -1,4 +1,4 @@
-#include "colors.h"
+#include "dawm.h"
 
 static unsigned long get_color(const char *);
 

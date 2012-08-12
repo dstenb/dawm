@@ -1,4 +1,4 @@
-#include "client.h"
+#include "dawm.h"
 
 /* Mask macros */
 #define BUTTON_MASK (ButtonPressMask | ButtonReleaseMask)

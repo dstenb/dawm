@@ -1,4 +1,4 @@
-#include "cursors.h"
+#include "dawm.h"
 
 static Cursor cursors[LASTCursor];
 

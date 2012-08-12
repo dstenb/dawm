@@ -1,4 +1,4 @@
-#include "layouts.h"
+#include "dawm.h"
 
 #define MW(N, NM, W, MF) ((N > NM) ? (NM ? (W * MF) : 0) : W)
 #define MH(N, NM, H, MF) ((N > NM) ? (NM ? (H * MF) : 0) : H)

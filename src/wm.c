@@ -1,4 +1,4 @@
-#include "wm.h"
+#include "dawm.h"
 
 #define WM_EVENT_MASK SubstructureRedirectMask | SubstructureNotifyMask \
 	| ButtonPressMask | ButtonReleaseMask | PointerMotionMask | \

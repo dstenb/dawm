@@ -1,4 +1,4 @@
-#include "atoms.h"
+#include "dawm.h"
 
 static char *atom_names[LASTAtom] = {
 	"WM_CHANGE_STATE",

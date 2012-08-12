@@ -1,4 +1,4 @@
-#include "sysinfo.h"
+#include "dawm.h"
 
 #ifdef SYSINFO_EXTENDED
 static int get_battery(int *, int *);

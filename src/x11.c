@@ -1,4 +1,4 @@
-#include "x11.h"
+#include "dawm.h"
 
 static bool initialized = false;
 

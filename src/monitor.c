@@ -1,4 +1,4 @@
-#include "monitor.h"
+#include "dawm.h"
 
 static void monitor_move_clients(struct monitor *);
 static void monitor_restack(struct monitor *);

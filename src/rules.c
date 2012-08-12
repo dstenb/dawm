@@ -1,4 +1,4 @@
-#include "rules.h"
+#include "dawm.h"
 
 struct rule *rule_append(struct rule *, struct rule *);
 static int rule_applicable(const struct rule *, const char *, const char *,

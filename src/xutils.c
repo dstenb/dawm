@@ -1,4 +1,4 @@
-#include "xutils.h"
+#include "dawm.h"
 
 static int has_wm_protocol(Window, Atom);
 

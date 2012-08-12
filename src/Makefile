@@ -1,8 +1,9 @@
 include config.mk
 
-SRC = main.c atoms.c bar.c client.c colors.c cursors.c ewmh.c keys.c \
+SRC = dawm.h main.c atoms.c bar.c client.c colors.c cursors.c ewmh.c keys.c \
       monitor.c rules.c settings.c sysinfo.c utils.c wm.c xutils.c layouts.c \
       x11.c
+HEADERS = dawm.h
 OBJ = ${SRC:.c=.o}
 
 all: options version.h dawm
@@ -13,7 +14,7 @@ options:
 	@echo "LDFLAGS  = ${LDFLAGS}"
 	@echo "CC       = ${CC}"
 
-.c.o:
+.c.o: ${HEADERS}
 	@echo CC $<
 	@${CC} -c ${CFLAGS} $<
 

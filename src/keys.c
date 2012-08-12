@@ -1,4 +1,4 @@
-#include "keys.h"
+#include "dawm.h"
 
 #define CLEANMASK(mask) (mask & ~(num_lock | LockMask))
 

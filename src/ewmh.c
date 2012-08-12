@@ -1,4 +1,12 @@
-#include "ewmh.h"
+#include "dawm.h"
+
+/* root window properties
+ * http://standards.freedesktop.org/wm-spec/wm-spec-latest.html#id2533796
+ */
+
+/* application window properties
+ * http://standards.freedesktop.org/wm-spec/wm-spec-latest.html#id2577833
+ */
 
 static char *atom_names[LASTNetAtom] = {
 	"_NET_ACTIVE_WINDOW",

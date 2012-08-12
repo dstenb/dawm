@@ -10,11 +10,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "common.h"
-#include "settings.h"
-#include "utils.h"
 #include "version.h"
-#include "wm.h"
+#include "dawm.h"
 
 static void autorun(void);
 static void compiled(void);

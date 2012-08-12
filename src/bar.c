@@ -1,4 +1,4 @@
-#include "bar.h"
+#include "dawm.h"
 
 #define EVENT_MASK (CWOverrideRedirect | CWBackPixmap | CWEventMask)
 
