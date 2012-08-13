@@ -24,6 +24,7 @@ static void quit(struct wm *, const char *);
 static void remove_client(struct wm *, struct client *, int);
 static void restart(struct wm *);
 static void set_environment(struct wm *);
+static void set_fullscreen(struct wm *, struct client *, bool);
 static void set_monitor(struct wm *, struct monitor *);
 static void update_bars(struct wm *);
 static void update_net_client_list(struct wm *);
@@ -405,6 +406,18 @@ handler_clientmessage_client(struct wm *wm, XClientMessageEvent *ev)
 		client_set_ws(c, ws);
 		monitor_focus(c->mon, NULL);
 		monitor_arrange(c->mon);
+	} else if (ev->message_type == netatom(NetWMState)) {
+		if (ev->data.l[1] == netatom(NetWMFullscreen) ||
+				ev->data.l[2] == netatom(NetWMFullscreen)) {
+			bool fs = false;
+
+			if (ev->data.l[0] == NET_WM_STATE_ADD)
+				fs = true;
+			else if (ev->data.l[0] == NET_WM_STATE_TOGGLE)
+				fs = !c->fullscreen;
+
+			set_fullscreen(wm, c, fs);
+		}
 	}
 }
 
@@ -680,7 +693,7 @@ handler_propertynotify_client(struct wm *wm, XPropertyEvent *ev)
 		DBG("normal hints\n");
 	} else if (ev->atom == XA_WM_HINTS) {
 		/* TODO: check for fullscreen and floating */
-		client_update_wm_hints(c, c == wm->selmon->sel);
+		client_update_wm_hints(c, c == c->mon->sel);
 		DBG("hints\n");
 	} else if (ev->atom == netatom(NetWMWindowType)) {
 		/* TODO */
@@ -879,17 +892,11 @@ key_handler_togglefloat(struct wm *wm, struct key *key)
 void
 key_handler_togglefs(struct wm *wm, struct key *key)
 {
-	int fs;
-
+	struct monitor *mon = wm->selmon;
 	(void)key;
 
-	if (wm->selmon->sel) {
-		fs = !wm->selmon->sel->fullscreen;
-		client_set_fullscreen(wm->selmon->sel, fs);
-
-		if (!fs)
-			monitor_arrange(wm->selmon);
-	}
+	if (mon->sel)
+		set_fullscreen(wm, mon->sel, !mon->sel->fullscreen);
 }
 
 void
@@ -966,6 +973,15 @@ set_environment(struct wm *wm)
 	setenv("BAR_NORM_BG", settings()->colors[BarNormBG], 1);
 	setenv("BAR_SEL_FG", settings()->colors[BarSelFG], 1);
 	setenv("BAR_SEL_BG", settings()->colors[BarSelBG], 1);
+}
+
+void
+set_fullscreen(struct wm *wm, struct client *c, bool fullscreen)
+{
+	client_set_fullscreen(c, fullscreen);
+
+	if (!fullscreen)
+		monitor_arrange(c->mon);
 }
 
 void
