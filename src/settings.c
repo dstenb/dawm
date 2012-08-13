@@ -18,8 +18,8 @@ static const char *default_colors[LASTColor] = {
 	[BarBorder] = "#FF0000",
 	[BarNormFG] = "#DDDDDD",
 	[BarNormBG] = "#000000",
-	[BarSelFG] = "#000000",
-	[BarSelBG] = "#0000FF",
+	[BarSelFG] = "#FF0000",
+	[BarSelBG] = "#000000",
 	[WinNormBorder] = "#000000",
 	[WinSelBorder] = "#FF0000"
 };
