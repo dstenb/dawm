@@ -5,69 +5,67 @@
 	EnterWindowMask | LeaveWindowMask | StructureNotifyMask | \
 	PropertyChangeMask
 
-static void checkotherwm(struct wm *);
-static void create_client(struct wm *, Window, XWindowAttributes *);
-static void create_monitors(struct wm *);
-static void get_windows(struct wm *);
-static void handler_clientmessage_client(struct wm *, XClientMessageEvent *);
-static void handler_clientmessage_root(struct wm *, XClientMessageEvent *);
-static void handler_configurerequest_resize(struct wm *, struct client *,
+static void checkotherwm(void);
+static void create_client(Window, XWindowAttributes *);
+static void create_monitors(void);
+static void get_windows(void);
+static void handler_clientmessage_client(XClientMessageEvent *);
+static void handler_clientmessage_root(XClientMessageEvent *);
+static void handler_configurerequest_resize(struct client *,
 		XConfigureRequestEvent *);
-static void handler_motionnotify_move(struct wm *, struct client *,
-		XMotionEvent *);
-static void handler_motionnotify_resize(struct wm *, struct client *,
-		XMotionEvent *);
-static void handler_propertynotify_client(struct wm *, XPropertyEvent *);
-static void handler_propertynotify_root(struct wm *, XPropertyEvent *);
-static int manageable_window(Window, XWindowAttributes *, int);
-static void quit(struct wm *, const char *);
-static void remove_client(struct wm *, struct client *, int);
-static void restart(struct wm *);
-static void set_environment(struct wm *);
-static void set_fullscreen(struct wm *, struct client *, bool);
-static void set_monitor(struct wm *, struct monitor *);
-static void update_bars(struct wm *);
-static void update_net_client_list(struct wm *);
+static void handler_motionnotify_move(struct client *, XMotionEvent *);
+static void handler_motionnotify_resize(struct client *, XMotionEvent *);
+static void handler_propertynotify_client(XPropertyEvent *);
+static void handler_propertynotify_root(XPropertyEvent *);
+static bool manageable_window(Window, XWindowAttributes *, bool);
+static void quit(const char *);
+static void remove_client(struct client *, bool);
+static void restart(void);
+static void set_environment(void);
+static void set_fullscreen(struct client *, bool);
+static void set_monitor(struct monitor *);
+static void update_bars(void);
+static void update_net_client_list(void);
 static int xerror_checkotherwm(Display *, XErrorEvent *);
 static int xerror(Display *, XErrorEvent *);
 
 /* X handlers */
-static void handler_buttonpress(struct wm *, XEvent *);
-static void handler_buttonrelease(struct wm *, XEvent *);
-static void handler_clientmessage(struct wm *, XEvent *);
-static void handler_configurerequest(struct wm *, XEvent *);
-static void handler_configurenotify(struct wm *, XEvent *);
-static void handler_destroynotify(struct wm *, XEvent *);
-static void handler_enternotify(struct wm *, XEvent *);
-static void handler_expose(struct wm *, XEvent *);
-static void handler_focusin(struct wm *, XEvent *);
-static void handler_keypress(struct wm *, XEvent *);
-static void handler_mappingnotify(struct wm *, XEvent *);
-static void handler_maprequest(struct wm *, XEvent *);
-static void handler_motionnotify(struct wm *, XEvent *);
-static void handler_propertynotify(struct wm *, XEvent *);
-static void handler_unmapnotify(struct wm *, XEvent *);
+static void handler_buttonpress(XEvent *);
+static void handler_buttonrelease(XEvent *);
+static void handler_clientmessage(XEvent *);
+static void handler_configurerequest(XEvent *);
+static void handler_configurenotify(XEvent *);
+static void handler_destroynotify(XEvent *);
+static void handler_enternotify(XEvent *);
+static void handler_expose(XEvent *);
+static void handler_focusin(XEvent *);
+static void handler_keypress(XEvent *);
+static void handler_mappingnotify(XEvent *);
+static void handler_maprequest(XEvent *);
+static void handler_motionnotify(XEvent *);
+static void handler_propertynotify(XEvent *);
+static void handler_unmapnotify(XEvent *);
 
-/* key action handlers */
-static void key_handler_kill(struct wm *, struct key *);
-static void key_handler_movewindow(struct wm *, struct key *);
-static void key_handler_quit(struct wm *, struct key *);
-static void key_handler_restart(struct wm *, struct key *);
-static void key_handler_select(struct wm *, struct key *);
-static void key_handler_setlayout(struct wm *, struct key *);
-static void key_handler_setmaster(struct wm *, struct key *);
-static void key_handler_setmfact(struct wm *, struct key *);
-static void key_handler_setmnum(struct wm *, struct key *);
-static void key_handler_setws(struct wm *, struct key *);
-static void key_handler_spawn(struct wm *, struct key *);
-static void key_handler_swap(struct wm *, struct key *);
-static void key_handler_togglebar(struct wm *, struct key *);
-static void key_handler_togglefloat(struct wm *, struct key *);
-static void key_handler_togglefs(struct wm *, struct key *);
-static void key_handler_togglews(struct wm *, struct key *);
+/* Key action handlers */
+static void key_handler_kill(struct key *);
+static void key_handler_movewindow(struct key *);
+static void key_handler_quit(struct key *);
+static void key_handler_restart(struct key *);
+static void key_handler_select(struct key *);
+static void key_handler_setlayout(struct key *);
+static void key_handler_setmaster(struct key *);
+static void key_handler_setmfact(struct key *);
+static void key_handler_setmnum(struct key *);
+static void key_handler_setws(struct key *);
+static void key_handler_spawn(struct key *);
+static void key_handler_swap(struct key *);
+static void key_handler_togglebar(struct key *);
+static void key_handler_togglefloat(struct key *);
+static void key_handler_togglefs(struct key *);
+static void key_handler_togglews(struct key *);
 
 static int (*xerrxlib) (Display *, XErrorEvent *);
-static void (*event_handler[LASTEvent]) (struct wm *, XEvent *) = {
+static void (*event_handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = handler_buttonpress,
 	[ButtonRelease] = handler_buttonrelease,
 	[ClientMessage] = handler_clientmessage,
@@ -85,7 +83,7 @@ static void (*event_handler[LASTEvent]) (struct wm *, XEvent *) = {
 	[UnmapNotify] = handler_unmapnotify
 };
 
-static void (*key_handler[LASTAction]) (struct wm *, struct key *) = {
+static void (*key_handler[LASTAction]) (struct key *) = {
 	[KillAction] = key_handler_kill,
 	[MoveWindowAction] = key_handler_movewindow,
 	[QuitAction] = key_handler_quit,
@@ -104,34 +102,22 @@ static void (*key_handler[LASTAction]) (struct wm *, struct key *) = {
 	[ToggleWsAction] = key_handler_togglews
 };
 
-/*#define MONITOR_DBG*/
+/*** Global variables ***/
+static struct monitor *mons = NULL;
+static struct monitor *selmon = NULL;
+static struct key *keys = NULL;
+static struct motion *motion = NULL;
+static const char *cmd = NULL;
 
 static void
-dbg_print(struct wm *wm, const char *str)
+dbg_print(const char *str)
 {
 	(void)str;
 	DBG(":::: dbg_print(%s)\n", str);
-
-#ifdef MONITOR_DBG
-	struct monitor *m = wm->selmon;
-	struct client *c;
-
-	DBG("m->sel: %p\n", (void *)m->sel);
-
-	DBG("m->clients:\n");
-	for (c = m->clients; c; c = c->next)
-		DBG("-> %p\n", c);
-	DBG("m->cstack:\n");
-	for (c = m->cstack; c; c = c->snext)
-		DBG("-> %p\n", c);
-	DBG("\n");
-#else
-	(void)wm;
-#endif
 }
 
 void
-checkotherwm(struct wm *wm)
+checkotherwm(void)
 {
 	xerrxlib = XSetErrorHandler(xerror_checkotherwm);
 	/* this causes an error if some other window manager is running */
@@ -142,15 +128,14 @@ checkotherwm(struct wm *wm)
 }
 
 void
-create_client(struct wm *wm, Window win, XWindowAttributes *attr)
+create_client(Window win, XWindowAttributes *attr)
 {
 	struct client *c, *tc;
 
 	c = client_create(win, attr);
+	tc = find_client_by_trans(mons, win);
 
-	tc = find_client_by_trans(wm->mons, win);
-
-	client_setup(c, wm->selmon, wm->mons, tc);
+	client_setup(c, selmon, mons, tc);
 	client_map_window(c);
 
 	rules_apply(c);
@@ -159,7 +144,7 @@ create_client(struct wm *wm, Window win, XWindowAttributes *attr)
 }
 
 void
-create_monitors(struct wm *wm)
+create_monitors(void)
 {
 #ifdef XINERAMA
 	struct monitor *mon;
@@ -168,51 +153,44 @@ create_monitors(struct wm *wm)
 	if (XineramaIsActive(dpy)) {
 		XineramaScreenInfo *xsi = XineramaQueryScreens(dpy, &nmon);
 
-		wm->mons = NULL;
+		mons = NULL;
 
 		for (i = 0; i < nmon; i++) {
 			mon = monitor_create(i, xsi[i].x_org, xsi[i].y_org,
 					xsi[i].width, xsi[i].height);
-			wm->mons = monitor_append(wm->mons, mon);
+			mons = monitor_append(mons, mon);
 		}
 
-		wm->selmon = wm->mons;
+		selmon = mons;
 		return;
 	}
 #endif /* XINERAMA */
 
-	wm->selmon = wm->mons = monitor_create(0, 0, 0, screen_w, screen_h);
+	selmon = mons = monitor_create(0, 0, 0, screen_w, screen_h);
 }
 
-int
-destroy(struct wm *wm)
+void
+destroy(void)
 {
 	struct monitor *mon;
 
-	for (mon = wm->mons; mon; mon = mon->next) {
+	for (mon = mons; mon; mon = mon->next) {
 		while (mon->cstack)
-			remove_client(wm, mon->cstack, 0);
+			remove_client(mon->cstack, false);
 	}
+
+	while (mons)
+		mons = monitor_free(mons);
 
 	bars_free();
 	cursors_free();
 	rules_free();
 
-	XUngrabKey(dpy, AnyKey, AnyModifier, root);
-
-	while (wm->mons)
-		wm->mons = monitor_free(wm->mons);
-
-	XSync(dpy, False);
-	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot,
-			CurrentTime);
 	x11_destroy();
-	free(wm);
-	return 0;
 }
 
-int
-eventloop(struct wm *wm)
+void
+eventloop(void)
 {
 	XEvent ev;
 	struct timeval tv;
@@ -234,73 +212,67 @@ eventloop(struct wm *wm)
 			while (XPending(dpy)) {
 				XNextEvent(dpy, &ev);
 				if (event_handler[ev.type])
-					event_handler[ev.type](wm, &ev);
+					event_handler[ev.type](&ev);
 			}
 		} else {
-			/* bar timer event */
-
-			update_bars(wm);
+			/* Bar timer event */
+			update_bars();
 
 			tv.tv_sec = BAR_UPDATE_RATE;
 			tv.tv_usec = 0;
 		}
 	}
-
-	return 0;
 }
 
-struct wm *
-init(const char *cmd)
+void
+init(const char *_cmd)
 {
-	struct wm *wm = xcalloc(1, sizeof(struct wm));
-
 	x11_init();
 
-	/* check if another wm is running */
-	checkotherwm(wm);
+	checkotherwm();
 
-	wm->cmd = cmd;
-	wm->keys = settings()->keys;
-	wm->motion.type = NoMotion;
+	cmd = _cmd;
+
+	/* Setup the motion struct */
+	motion = xcalloc(1, sizeof(struct motion));
+	motion->type = NoMotion;
 
 	sysinfo_init();
 
 	colors_init(settings()->colors);
 	bars_init(settings()->barfont);
 
-	/* select events to handle */
+	/* Select wvents to handle */
 	XSelectInput(dpy, root, WM_EVENT_MASK);
 
-	/* setup cursors */
+	/* Setup cursors */
 	cursors_init();
 	cursor_set(root, NormalCursor);
 
-	/* setup key bindings */
+	/* Setup key bindings */
+	keys = settings()->keys;
 	key_init();
-	key_grab_all(wm->keys);
+	key_grab_all(keys);
 
-	/* init atoms and ewmh */
+	/* Init atoms and EWMH */
 	atoms_init();
 	ewmh_init();
 	ewmh_root_set_name(WMNAME);
 
-	/* create monitors */
-	create_monitors(wm);
+	/* Create monitors */
+	create_monitors();
 
-	/* init ewmh desktop functionality */
+	/* Init ewmh desktop functionality */
 	ewmh_root_set_number_of_desktops(
-			monitor_count(wm->mons) * N_WORKSPACES);
+			monitor_count(mons) * N_WORKSPACES);
 	ewmh_root_set_current_desktop(0);
 
-	get_windows(wm);
-
-	set_environment(wm);
-
-	return wm;
+	get_windows();
+	set_environment();
 }
 
 void
-get_windows(struct wm *wm)
+get_windows(void)
 {
 	XWindowAttributes attr;
 	Window d1, d2;
@@ -308,15 +280,15 @@ get_windows(struct wm *wm)
 	unsigned int i, n;
 
 	if (XQueryTree(dpy, root, &d1, &d2, &wins, &n)) {
-		/* normal windows */
+		/* Normal windows */
 		for (i = 0; i < n; i++) {
-			if (manageable_window(wins[i], &attr, 0))
-				create_client(wm, wins[i], &attr);
+			if (manageable_window(wins[i], &attr, false))
+				create_client(wins[i], &attr);
 		}
-		/* transient windows */
+		/* Transient windows */
 		for (i = 0; i < n; i++) {
-			if (manageable_window(wins[i], &attr, 1))
-				create_client(wm, wins[i], &attr);
+			if (manageable_window(wins[i], &attr, true))
+				create_client(wins[i], &attr);
 		}
 
 		if (wins)
@@ -325,62 +297,62 @@ get_windows(struct wm *wm)
 }
 
 void
-handler_buttonpress(struct wm *wm, XEvent *ev)
+handler_buttonpress(XEvent *ev)
 {
 	XButtonPressedEvent *bpev = &ev->xbutton;
 	struct client *c;
 
-	dbg_print(wm, __func__);
+	dbg_print(__func__);
 
-	if (wm->motion.type != NoMotion)
+	if (motion->type != NoMotion)
 		return;
 
-	if (!(c = find_client_by_window(wm->mons, bpev->window)))
+	if (!(c = find_client_by_window(mons, bpev->window)))
 		return;
 
 	XGrabPointer(dpy, ev->xbutton.window, True,
 			PointerMotionMask | ButtonReleaseMask, GrabModeAsync,
 			GrabModeAsync, None, None, CurrentTime);
 
-	/* set start motion data */
-	XGetWindowAttributes(dpy, ev->xbutton.window, &wm->motion.attr);
-	wm->motion.start = ev->xbutton;
+	/* Set start motion data */
+	XGetWindowAttributes(dpy, ev->xbutton.window, &motion->attr);
+	motion->start = ev->xbutton;
 
-	/* set the motion type */
-	if (wm->motion.start.button == 1)
-		wm->motion.type = MovementMotion;
-	else if (wm->motion.start.button == 3)
-		wm->motion.type = ResizeMotion;
+	/* Set the motion type */
+	if (motion->start.button == 1)
+		motion->type = MovementMotion;
+	else if (motion->start.button == 3)
+		motion->type = ResizeMotion;
 }
 
 void
-handler_buttonrelease(struct wm *wm, XEvent *ev)
+handler_buttonrelease(XEvent *ev)
 {
-	dbg_print(wm, __func__);
+	dbg_print(__func__);
 
-	if (wm->motion.start.button == ev->xbutton.button) {
-		wm->motion.type = NoMotion;
+	if (motion->start.button == ev->xbutton.button) {
+		motion->type = NoMotion;
 		XUngrabPointer(dpy, CurrentTime);
 	}
 }
 
 void
-handler_clientmessage(struct wm *wm, XEvent *ev)
+handler_clientmessage(XEvent *ev)
 {
-	dbg_print(wm, __func__);
+	dbg_print(__func__);
 
 	if (ev->xclient.window == root)
-		handler_clientmessage_root(wm, &ev->xclient);
+		handler_clientmessage_root(&ev->xclient);
 	else
-		handler_clientmessage_client(wm, &ev->xclient);
+		handler_clientmessage_client(&ev->xclient);
 }
 
 void
-handler_clientmessage_client(struct wm *wm, XClientMessageEvent *ev)
+handler_clientmessage_client(XClientMessageEvent *ev)
 {
 	struct client *c;
 
-	if (!(c = find_client_by_window(wm->mons, ev->window)))
+	if (!(c = find_client_by_window(mons, ev->window)))
 		return;
 
 	if (ev->message_type == atom(WMState)) {
@@ -390,7 +362,7 @@ handler_clientmessage_client(struct wm *wm, XClientMessageEvent *ev)
 		 * and set focus on the client when a NetActive event
 		 * occurs. the spec is quite ambiguous about this. this
 		 * behaviour might be changed */
-		set_monitor(wm, c->mon);
+		set_monitor(c->mon);
 		monitor_select_client(c->mon, c, true);
 	} else if (ev->message_type == atom(WMChangeState)) {
 		if (ev->data.l[0] == IconicState && ev->format == 32) {
@@ -416,16 +388,14 @@ handler_clientmessage_client(struct wm *wm, XClientMessageEvent *ev)
 			else if (ev->data.l[0] == NET_WM_STATE_TOGGLE)
 				fs = !c->fullscreen;
 
-			set_fullscreen(wm, c, fs);
+			set_fullscreen(c, fs);
 		}
 	}
 }
 
 void
-handler_clientmessage_root(struct wm *wm, XClientMessageEvent *ev)
+handler_clientmessage_root(XClientMessageEvent *ev)
 {
-	(void) wm;
-
 	if (ev->format == 32) {
 		/* TODO: Maybe handle
 		 * net_current_desktop & net_number_of_desktops */
@@ -433,11 +403,9 @@ handler_clientmessage_root(struct wm *wm, XClientMessageEvent *ev)
 }
 
 void
-handler_configurerequest_resize(struct wm *wm, struct client *c,
+handler_configurerequest_resize(struct client *c,
 		XConfigureRequestEvent *ev)
 {
-	(void)wm;
-
 	if (ev->value_mask & CWX)
 		c->x = c->mon->mx + ev->x;
 	if (ev->value_mask & CWY)
@@ -457,20 +425,20 @@ handler_configurerequest_resize(struct wm *wm, struct client *c,
 }
 
 void
-handler_configurerequest(struct wm *wm, XEvent *ev)
+handler_configurerequest(XEvent *ev)
 {
 	XConfigureRequestEvent *crev = &ev->xconfigurerequest;
 	struct client *c;
 
-	dbg_print(wm, __func__);
+	dbg_print(__func__);
 
-	if ((c = find_client_by_window(wm->mons, crev->window))) {
+	if ((c = find_client_by_window(mons, crev->window))) {
 		if (crev->value_mask & CWBorderWidth) {
 			/* TODO: set border size (crev->border_width) */
 			DBG("%s: set window border\n", __func__);
 		} else {
 			if (ISRESIZABLE(c))
-				handler_configurerequest_resize(wm, c, crev);
+				handler_configurerequest_resize(c, crev);
 		}
 	} else {
 		/* TODO: send XConfigureWindow to window */
@@ -481,76 +449,73 @@ handler_configurerequest(struct wm *wm, XEvent *ev)
 }
 
 void
-handler_configurenotify(struct wm *wm, XEvent *ev)
+handler_configurenotify(XEvent *ev)
 {
-	dbg_print(wm, __func__);
-
 	if (ev->xconfigure.window == root) {
-		/* restart the WM to make sure that any changes to the
+		/* Restart the WM to make sure that any changes to the
 		 * X server are handled (e.g. resolution change etc.) */
-		restart(wm);
+		restart();
 	}
 }
 
 void
-handler_destroynotify(struct wm *wm, XEvent *ev)
+handler_destroynotify(XEvent *ev)
 {
 	struct client *c;
 
-	dbg_print(wm, __func__);
+	dbg_print(__func__);
 
-	if ((c = find_client_by_window(wm->mons, ev->xdestroywindow.window)))
-		remove_client(wm, c, 1);
+	if ((c = find_client_by_window(mons, ev->xdestroywindow.window)))
+		remove_client(c, true);
 }
 
 void
-handler_enternotify(struct wm *wm, XEvent *ev)
+handler_enternotify(XEvent *ev)
 {
 	XCrossingEvent *cev = &ev->xcrossing;
 	struct client *c;
 
-	dbg_print(wm, __func__);
+	dbg_print(__func__);
 
-	if (!(c = find_client_by_window(wm->mons, cev->window)))
+	if (!(c = find_client_by_window(mons, cev->window)))
 		return;
 
 	monitor_select_client(c->mon, c, false);
 }
 
 void
-handler_expose(struct wm *wm, XEvent *ev)
+handler_expose(XEvent *ev)
 {
-	(void)wm;
 	(void)ev;
-	dbg_print(wm, __func__);
+	dbg_print(__func__);
 }
 
 void
-handler_focusin(struct wm *wm, XEvent *ev)
+handler_focusin(XEvent *ev)
 {
 	XFocusChangeEvent *fcev = &ev->xfocus;
 
-	dbg_print(wm, __func__);
+	dbg_print(__func__);
 
 	/* reacquire focus from a broken client */
-	if(wm->selmon->sel && fcev->window != wm->selmon->sel->win)
-		monitor_focus(wm->selmon, wm->selmon->sel);
+	if(selmon->sel && fcev->window != selmon->sel->win)
+		monitor_focus(selmon, selmon->sel);
 }
 
 void
-handler_keypress(struct wm *wm, XEvent *ev)
+handler_keypress(XEvent *ev)
 {
 	XKeyEvent *kev = &ev->xkey;
 	struct key *key;
 
-	dbg_print(wm, __func__);
+	dbg_print(__func__);
 
-	for (key = wm->keys; key; key = key->next) {
+	for (key = keys; key; key = key->next) {
 		if (key_pressed(key, kev->keycode, kev->state)) {
 			if (key->action >= 0 && key->action < LASTAction &&
 					key_handler[key->action]) {
-				key_handler[key->action](wm, key);
-				break; /* skip further bindings */
+				key_handler[key->action](key);
+				break; /* Skip further bindings */
 			} else {
 				die("unhandled key action (%d), fix this!\n",
 						key->action);
@@ -560,52 +525,51 @@ handler_keypress(struct wm *wm, XEvent *ev)
 }
 
 void
-handler_mappingnotify(struct wm *wm, XEvent *ev)
+handler_mappingnotify(XEvent *ev)
 {
-	(void)wm;
 	(void)ev;
-	dbg_print(wm, __func__);
+	dbg_print(__func__);
 }
 
 void
-handler_maprequest(struct wm *wm, XEvent *ev)
+handler_maprequest(XEvent *ev)
 {
 	static XWindowAttributes attr;
 	XMapRequestEvent *mrev = &ev->xmaprequest;
 
-	dbg_print(wm, __func__);
+	dbg_print(__func__);
 
 	if(!XGetWindowAttributes(dpy, mrev->window, &attr) ||
 			attr.override_redirect)
 		return;
-	if(!find_client_by_window(wm->mons, mrev->window))
-		create_client(wm, mrev->window, &attr);
+	if(!find_client_by_window(mons, mrev->window))
+		create_client(mrev->window, &attr);
 }
 
 void
-handler_motionnotify(struct wm *wm, XEvent *ev)
+handler_motionnotify(XEvent *ev)
 {
 	XMotionEvent *mev = &ev->xmotion;
 	struct monitor *mon;
 	struct client *c;
 
-	if ((c = find_client_by_window(wm->mons, mev->window))) {
+	if ((c = find_client_by_window(mons, mev->window))) {
 		while(XCheckTypedEvent(dpy, MotionNotify, ev));
 
 		/* TODO: select client */
 
-		if (wm->motion.type == MovementMotion)
-			handler_motionnotify_move(wm, c, mev);
-		else if (wm->motion.type == ResizeMotion)
-			handler_motionnotify_resize(wm, c, mev);
+		if (motion->type == MovementMotion)
+			handler_motionnotify_move(c, mev);
+		else if (motion->type == ResizeMotion)
+			handler_motionnotify_resize(c, mev);
 	} else {
-		mon = find_monitor_by_pos(wm->mons, mev->x_root, mev->y_root);
-		set_monitor(wm, mon);
+		mon = find_monitor_by_pos(mons, mev->x_root, mev->y_root);
+		set_monitor(mon);
 	}
 }
 
 void
-handler_motionnotify_move(struct wm *wm, struct client *c, XMotionEvent *ev)
+handler_motionnotify_move(struct client *c, XMotionEvent *ev)
 {
 		int xdiff, ydiff;
 		int x, y, w, h;
@@ -614,25 +578,19 @@ handler_motionnotify_move(struct wm *wm, struct client *c, XMotionEvent *ev)
 		y = c->y;
 		w = c->w;
 		h = c->h;
-		xdiff = ev->x_root - wm->motion.start.x_root;
-		ydiff = ev->y_root - wm->motion.start.y_root;
+		xdiff = ev->x_root - motion->start.x_root;
+		ydiff = ev->y_root - motion->start.y_root;
 
-		x = wm->motion.attr.x + xdiff;
-		y = wm->motion.attr.y + ydiff;
+		x = motion->attr.x + xdiff;
+		y = motion->attr.y + ydiff;
 
 		client_move_resize(c, x, y, w, h);
-		monitor_float_selected(wm->selmon, true);
-
-		snprintf(wm->selmon->str, 1024,  "%i %i %i %i "
-				"(xroot: %i, yroot: %i) "
-				"(xdiff: %i, ydiff: %i)\n",
-				x, y, w, h, ev->x_root, ev->y_root,
-				xdiff, ydiff);
-		monitor_draw_bar(wm->selmon);
+		monitor_float_selected(selmon, true);
+		monitor_draw_bar(selmon);
 }
 
 void
-handler_motionnotify_resize(struct wm *wm, struct client *c, XMotionEvent *ev)
+handler_motionnotify_resize(struct client *c, XMotionEvent *ev)
 {
 		int xdiff, ydiff;
 		int x, y, w, h;
@@ -641,45 +599,39 @@ handler_motionnotify_resize(struct wm *wm, struct client *c, XMotionEvent *ev)
 		y = c->y;
 		w = c->w;
 		h = c->h;
-		xdiff = ev->x_root - wm->motion.start.x_root;
-		ydiff = ev->y_root - wm->motion.start.y_root;
+		xdiff = ev->x_root - motion->start.x_root;
+		ydiff = ev->y_root - motion->start.y_root;
 
 		if (!c->floating) { /* TODO: check if the monitor is arranged */
 			w = c->ow;
 			h = c->oh;
 		} else {
-			w = wm->motion.attr.width + xdiff;
-			h = wm->motion.attr.height + ydiff;
+			w = motion->attr.width + xdiff;
+			h = motion->attr.height + ydiff;
 		}
 
 		client_move_resize(c, x, y, w, h);
-		monitor_float_selected(wm->selmon, true);
-
-		snprintf(wm->selmon->str, 1024,  "%i %i %i %i "
-				"(xroot: %i, yroot: %i) "
-				"(xdiff: %i, ydiff: %i)\n",
-				x, y, w, h, ev->x_root, ev->y_root,
-				xdiff, ydiff);
-		monitor_draw_bar(wm->selmon);
+		monitor_float_selected(selmon, true);
+		monitor_draw_bar(selmon);
 }
 
 void
-handler_propertynotify(struct wm *wm, XEvent *ev)
+handler_propertynotify(XEvent *ev)
 {
-	dbg_print(wm, __func__);
+	dbg_print(__func__);
 
 	if (ev->xproperty.window == root)
-		handler_propertynotify_root(wm, &ev->xproperty);
+		handler_propertynotify_root(&ev->xproperty);
 	else
-		handler_propertynotify_client(wm, &ev->xproperty);
+		handler_propertynotify_client(&ev->xproperty);
 }
 
 void
-handler_propertynotify_client(struct wm *wm, XPropertyEvent *ev)
+handler_propertynotify_client(XPropertyEvent *ev)
 {
 	struct client *c;
 
-	if (!(c = find_client_by_window(wm->mons, ev->window)))
+	if (!(c = find_client_by_window(mons, ev->window)))
 		return;
 
 	if (ev->atom == XA_WM_NAME || ev->atom == netatom(NetWMName)) {
@@ -703,10 +655,8 @@ handler_propertynotify_client(struct wm *wm, XPropertyEvent *ev)
 }
 
 void
-handler_propertynotify_root(struct wm *wm, XPropertyEvent *ev)
+handler_propertynotify_root(XPropertyEvent *ev)
 {
-	(void)wm;
-
 	if (ev->atom == XA_WM_NAME) {
 		/* TODO: Two options:
 		 * 1.) Read the prop and set the status text and redraw all
@@ -718,65 +668,65 @@ handler_propertynotify_root(struct wm *wm, XPropertyEvent *ev)
 }
 
 void
-handler_unmapnotify(struct wm *wm, XEvent *ev)
+handler_unmapnotify(XEvent *ev)
 {
 	struct client *c;
 	XUnmapEvent *uev = &ev->xunmap;
 
-	dbg_print(wm, __func__);
+	dbg_print(__func__);
 
-	if((c = find_client_by_window(wm->mons, uev->window))) {
+	if ((c = find_client_by_window(mons, uev->window))) {
 		if(uev->send_event)
 			client_set_state(c, WithdrawnState);
 		else
-			remove_client(wm, c, 0);
+			remove_client(c, false);
 	}
 }
 
 void
-key_handler_kill(struct wm *wm, struct key *key)
+key_handler_kill(struct key *key)
 {
 	(void)key;
-	if (wm->selmon->sel)
-		client_kill(wm->selmon->sel);
+	if (selmon->sel)
+		client_kill(selmon->sel);
 }
 
 void
-key_handler_movewindow(struct wm *wm, struct key *key)
+key_handler_movewindow(struct key *key)
 {
-	if (key->args && wm->selmon->sel) {
+	if (key->args && selmon->sel) {
 		int ws = atoi(key->args) - 1; /* off-by-one in binding */
 
-		if (VALID_WORKSPACE(ws) && wm->selmon->sel->ws != ALL_WS) {
-			client_set_ws(wm->selmon->sel, ws);
-			monitor_focus(wm->selmon, NULL);
-			monitor_arrange(wm->selmon);
+		if (VALID_WORKSPACE(ws) && selmon->sel->ws != ALL_WS) {
+			client_set_ws(selmon->sel, ws);
+			monitor_focus(selmon, NULL);
+			monitor_arrange(selmon);
 		}
 	}
 }
 
 void
-key_handler_quit(struct wm *wm, struct key *key)
+key_handler_quit(struct key *key)
 {
 	(void)key;
-	quit(wm, "received exit key command");
+	quit("received exit key command");
 }
 
 void
-key_handler_restart(struct wm *wm, struct key *key)
+key_handler_restart(struct key *key)
 {
 	(void)key;
-	restart(wm);
+	restart();
 }
 
 void
-key_handler_select(struct wm *wm, struct key *key)
+key_handler_select(struct key *key)
 {
 	if (key->args) {
 		if (STREQ(key->args, "next")) {
-			monitor_select_next_client(wm->selmon);
+			monitor_select_next_client(selmon);
 		} else if (STREQ(key->args, "prev")) {
-			monitor_select_prev_client(wm->selmon);
+			monitor_select_prev_client(selmon);
 		} else {
 			error("%s: invalid arg: '%s'", __func__, key->args);
 		}
@@ -784,9 +734,9 @@ key_handler_select(struct wm *wm, struct key *key)
 }
 
 void
-key_handler_setlayout(struct wm *wm, struct key *key)
+key_handler_setlayout(struct key *key)
 {
-	struct monitor *mon = wm->selmon;
+	struct monitor *mon = selmon;
 	int nid, oid;
 
 	oid = mon->selws->layout->id;
@@ -805,18 +755,18 @@ key_handler_setlayout(struct wm *wm, struct key *key)
 }
 
 void
-key_handler_setmaster(struct wm *wm, struct key *key)
+key_handler_setmaster(struct key *key)
 {
 	(void)key;
 
-	monitor_selected_to_master(wm->selmon);
-	monitor_arrange(wm->selmon);
+	monitor_selected_to_master(selmon);
+	monitor_arrange(selmon);
 }
 
 void
-key_handler_setmfact(struct wm *wm, struct key *key)
+key_handler_setmfact(struct key *key)
 {
-	struct monitor *mon = wm->selmon;
+	struct monitor *mon = selmon;
 	struct layout *layout = mon->selws->layout;
 
 	if (key->args) {
@@ -824,14 +774,14 @@ key_handler_setmfact(struct wm *wm, struct key *key)
 			layout_set_mfact(layout, layout->mfact + M_FACTSTEP);
 		else if (STREQ(key->args, "-"))
 			layout_set_mfact(layout, layout->mfact - M_FACTSTEP);
-		monitor_arrange(wm->selmon);
+		monitor_arrange(selmon);
 	}
 }
 
 void
-key_handler_setmnum(struct wm *wm, struct key *key)
+key_handler_setmnum(struct key *key)
 {
-	struct monitor *mon = wm->selmon;
+	struct monitor *mon = selmon;
 	struct layout *layout = mon->selws->layout;
 
 	if (key->args) {
@@ -839,32 +789,31 @@ key_handler_setmnum(struct wm *wm, struct key *key)
 			layout_set_nmaster(layout, layout->nmaster + 1);
 		else if (STREQ(key->args, "-") && layout->nmaster > 0)
 			layout_set_nmaster(layout, layout->nmaster - 1);
-		monitor_arrange(wm->selmon);
+		monitor_arrange(selmon);
 	}
 }
 
 void
-key_handler_setws(struct wm *wm, struct key *key)
+key_handler_setws(struct key *key)
 {
 	if (key->args) {
 		int ws = atoi(key->args) - 1; /* off-by-one in binding */
 
 		if (ws >= MIN_WS && ws <= MAX_WS)
-			monitor_set_ws(wm->selmon, ws);
+			monitor_set_ws(selmon, ws);
 	}
 }
 
 void
-key_handler_spawn(struct wm *wm, struct key *key)
+key_handler_spawn(struct key *key)
 {
-	(void)wm;
 	spawn(key->args);
 }
 
 void
-key_handler_swap(struct wm *wm, struct key *key)
+key_handler_swap(struct key *key)
 {
-	struct monitor *mon = wm->selmon;
+	struct monitor *mon = selmon;
 
 	if (key->args) {
 		if (STREQ(key->args, "next"))
@@ -875,67 +824,64 @@ key_handler_swap(struct wm *wm, struct key *key)
 }
 
 void
-key_handler_togglebar(struct wm *wm, struct key *key)
+key_handler_togglebar(struct key *key)
 {
 	(void)key;
-	monitor_toggle_bar(wm->selmon);
+	monitor_toggle_bar(selmon);
 }
 
 void
-key_handler_togglefloat(struct wm *wm, struct key *key)
+key_handler_togglefloat(struct key *key)
 {
 	(void)key;
-	if (wm->selmon->sel)
-		monitor_float_selected(wm->selmon, !wm->selmon->sel->floating);
+	if (selmon->sel)
+		monitor_float_selected(selmon, !selmon->sel->floating);
 }
 
 void
-key_handler_togglefs(struct wm *wm, struct key *key)
+key_handler_togglefs(struct key *key)
 {
-	struct monitor *mon = wm->selmon;
+	struct monitor *mon = selmon;
 	(void)key;
 
 	if (mon->sel)
-		set_fullscreen(wm, mon->sel, !mon->sel->fullscreen);
+		set_fullscreen(mon->sel, !mon->sel->fullscreen);
 }
 
 void
-key_handler_togglews(struct wm *wm, struct key *key)
+key_handler_togglews(struct key *key)
 {
-	x11_init();
-	x11_destroy();
 	(void)key;
-	monitor_set_ws(wm->selmon, wm->selmon->prevws_i);
+	monitor_set_ws(selmon, selmon->prevws_i);
 }
 
-int
-manageable_window(Window win, XWindowAttributes *attr,
-		int trans)
+bool
+manageable_window(Window win, XWindowAttributes *attr, bool trans)
 {
 	Window dummy;
 
 	if (!XGetWindowAttributes(dpy, win, attr))
-		return 0;
+		return false;
 	if (trans && !XGetTransientForHint(dpy, win, &dummy))
-		return 0;
+		return false;
 	if (!trans && (attr->override_redirect ||
 				XGetTransientForHint(dpy, win, &dummy)))
-		return 0;
+		return false;
 	return (attr->map_state == IsViewable ||
 			get_state(win) == IconicState);
 }
 
 void
-quit(struct wm *wm, const char *reason)
+quit(const char *reason)
 {
-	destroy(wm);
+	destroy();
 	if (reason)
 		die("quitting (%s)\n", reason);
 	die("quitting\n");
 }
 
 void
-remove_client(struct wm *wm, struct client *c, int destroyed)
+remove_client(struct client *c, bool destroyed)
 {
 	struct monitor *mon = c->mon;
 
@@ -949,25 +895,24 @@ remove_client(struct wm *wm, struct client *c, int destroyed)
 	monitor_focus(mon, NULL);
 	monitor_arrange(mon);
 
-	update_net_client_list(wm);
+	update_net_client_list();
 }
 
 void
-restart(struct wm *wm)
+restart(void)
 {
-	if (wm->cmd) {
-		char *cmd = xstrdup(wm->cmd);
+	if (cmd) {
+		char *_cmd = xstrdup(cmd);
 
 		DBG("%s. restarting!\n", __func__);
-		destroy(wm);
-		execlp("/bin/sh", "sh" , "-c", cmd, NULL);
+		destroy();
+		execlp("/bin/sh", "sh" , "-c", _cmd, NULL);
 	}
 }
 
 void
-set_environment(struct wm *wm)
+set_environment(void)
 {
-	(void)wm;
 	setenv("BAR_FONT", settings()->barfont, 1);
 	setenv("BAR_NORM_FG", settings()->colors[BarNormFG], 1);
 	setenv("BAR_NORM_BG", settings()->colors[BarNormBG], 1);
@@ -976,7 +921,7 @@ set_environment(struct wm *wm)
 }
 
 void
-set_fullscreen(struct wm *wm, struct client *c, bool fullscreen)
+set_fullscreen(struct client *c, bool fullscreen)
 {
 	client_set_fullscreen(c, fullscreen);
 
@@ -985,12 +930,12 @@ set_fullscreen(struct wm *wm, struct client *c, bool fullscreen)
 }
 
 void
-set_monitor(struct wm *wm, struct monitor *mon)
+set_monitor(struct monitor *mon)
 {
-	if (wm->selmon != mon) {
-		monitor_unfocus_selected(wm->selmon);
-		wm->selmon = mon;
+	if (selmon != mon) {
+		monitor_unfocus_selected(selmon);
 		monitor_focus(mon, mon->sel);
+		selmon = mon;
 
 		ewmh_root_set_current_desktop(mon->num * N_WORKSPACES
 				+ mon->selws_i);
@@ -998,27 +943,27 @@ set_monitor(struct wm *wm, struct monitor *mon)
 }
 
 void
-update_bars(struct wm *wm)
+update_bars(void)
 {
 	struct monitor *mon;
 
 	sysinfo_update();
 
-	for (mon = wm->mons; mon; mon = mon->next)
+	for (mon = mons; mon; mon = mon->next)
 		monitor_draw_bar(mon);
 
-	dbg_print(wm, __func__);
+	dbg_print(__func__);
 }
 
 void
-update_net_client_list(struct wm *wm)
+update_net_client_list(void)
 {
 	struct monitor *mon;
 	struct client *c;
 
 	ewmh_root_client_list_clear();
 
-	for (mon = wm->mons; mon; mon = mon->next)
+	for (mon = mons; mon; mon = mon->next)
 		for (c = mon->clients; c; c = c->next)
 			ewmh_root_client_list_add(c->win);
 }

@@ -119,9 +119,9 @@ main(int argc, char **argv)
 
 	error("starting!\n");
 
-	wm = init(strfvs(argv, ' '));
-	eventloop(wm);
-	destroy(wm);
+	init(strfvs(argv, ' '));
+	eventloop();
+	destroy();
 
 	return 0;
 }

@@ -246,7 +246,6 @@ struct monitor {
 	unsigned long prevws_i;     /* previous workspace index */
 	struct ws ws[N_WORKSPACES]; /* workspace information */
 	struct monitor *next;       /* next monitor */
-	char str[1024];
 };
 
 /* Size hints struct */
@@ -375,15 +374,6 @@ struct rule {
 	struct rule_match *match;
 	struct rule_settings *settings;
 	struct rule *next;
-};
-
-/* Main struct */
-struct wm {
-	struct monitor *mons;   /* monitor list */
-	struct monitor *selmon; /* selected monitor */
-	struct key *keys;       /* key bindings */
-	const char *cmd;        /* command used to launch the wm*/
-	struct motion motion;   /* mouse motion info */
 };
 
 /*** Function prototypes ***/
@@ -556,9 +546,9 @@ void *xrealloc(void *, size_t);
 char *xstrdup(const char *);
 
 /* wm.c */
-struct wm *init(const char *);
-int eventloop(struct wm *);
-int destroy(struct wm *);
+void init(const char *);
+void eventloop(void);
+void destroy(void);
 
 /* x11.c */
 void x11_init(void);

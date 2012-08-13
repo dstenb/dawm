@@ -30,6 +30,10 @@ void
 x11_destroy(void)
 {
 	if (initialized) {
+		XUngrabKey(dpy, AnyKey, AnyModifier, root);
+		XSync(dpy, False);
+		XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot,
+				CurrentTime);
 		XCloseDisplay(dpy);
 	}
 }
