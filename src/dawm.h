@@ -65,6 +65,7 @@
 /* Client macros */
 #define CLIENT_NAME_SIZE 128
 #define ISDOCK(c)               (c->wtype & Dock)
+#define ISFOCUSABLE(c)          (ISVISIBLE(c) && !ISDOCK(c))
 #define ISRESIZABLE(c)          (c->floating || !ISARRANGED(c->mon))
 #define ISSELECTABLE(c)         (ISVISIBLE(c) && !ISDOCK(c))
 #define ISTILED(c)              (!c->floating && ISVISIBLE(c))
