@@ -58,9 +58,16 @@
 #define M_FACTSTEP 0.05
 #define N_MASTER 1
 
-/* Default bar settings */
+#ifdef SYSINFO_EXTENDED
+#define BAR_FMT "  %W  [%L]  %T  Uptime: %U  CPU: %P  MEM: %M  BAT: %B"
+#else
+#define BAR_FMT "  %W  [%L]  %T"
+#endif /* SYSINFO_EXTENDED */
+
 #define BAR_FONT "-*-profont-*-*-*-*-10-*-*-*-*-*-*-*"
 #define BAR_UPDATE_RATE 5
+
+#define TIME_FMT "%y/%m/%d %H:%M"
 
 /* Client macros */
 #define CLIENT_NAME_SIZE 128
@@ -89,6 +96,8 @@
 #define NET_WM_STATE_ADD 1
 #define NET_WM_STATE_TOGGLE 2
 
+/*** Global variables ***/
+
 /* Global XLib variables (see x11.c) */
 extern Display *dpy;
 extern Window root;
@@ -96,6 +105,8 @@ extern int dpy_fd;
 extern int screen;
 extern int screen_w;
 extern int screen_h;
+
+/*** Enums ***/
 
 /* Atoms */
 typedef enum {
@@ -293,6 +304,12 @@ struct client {
 	struct client *snext;        /* next client in stack */
 };
 
+/* Format data struct */
+struct format_data {
+	const char *layout;    /* layout symbol */
+	const char *workspace; /* workspace name */
+};
+
 /* Key struct */
 struct key {
 	unsigned int mod; /* modifier mask */
@@ -322,6 +339,7 @@ struct settings {
 	struct key *keys;        /* key bindings */
 	float mfact;             /* master size factor [0, 1] */
 	unsigned int nmaster;    /* number of master clients */
+	char *barfmt;            /* bar format string */
 	char *barfont;           /* bar font */
 	char *colors[LASTColor]; /* color values, in "#XXXXXX" form */
 	int bw;
@@ -518,6 +536,7 @@ void settings_read(const char *);
 
 /* sysinfo.c */
 const struct sysinfo *sysinfo(void);
+void sysinfo_format(const char *, char *, unsigned, struct format_data *);
 void sysinfo_init(void);
 void sysinfo_update(void);
 

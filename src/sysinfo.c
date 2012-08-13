@@ -18,6 +18,7 @@ static struct {
 static const char *bat_full = "/sys/class/power_supply/BAT0/charge_full";
 static const char *bat_now = "/sys/class/power_supply/BAT0/charge_now";
 static const char *bat_status = "/sys/class/power_supply/BAT0/status";
+static const char *bat_sym[] = { "", "+", "-", "" };
 
 static int
 get_battery_full(float *full)
@@ -198,6 +199,95 @@ const struct sysinfo *
 sysinfo()
 {
 	return &_sysinfo;
+}
+
+/** */
+void
+sysinfo_format(const char *fmt, char *str, unsigned size,
+		struct format_data *fd)
+{
+	char buf[256];
+	char *p;
+	char c;
+	unsigned j = 0;
+	unsigned l;
+
+	if (!str || size == 0)
+		return;
+
+	p = str;
+
+	while ((c = *fmt++)) {
+		if (j >= size - 1)
+			break;
+
+		if (c == '%') {
+			c = *fmt++;
+
+			switch(c) {
+			case 'L': /* Layout symbol */
+				l = MIN(size - j, strlen(fd->layout));
+				p = stpncpy(p, fd->layout, l);
+				j += l;
+				break;
+			case 'W': /* Workspace name */
+				l = MIN(size - j, strlen(fd->workspace));
+				p = stpncpy(p, fd->workspace, l);
+				j += l;
+				break;
+			case 'T': /* Time */
+				strftime(buf, sizeof(buf), TIME_FMT,
+						localtime(&_sysinfo.time));
+				l = MIN(size - j, strlen(buf));
+				p = stpncpy(p, buf, l);
+				j += l;
+				break;
+#ifdef SYSINFO_EXTENDED
+			case 'P': /* Processor */
+				snprintf(buf, sizeof(buf), "%i%c",
+						_sysinfo.cpu, '%');
+				l = MIN(size - j, strlen(buf));
+				p = stpncpy(p, buf, l);
+				j += l;
+				break;
+			case 'M': /* Memory */
+				snprintf(buf, sizeof(buf), "%ld/%ld",
+						_sysinfo.mem_used / 1024,
+						_sysinfo.mem_total / 1024);
+				l = MIN(size - j, strlen(buf));
+				p = stpncpy(p, buf, l);
+				j += l;
+				break;
+			case 'U': /* Uptime */
+				snprintf(buf, sizeof(buf), "%ld:%02ld",
+						_sysinfo.uptime / 3600,
+						(_sysinfo.uptime / 60) % 60);
+				l = MIN(size - j, strlen(buf));
+				p = stpncpy(p, buf, l);
+				j += l;
+				break;
+			case 'B': /* Battery level */
+				snprintf(buf, sizeof(buf), "%s%i%c",
+						bat_sym[_sysinfo.bat_status],
+						_sysinfo.bat_level, '%');
+				l = MIN(size - j, strlen(buf));
+				p = stpncpy(p, buf, l);
+				j += l;
+				break;
+#endif /* SYSINFO_EXTENDED */
+			default: /* Not a format '%' char */
+				snprintf(buf, sizeof(buf), "%c%c", '%', c);
+				p = stpncpy(p, buf, 2);
+				j += 2;
+				break;
+			}
+		} else {
+			*p++ = c;
+			j++;
+		}
+	}
+
+	str[MIN(j, size - 1)] = '\0';
 }
 
 /** Initializes the main sysinfo struct */

@@ -238,35 +238,13 @@ monitor_create(int num, int x, int y, int w, int h)
 void
 monitor_draw_bar(struct monitor *mon)
 {
-	char buf[512];
-	char timestr[64];
-	const struct sysinfo *i = sysinfo();
-	const char *layoutstr = layout_symbol(mon->selws->layout);
+	struct format_data fd = {
+		.layout = layout_symbol(mon->selws->layout),
+		.workspace = mon->selws->name
+	};
+	char buf[1024];
 
-	strftime(timestr, sizeof(timestr), "%y/%m/%d %H:%M",
-			localtime(&i->time));
-
-#ifdef SYSINFO_EXTENDED
-	char *batstr;
-
-	if (i->bat_status == Charging)
-		batstr = "+";
-	else if (i->bat_status == Discharging)
-		batstr = "-";
-	else
-		batstr = "";
-
-	snprintf(buf, sizeof(buf), "'%s'  %i:%lu  [%s]  %s  UPTIME: %ld:%02ld  "
-			"CPU: %i%c  MEM: %ld/%ldMB  BAT: %s%i%c", mon->str,
-			mon->num + 1, mon->selws_i + 1, layoutstr, timestr,
-			i->uptime / 3600, (i->uptime / 60) % 60,
-			i->cpu, '%', i->mem_used / 1024, i->mem_total / 1024,
-			batstr, i->bat_level, '%');
-#else
-	snprintf(buf, sizeof(buf), "  %i:%lu  [%s]  %s", mon->num + 1,
-			mon->selws + 1, layoutstr, timestr);
-#endif /* SYSINFO_EXTENDED */
-
+	sysinfo_format(settings()->barfmt, buf, sizeof(buf), &fd);
 	bar_draw(mon->bar, buf);
 }
 

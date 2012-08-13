@@ -42,6 +42,8 @@ parse_bar(config_t *cfg)
 		_settings.showbar = b;
 	if (config_setting_lookup_bool(group, "top_bar", &b))
 		_settings.topbar = b;
+	if (config_setting_lookup_string(group, "fmt", &str))
+		replace_str(&_settings.barfmt, xstrdup(str));
 	if (config_setting_lookup_string(group, "font", &str))
 		replace_str(&_settings.barfont, xstrdup(str));
 }
@@ -208,6 +210,7 @@ settings_init()
 	_settings.keys = key_default_keys();
 	_settings.mfact = M_FACT;
 	_settings.nmaster = N_MASTER;
+	_settings.barfmt = xstrdup(BAR_FMT);
 	_settings.barfont = xstrdup(BAR_FONT);
 
 	for (i = 0; i < LASTColor; i++)
