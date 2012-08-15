@@ -685,10 +685,17 @@ key_handler_kill(struct key *key)
 void
 key_handler_movewindow(struct key *key)
 {
-	if (key->args && selmon->sel) {
-		int ws = atoi(key->args) - 1; /* off-by-one in binding */
+	int ws;
 
-		if (VALID_WORKSPACE(ws) && selmon->sel->ws != ALL_WS) {
+	if (key->args && selmon->sel) {
+		if (STREQ(key->args, "prev"))
+			ws = selmon->sel->ws - 1;
+		else if (STREQ(key->args, "next"))
+			ws = selmon->sel->ws + 1;
+		else
+			ws = atoi(key->args) - 1; /* Off-by-one in binding */
+
+		if (ws >= MIN_WS && ws <= MAX_WS && selmon->sel->ws != ALL_WS) {
 			client_set_ws(selmon->sel, ws);
 			monitor_focus(selmon, NULL);
 			monitor_arrange(selmon);
@@ -787,8 +794,15 @@ key_handler_setmnum(struct key *key)
 void
 key_handler_setws(struct key *key)
 {
+	int ws;
+
 	if (key->args) {
-		int ws = atoi(key->args) - 1; /* off-by-one in binding */
+		if (STREQ(key->args, "prev"))
+			ws = selmon->selws_i - 1;
+		else if (STREQ(key->args, "next"))
+			ws = selmon->selws_i + 1;
+		else
+			ws = atoi(key->args) - 1; /* Off-by-one in binding */
 
 		if (ws >= MIN_WS && ws <= MAX_WS)
 			monitor_set_ws(selmon, ws);

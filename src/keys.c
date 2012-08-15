@@ -33,6 +33,8 @@ static struct key default_keys[] = {
 	{ MOD_SUPER,       XK_7,      SetWsAction,         "7",      NULL },
 	{ MOD_SUPER,       XK_8,      SetWsAction,         "8",      NULL },
 	{ MOD_SUPER,       XK_9,      SetWsAction,         "9",      NULL },
+	{ MOD_SUPER,       XK_Left,   SetWsAction,         "prev",   NULL },
+	{ MOD_SUPER,       XK_Right,  SetWsAction,         "next",   NULL },
 	{ MOD_SUPER,       XK_g,      ToggleWsAction,      NULL,     NULL },
 
 	{ MOD_SHIFT_SUPER, XK_1,      MoveWindowAction,    "1",      NULL },
@@ -44,6 +46,8 @@ static struct key default_keys[] = {
 	{ MOD_SHIFT_SUPER, XK_7,      MoveWindowAction,    "7",      NULL },
 	{ MOD_SHIFT_SUPER, XK_8,      MoveWindowAction,    "8",      NULL },
 	{ MOD_SHIFT_SUPER, XK_9,      MoveWindowAction,    "9",      NULL },
+	{ MOD_SHIFT_SUPER, XK_Left,   MoveWindowAction,    "prev",   NULL },
+	{ MOD_SHIFT_SUPER, XK_Right,  MoveWindowAction,    "next",   NULL },
 
 	{ MOD_SUPER,       XK_h,      SetLayoutAction,     "horz",   NULL },
 	{ MOD_SUPER,       XK_v,      SetLayoutAction,     "vert",   NULL },
