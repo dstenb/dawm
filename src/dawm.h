@@ -73,6 +73,7 @@
 #define CLIENT_NAME_SIZE 128
 #define ISDOCK(c)               (c->wtype & Dock)
 #define ISFOCUSABLE(c)          (ISVISIBLE(c) && !ISDOCK(c))
+#define ISMOVEABLE(c)           (c->floating && !ISDOCK(c))
 #define ISRESIZABLE(c)          (c->floating || !ISARRANGED(c->mon))
 #define ISSELECTABLE(c)         (ISVISIBLE(c) && !ISDOCK(c))
 #define ISTILED(c)              (!c->floating && ISVISIBLE(c))
@@ -500,12 +501,14 @@ void monitor_selected_to_master(struct monitor *);
 void monitor_set_layout(struct monitor *, int);
 void monitor_set_ws(struct monitor *, unsigned long);
 void monitor_show_bar(struct monitor *, bool);
+void monitor_swap(struct monitor *, struct client *, struct client *);
 void monitor_swap_next_client(struct monitor *);
 void monitor_swap_prev_client(struct monitor *);
 void monitor_unfocus_selected(struct monitor *);
 
 struct client *find_client_by_trans(struct monitor *, Window);
 struct client *find_client_by_window(struct monitor *, Window);
+struct client *find_nth_tiled_client(struct monitor *, int);
 
 struct monitor *find_monitor_by_num(struct monitor *, int);
 struct monitor *find_monitor_by_pos(struct monitor *, int, int);

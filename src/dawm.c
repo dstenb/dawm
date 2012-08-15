@@ -556,7 +556,8 @@ handler_motionnotify(XEvent *ev)
 	if ((c = find_client_by_window(mons, mev->window))) {
 		while(XCheckTypedEvent(dpy, MotionNotify, ev));
 
-		/* TODO: select client */
+		if (c->mon->sel != c)
+			monitor_select_client(c->mon, c, false);
 
 		if (motion->type == MovementMotion)
 			handler_motionnotify_move(c, mev);
@@ -571,48 +572,38 @@ handler_motionnotify(XEvent *ev)
 void
 handler_motionnotify_move(struct client *c, XMotionEvent *ev)
 {
-		int xdiff, ydiff;
-		int x, y, w, h;
+	struct client *t;
+	int x, y, pos;
 
-		x = c->x;
-		y = c->y;
-		w = c->w;
-		h = c->h;
-		xdiff = ev->x_root - motion->start.x_root;
-		ydiff = ev->y_root - motion->start.y_root;
+	if (ISTILED(c)) {
+		pos = layout_pos_index(c->mon->selws->layout, ev->x_root,
+				ev->y_root);
 
-		x = motion->attr.x + xdiff;
-		y = motion->attr.y + ydiff;
+		if (pos >= 0 && (t = find_nth_tiled_client(c->mon, pos)))
+			monitor_swap(c->mon, c, t);
+	} else if (ISMOVEABLE(c)) {
+		x = ev->x_root + motion->attr.x - motion->start.x_root;
+		y = ev->y_root + motion->attr.y - motion->start.y_root;
 
-		client_move_resize(c, x, y, w, h);
-		monitor_float_selected(selmon, true);
+		client_move_resize(c, x, y, c->w, c->h);
 		monitor_draw_bar(selmon);
+	}
 }
 
 void
 handler_motionnotify_resize(struct client *c, XMotionEvent *ev)
 {
-		int xdiff, ydiff;
-		int x, y, w, h;
+	int w, h;
 
-		x = c->x;
-		y = c->y;
-		w = c->w;
-		h = c->h;
-		xdiff = ev->x_root - motion->start.x_root;
-		ydiff = ev->y_root - motion->start.y_root;
+	if (ISTILED(c)) {
+		/* TODO: handle resizing of tiled clients */
+	} else if (ISRESIZABLE(c)) {
+		w = ev->x_root + motion->attr.width - motion->start.x_root;
+		h = ev->y_root + motion->attr.height - motion->start.y_root;
 
-		if (!c->floating) { /* TODO: check if the monitor is arranged */
-			w = c->ow;
-			h = c->oh;
-		} else {
-			w = motion->attr.width + xdiff;
-			h = motion->attr.height + ydiff;
-		}
-
-		client_move_resize(c, x, y, w, h);
-		monitor_float_selected(selmon, true);
+		client_move_resize(c, c->x, c->y, w, h);
 		monitor_draw_bar(selmon);
+	}
 }
 
 void

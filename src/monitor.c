@@ -3,7 +3,6 @@
 static void monitor_move_clients(struct monitor *);
 static void monitor_restack(struct monitor *);
 static void monitor_show_hide(struct monitor *);
-static void monitor_swap(struct monitor *, struct client *, struct client *);
 static void monitor_update_window_size(struct monitor *);
 
 /* Returns the last tiled client */
@@ -477,6 +476,12 @@ monitor_swap(struct monitor *mon, struct client *c1, struct client *c2)
 {
 	struct client *tmp;
 
+	assert(c1->mon == mon);
+	assert(c2->mon == mon);
+
+	if (c1 == c2)
+		return;
+
 	tmp = c1->next;
 	c1->next = c2->next;
 	c2->next = tmp;
@@ -499,6 +504,8 @@ monitor_swap(struct monitor *mon, struct client *c1, struct client *c2)
 		c2->prev->next = c2;
 	else
 		mon->clients = c2;
+
+	monitor_arrange(mon);
 }
 
 /** Swaps the currently selected client with the next tiled client */
@@ -514,7 +521,6 @@ monitor_swap_next_client(struct monitor *mon)
 	if (((c = next_tiled(sel->next)) || (c = next_tiled(mon->clients)))
 			&& c != sel) {
 		monitor_swap(mon, sel, c);
-		monitor_arrange(mon);
 	}
 }
 
@@ -531,7 +537,6 @@ monitor_swap_prev_client(struct monitor *mon)
 	if (((c = prev_tiled(sel->prev)) || (c = last_tiled(mon->clients)))
 			&& c != sel) {
 		monitor_swap(mon, sel, c);
-		monitor_arrange(mon);
 	}
 }
 
@@ -612,6 +617,15 @@ find_client_by_window(struct monitor *mon, Window win)
 	}
 
 	return NULL;
+}
+
+struct client *
+find_nth_tiled_client(struct monitor *mon, int pos)
+{
+	struct client *c;
+	for (c = next_tiled(mon->clients); c && pos > 0;
+			c = next_tiled(c->next), pos--);
+	return c;
 }
 
 /** Returns the monitor that corresponds to the given monitor number */
