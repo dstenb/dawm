@@ -234,6 +234,9 @@ settings_read(const char *path)
 	FILE *fp;
 	config_t cfg;
 
+	if (!path)
+		path = settings_default_path();
+
 	if (!(fp = fopen(path, "r"))) {
 		if (errno == ENOENT) {
 			error("no such file or directory: %s\n", path);

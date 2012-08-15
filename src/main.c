@@ -82,8 +82,8 @@ version(void)
 int
 main(int argc, char **argv)
 {
-	struct wm *wm;
-	char *cfg_str = NULL;
+	char *cmd_line = strfvs(argv, ' ');
+	char *cfg_path = NULL;
 	int i;
 
 	for (i = 1; i < argc; i++) {
@@ -99,7 +99,7 @@ main(int argc, char **argv)
 				STREQ(argv[i], "-c")) {
 			if (++i == argc)
 				die("missing argument for %s\n", argv[i - 1]);
-			cfg_str = argv[i];
+			cfg_path = argv[i];
 		} else if (STREQ(argv[i], "--check") ||
 				STREQ(argv[i], "-k")) {
 			check_config = true;
@@ -109,17 +109,14 @@ main(int argc, char **argv)
 		}
 	}
 
-	autorun();
-
 	settings_init();
-	settings_read(cfg_str ? cfg_str : settings_default_path());
+	settings_read(cfg_path);
 
 	if (check_config)
 		die("configuration file ok!\n");
 
-	error("starting!\n");
-
-	init(strfvs(argv, ' '));
+	init(cmd_line);
+	autorun();
 	eventloop();
 	destroy();
 
