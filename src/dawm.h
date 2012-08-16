@@ -233,6 +233,14 @@ struct ws {
 	struct layout *layout;   /* layout */
 };
 
+/* Workspace settings struct */
+struct ws_settings {
+	char name[WS_NAME_SIZE]; /* name */
+	float mfact;             /*  */
+	unsigned nmaster;        /*  */
+	LayoutID layout;         /*  */
+};
+
 struct client;
 struct monitor {
 	int num;                    /* monitor number, 0... */
@@ -337,11 +345,10 @@ struct settings {
 	bool topbar;             /* non-zero if bars should be in the top */
 	bool showbar;            /* non-zero if bars should be shown */
 	struct key *keys;        /* key bindings */
-	float mfact;             /* master size factor [0, 1] */
-	unsigned int nmaster;    /* number of master clients */
 	char *barfmt;            /* bar format string */
 	char *barfont;           /* bar font */
 	char *colors[LASTColor]; /* color values, in "#XXXXXX" form */
+	struct ws_settings ws[N_WORKSPACES];
 	int bw;
 };
 
@@ -417,7 +424,7 @@ void client_set_state(struct client *, long);
 void client_set_ws(struct client *, unsigned long);
 void client_setup(struct client *, struct monitor *,
 		struct monitor *, struct client *);
-void client_show(struct client *, int);
+void client_show(struct client *, bool);
 void client_unmap(struct client *);
 void client_update_size_hints(struct client *);
 void client_update_title(struct client *);
@@ -459,8 +466,8 @@ void ewmh_client_set_state(Window, Atom);
 const char *key_action2str(KeyAction);
 struct key *key_append(struct key *, struct key *);
 struct key *key_copy(struct key *);
-struct key *key_create(unsigned int, KeySym, KeyAction, const char *,
-		struct key *);
+struct key *key_create(unsigned int, KeySym, KeyAction,
+		const char *, struct key *);
 struct key *key_default_keys(void);
 struct key *key_free_all(struct key *);
 void key_grab_all(struct key *);

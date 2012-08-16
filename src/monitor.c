@@ -138,11 +138,11 @@ show_hide(struct client *c)
 {
 	if (c) {
 		if (ISVISIBLE(c)) {
-			client_show(c, 1);
+			client_show(c, true);
 			show_hide(c->snext);
 		} else {
 			show_hide(c->snext);
-			client_show(c, 0);
+			client_show(c, false);
 		}
 	}
 }
@@ -201,6 +201,7 @@ struct monitor *
 monitor_create(int num, int x, int y, int w, int h)
 {
 	struct monitor *mon = xcalloc(1, sizeof(struct monitor));
+	const struct ws_settings *wss;
 	int i;
 
 	mon->bar = bar_create(settings()->topbar, settings()->showbar, x, y, w);
@@ -222,10 +223,11 @@ monitor_create(int num, int x, int y, int w, int h)
 	mon->selws = &mon->ws[mon->selws_i];
 
 	for (i = 0; i < N_WORKSPACES; i++) {
-		snprintf(mon->ws[i].name, WS_NAME_SIZE, "%i", (i + 1));
-		mon->ws[i].layout = layout_init(DEFAULT_LAYOUT,
-				mon->mw, mon->mh, mon->ww, mon->wh,
-				settings()->nmaster, settings()->mfact);
+		wss = &settings()->ws[i];
+
+		strcpy(mon->ws[i].name, wss->name);
+		mon->ws[i].layout = layout_init(wss->layout, mon->mw, mon->mh,
+				mon->ww, mon->wh, wss->nmaster, wss->mfact);
 	}
 
 	monitor_show_bar(mon, mon->bar->showbar);

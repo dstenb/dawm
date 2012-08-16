@@ -9,6 +9,8 @@ static void parse_key_bindings(config_t *);
 static void parse_rule(config_setting_t *);
 static void parse_rules_list(config_setting_t *);
 static void parse_rules(config_t *);
+static void parse_workspace(config_setting_t *);
+static void parse_workspaces_list(config_setting_t *);
 static void parse_workspaces(config_t *);
 static void replace_str(char **, char *);
 
@@ -171,7 +173,6 @@ parse_rules_list(config_setting_t *rules)
 
 	for (i = 0; i < config_setting_length(list); i++)
 		parse_rule(config_setting_get_elem(list, i));
-
 }
 
 void
@@ -188,10 +189,55 @@ parse_rules(config_t *cfg)
 }
 
 void
+parse_workspace(config_setting_t *elem)
+{
+	const char *str = NULL;
+	double mfact = M_FACT;
+	long int nmaster = N_MASTER;
+	int index = config_setting_index(elem);
+
+	if (!config_setting_is_group(elem))
+		die("workspace %i: not a group\n", index);
+
+	if (config_setting_lookup_string(elem, "name", &str))
+		snprintf(_settings.ws[index].name, WS_NAME_SIZE, "%s", str);
+	if (config_setting_lookup_float(elem, "mfact", &mfact))
+		_settings.ws[index].mfact = MIN(1.0, MAX(mfact, 0.0));
+	if (config_setting_lookup_int(elem, "nmaster", &nmaster))
+		_settings.ws[index].nmaster = MAX(0, nmaster);
+	if (config_setting_lookup_string(elem, "layout", &str)) {
+		if ((_settings.ws[index].layout = layout_str2id(str)) == -1)
+			_settings.ws[index].layout = DEFAULT_LAYOUT;
+	}
+}
+
+void
+parse_workspaces_list(config_setting_t *workspaces)
+{
+	config_setting_t *list;
+	int i;
+
+	if (!(list = config_setting_get_member(workspaces, "list")))
+		return;
+	if (!config_setting_is_list(list))
+		die("workspaces.list not a list\n");
+
+	for (i = 0; i < MIN(N_WORKSPACES, config_setting_length(list)); i++)
+		parse_workspace(config_setting_get_elem(list, i));
+}
+
+void
 parse_workspaces(config_t *cfg)
 {
-	/* TODO */
-	(void)cfg;
+	config_setting_t *workspaces;
+
+	if (!(workspaces = config_lookup(cfg, "workspaces")))
+		return;
+	if (!config_setting_is_group(workspaces))
+		die("workspaces must be a group\n");
+
+	parse_workspaces_list(workspaces);
+
 }
 
 const struct settings *settings()
@@ -208,13 +254,18 @@ settings_init()
 	_settings.showbar = true;
 	_settings.bw = 1;
 	_settings.keys = key_default_keys();
-	_settings.mfact = M_FACT;
-	_settings.nmaster = N_MASTER;
 	_settings.barfmt = xstrdup(BAR_FMT);
 	_settings.barfont = xstrdup(BAR_FONT);
 
 	for (i = 0; i < LASTColor; i++)
 		_settings.colors[i] = xstrdup(default_colors[i]);
+
+	for (i = 0; i < N_WORKSPACES; i++) {
+		snprintf(_settings.ws[i].name, WS_NAME_SIZE, "%i", (i + 1));
+		_settings.ws[i].mfact = M_FACT;
+		_settings.ws[i].nmaster = N_MASTER;
+		_settings.ws[i].layout = DEFAULT_LAYOUT;
+	}
 }
 
 void

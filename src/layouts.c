@@ -296,6 +296,8 @@ layout_init(LayoutID id, int mw, int mh, int ww, int wh,
 {
 	struct layout *layout = xcalloc(1, sizeof(struct layout));
 
+	assert(id < LASTLayout);
+
 	layout->pos = NULL;
 	layout->n = 0;
 	layout->mw = mw;
