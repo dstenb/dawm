@@ -1,9 +1,11 @@
 #include "dawm.h"
 
 struct rule *rule_append(struct rule *, struct rule *);
-static int rule_applicable(const struct rule *, const char *, const char *,
-		const char *);
+static int rule_applicable(const struct rule *, const char *,
+		const char *, const char *);
 static void rule_apply(struct rule *, struct client *);
+struct rule_match *rule_create_match(const char *, const char *, const char *);
+struct rule_settings *rule_create_settings(void);
 static struct rule *rule_free(struct rule *);
 static void rule_print(const struct rule *);
 
@@ -37,8 +39,27 @@ rule_applicable(const struct rule *rule, const char *class,
 void
 rule_apply(struct rule *rule, struct client *c)
 {
-	(void)c;
-	(void)dpy;
+	switch (rule->settings->honor_size) {
+		case RuleTrue:
+			c->shints->honor = true;
+			break;
+		case RuleFalse:
+			c->shints->honor = false;
+			break;
+		case RuleIgnore:
+			break;
+	}
+
+	switch (rule->settings->floating) {
+		case RuleTrue:
+			c->floating = true;
+			break;
+		case RuleFalse:
+			c->floating = false;
+			break;
+		case RuleIgnore:
+			break;
+	}
 
 	rule_print(rule);
 }
@@ -48,24 +69,39 @@ rule_create(const char *class, const char *instance, const char *title)
 {
 	struct rule *rule = xcalloc(1, sizeof(struct rule));
 
-	rule->match = xcalloc(1, sizeof(struct rule_match));
-	rule->settings = xcalloc(1, sizeof(struct rule_settings));
-
-	rule->match->class = class ? xstrdup(class) : NULL;
-	rule->match->instance = instance ? xstrdup(instance) : NULL;
-	rule->match->title = title ? xstrdup(title) : NULL;
-
-	rule->settings->mn = -1;
-	rule->settings->ws = 0;
-	rule->settings->set_ws = false;
-	rule->settings->switch_to_ws = false;
-	rule->settings->floating = false;
-	rule->settings->fullscreen = false;
-	rule->settings->ignore_hints = false;
-
+	rule->match = rule_create_match(class, instance, title);
+	rule->settings = rule_create_settings();
 	rule->next = NULL;
 
 	return rule;
+}
+
+struct rule_match *
+rule_create_match(const char *c, const char *i, const char *t)
+{
+	struct rule_match *m = xcalloc(1, sizeof(struct rule_match));
+
+	m->class = c ? xstrdup(c) : NULL;
+	m->instance = i ? xstrdup(i) : NULL;
+	m->title = t ? xstrdup(t) : NULL;
+
+	return m;
+}
+
+struct rule_settings *
+rule_create_settings(void)
+{
+	struct rule_settings *s = xcalloc(1, sizeof(struct rule_settings));
+
+	s->mn = -1;
+	s->ws = 0;
+	s->set_ws = 0;
+	s->switch_to_ws = RuleIgnore;
+	s->floating = RuleIgnore;
+	s->fullscreen = RuleIgnore;
+	s->honor_size = RuleIgnore;
+
+	return s;
 }
 
 struct rule *

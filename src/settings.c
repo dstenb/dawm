@@ -148,6 +148,8 @@ parse_rule(config_setting_t *elem)
 	const char *class = NULL;
 	const char *instance = NULL;
 	const char *title = NULL;
+	struct rule *rule;
+	int i;
 	int index = config_setting_index(elem);
 
 	if (!config_setting_is_group(elem))
@@ -157,7 +159,14 @@ parse_rule(config_setting_t *elem)
 	config_setting_lookup_string(elem, "instance", &instance);
 	config_setting_lookup_string(elem, "title", &title);
 
-	rules_add(rule_create(class, instance, title));
+	rule = rule_create(class, instance, title);
+
+	if (config_setting_lookup_bool(elem, "honor_size", &i))
+		rule->settings->honor_size = i ? RuleTrue : RuleFalse;
+	if (config_setting_lookup_bool(elem, "float", &i))
+		rule->settings->floating = i ? RuleTrue : RuleFalse;
+
+	rules_add(rule);
 }
 
 void

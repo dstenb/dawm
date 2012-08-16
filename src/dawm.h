@@ -213,6 +213,12 @@ typedef enum {
 	LASTNetAtom
 } NetAtomID;
 
+typedef enum {
+	RuleIgnore = -1,
+	RuleTrue,
+	RuleFalse
+} RuleStatus;
+
 struct layout_pos {
 	int x, y, w, h;
 };
@@ -369,13 +375,13 @@ struct rule_match {
 
 /* Applicable rule settings */
 struct rule_settings {
-	int mn;            /* monitor number, -1 to avoid this rule */
-	unsigned long ws;  /* workspace number */
-	bool set_ws;        /* set the workspace if set_ws is non-zero*/
-	bool switch_to_ws;  /* switch to the clients' workspace */
-	bool floating;      /* float the client */
-	bool fullscreen;    /* put the client in fullscreen mode */
-	bool ignore_hints;  /* ignore size hints */
+	int mn;                  /* monitor number, -1 to avoid this rule */
+	unsigned long ws;        /* workspace number */
+	bool set_ws;             /* set the workspace if set_ws is non-zero*/
+	RuleStatus switch_to_ws; /* switch to the clients' workspace */
+	RuleStatus floating;     /* float the client */
+	RuleStatus fullscreen;   /* put the client in fullscreen mode */
+	RuleStatus honor_size;   /* ignore size hints */
 };
 
 /*  */
