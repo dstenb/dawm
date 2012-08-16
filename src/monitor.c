@@ -322,7 +322,7 @@ monitor_move_clients(struct monitor *mon)
 		w = pos->w - (2 * c->bw);
 		h = pos->h - (2 * c->bw);
 
-		client_move_resize(c, x, y, w, h);
+		client_move_resize(c, x, y, w, h, true, false);
 	}
 }
 

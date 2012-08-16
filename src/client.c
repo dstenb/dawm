@@ -7,11 +7,88 @@
 	PropertyChangeMask | StructureNotifyMask)
 #define MOVE_RESIZE_MASK (CWX | CWY | CWWidth | CWHeight)
 
+bool client_apply_hints(struct client *, int *, int *, int *, int *, bool);
 void client_grab_buttons(struct client *);
+void client_reset_size_hints(struct client *, bool);
 void client_select_input(struct client *);
 void client_set_border(struct client *, int);
 void client_set_dialog_wtype(struct client *);
 void client_set_dock_wtype(struct client *);
+
+bool
+client_apply_hints(struct client *c, int *x, int *y,
+		int *w, int *h, bool interact)
+{
+	bool baseismin;
+	struct size_hints *hints = c->shints;
+	struct monitor *m = c->mon;
+
+	/* Set minimum possible */
+	*w = MAX(1, *w);
+	*h = MAX(1, *h);
+
+	if(interact) {
+		if(*x > screen_w)
+			*x = screen_w - WIDTH(c);
+		if(*y > screen_h)
+			*y = screen_h - HEIGHT(c);
+		if(*x + *w + 2 * c->bw < 0)
+			*x = 0;
+		if(*y + *h + 2 * c->bw < 0)
+			*y = 0;
+	} else {
+		if(*x >= m->wx + m->ww)
+			*x = m->wx + m->ww - WIDTH(c);
+		if(*y >= m->wy + m->wh)
+			*y = m->wy + m->wh - HEIGHT(c);
+		if(*x + *w + 2 * c->bw <= m->wx)
+			*x = m->wx;
+		if(*y + *h + 2 * c->bw <= m->wy)
+			*y = m->wy;
+	}
+
+	if(hints->honor || c->floating) {
+		/* See last two sentences in ICCCM 4.1.2.3 */
+		baseismin = hints->basew == hints->minw &&
+			hints->baseh == hints->minh;
+
+		if(!baseismin) { /* Temporarily remove base dimensions */
+			*w -= hints->basew;
+			*h -= hints->baseh;
+		}
+
+		/* Adjust for aspect limits */
+		if(hints->mina > 0 && hints->maxa > 0) {
+			if(hints->maxa < (float)*w / *h)
+				*w = *h * hints->maxa + 0.5;
+			else if(hints->mina < (float)*h / *w)
+				*h = *w * hints->mina + 0.5;
+		}
+
+		if(baseismin) { /* Increment calculation requires this */
+			*w -= hints->basew;
+			*h -= hints->baseh;
+		}
+
+		/* Adjust for increment value */
+		if(hints->incw)
+			*w -= *w % hints->incw;
+		if(hints->inch)
+			*h -= *h % hints->inch;
+
+		/* Restore base dimensions */
+		*w = MAX(*w + hints->basew, hints->minw);
+		*h = MAX(*h + hints->baseh, hints->minh);
+
+		if(hints->maxw)
+			*w = MIN(*w, hints->maxw);
+		if(hints->maxh)
+			*h = MIN(*h, hints->maxh);
+	}
+
+	return *x != c->x || *y != c->y || *w != c->w || *h != c->h;
+
+}
 
 /** Create a client */
 struct client *
@@ -90,17 +167,19 @@ client_map_window(struct client *c)
 /** Move and resize the client */
 void
 client_move_resize(struct client *c,
-		int x, int y, int w, int h)
+		int x, int y, int w, int h, bool hints, bool interact)
 {
 	XWindowChanges wc;
 
-	c->x = wc.x = x;
-	c->y = wc.y = y;
-	c->w = wc.width = MAX(1, w);
-	c->h = wc.height = MAX(1, h);
+	if (!hints || client_apply_hints(c, &x, &y, &w, &h, interact)) {
+		c->x = wc.x = x;
+		c->y = wc.y = y;
+		c->w = wc.width = MAX(1, w);
+		c->h = wc.height = MAX(1, h);
 
-	XConfigureWindow(dpy, c->win, MOVE_RESIZE_MASK, &wc);
-	XSync(dpy, False);
+		XConfigureWindow(dpy, c->win, MOVE_RESIZE_MASK, &wc);
+		XSync(dpy, False);
+	}
 }
 
 /** Raise the client */
@@ -108,6 +187,20 @@ void
 client_raise(struct client *c)
 {
 	XRaiseWindow(dpy, c->win);
+}
+
+void
+client_reset_size_hints(struct client *c, bool honor)
+{
+	struct size_hints *h = c->shints;
+
+	h->basew = h->baseh = 0;
+	h->incw = h->inch = 0;
+	h->maxw = h->maxh = 0;
+	h->minw = h->minh = 0;
+	h->mina = h->maxa = 0.0;
+	h->fixed = false;
+	h->honor = honor;
 }
 
 /** Set the client's events to listen for */
@@ -158,7 +251,8 @@ client_set_floating(struct client *c, bool floating)
 {
 	if (floating) {
 		if (!c->floating)
-			client_move_resize(c, c->ox, c->oy, c->ow, c->oh);
+			client_move_resize(c, c->ox, c->oy, c->ow, c->oh,
+					true, false);
 		client_raise(c);
 		c->floating = true;
 	} else {
@@ -209,8 +303,8 @@ client_set_fullscreen(struct client *c, bool fullscreen)
 		c->oh = c->h;
 
 		client_set_border(c, 0);
-		client_move_resize(c, c->mon->mx, c->mon->my,
-				c->mon->mw, c->mon->mh);
+		client_move_resize(c, c->mon->mx, c->mon->my, c->mon->mw,
+				c->mon->mh, false, false);
 		client_raise(c);
 	} else {
 		ewmh_client_set_state(c->win, 0);
@@ -219,7 +313,8 @@ client_set_fullscreen(struct client *c, bool fullscreen)
 		c->floating = c->ostate;
 
 		client_set_border(c, c->obw);
-		client_move_resize(c, c->ox, c->oy, c->ow, c->oh);
+		client_move_resize(c, c->ox, c->oy, c->ow, c->oh,
+				false, false);
 	}
 }
 
@@ -269,6 +364,7 @@ client_setup(struct client *c, struct monitor *selmon, struct monitor *mons,
 		}
 	}
 
+	client_reset_size_hints(c, true);
 	client_set_ws(c, ws);
 	client_set_border(c, settings()->bw);
 	client_update_window_type(c);
@@ -325,12 +421,7 @@ client_update_size_hints(struct client *c)
 	long msize;
 
 	/* Reset the data */
-	h->basew = h->baseh = 0;
-	h->incw = h->inch = 0;
-	h->maxw = h->maxh = 0;
-	h->minw = h->minh = 0;
-	h->mina = h->maxa = 0.0;
-	h->fixed = false;
+	client_reset_size_hints(c, h->honor);
 
 	if (!XGetWMNormalHints(dpy, c->win, &size, &msize))
 		return;

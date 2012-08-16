@@ -265,6 +265,7 @@ struct size_hints {
 	int minw, minh;
 	float mina, maxa;
 	bool fixed;
+	bool honor;
 };
 
 /* Strut data struct */
@@ -415,7 +416,7 @@ struct client *client_create(Window, XWindowAttributes *);
 void client_free(struct client *);
 void client_kill(struct client *);
 void client_map_window(struct client *);
-void client_move_resize(struct client *, int, int, int, int);
+void client_move_resize(struct client *, int, int, int, int, bool, bool);
 void client_raise(struct client *);
 void client_set_floating(struct client *, bool);
 void client_set_focus(struct client *, bool);

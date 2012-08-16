@@ -421,7 +421,7 @@ handler_configurerequest_resize(struct client *c,
 		c->y = c->mon->my + (c->mon->mh / 2 - HEIGHT(c) / 2);
 
 	if (ISVISIBLE(c))
-		client_move_resize(c, c->x, c->y, c->w, c->h);
+		client_move_resize(c, c->x, c->y, c->w, c->h, false, false);
 }
 
 void
@@ -585,7 +585,7 @@ handler_motionnotify_move(struct client *c, XMotionEvent *ev)
 		x = ev->x_root + motion->attr.x - motion->start.x_root;
 		y = ev->y_root + motion->attr.y - motion->start.y_root;
 
-		client_move_resize(c, x, y, c->w, c->h);
+		client_move_resize(c, x, y, c->w, c->h, true, true);
 		monitor_draw_bar(selmon);
 	}
 }
@@ -601,7 +601,7 @@ handler_motionnotify_resize(struct client *c, XMotionEvent *ev)
 		w = ev->x_root + motion->attr.width - motion->start.x_root;
 		h = ev->y_root + motion->attr.height - motion->start.y_root;
 
-		client_move_resize(c, c->x, c->y, w, h);
+		client_move_resize(c, c->x, c->y, w, h, true, true);
 		monitor_draw_bar(selmon);
 	}
 }
