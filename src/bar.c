@@ -2,6 +2,9 @@
 
 #define EVENT_MASK (CWOverrideRedirect | CWBackPixmap | CWEventMask)
 
+static void bar_copy_area(struct bar *);
+static void bar_draw_bg(struct bar *);
+static void bar_draw_text(struct bar *, const char *, int);
 static void bars_init_dc(void);
 static void bars_init_font(const char *);
 
@@ -18,7 +21,15 @@ static struct {
 	XFontStruct *xfont;
 } font;
 
-static int initialized = 0;
+static bool initialized = false;
+
+void
+bar_copy_area(struct bar *bar)
+{
+	XCopyArea(dpy, dc.drawable, bar->win, dc.gc,
+			0, 0, bar->w, bar->h, 0, 0);
+	XSync(dpy, False);
+}
 
 struct bar *
 bar_create(bool topbar, bool showbar, int x, int y, int w)
@@ -50,7 +61,22 @@ bar_create(bool topbar, bool showbar, int x, int y, int w)
 	return bar;
 }
 
-static void
+void
+bar_draw(struct bar *bar, const char *str)
+{
+	bar_draw_bg(bar);
+	bar_draw_text(bar, str, strlen(str));
+	bar_copy_area(bar);
+}
+
+void
+bar_draw_bg(struct bar *bar)
+{
+	XSetForeground(dpy, dc.gc, color(BarNormBG));
+	XFillRectangle(dpy, dc.drawable, dc.gc, 0, 0, bar->w, bar->h);
+}
+
+void
 bar_draw_text(struct bar *bar, const char *str, int len)
 {
 	int x = (font.height) / 2;
@@ -62,18 +88,7 @@ bar_draw_text(struct bar *bar, const char *str, int len)
 		XmbDrawString(dpy, dc.drawable, font.set, dc.gc,
 				x, y, str, len);
 	else
-		XDrawString(dpy, dc.drawable, dc.gc,
-				x, y, str, len);
-}
-
-void
-bar_draw(struct bar *bar, const char *str)
-{
-	XSetForeground(dpy, dc.gc, color(BarNormBG));
-	XFillRectangle(dpy, dc.drawable, dc.gc, 0, 0, bar->w, bar->h);
-	bar_draw_text(bar, str, strlen(str));
-	XCopyArea(dpy, dc.drawable, bar->win, dc.gc, 0, 0, bar->w, bar->h, 0, 0);
-	XSync(dpy, False);
+		XDrawString(dpy, dc.drawable, dc.gc, x, y, str, len);
 }
 
 void
@@ -90,15 +105,15 @@ bars_init(const char *fontstr)
 	if (!initialized) {
 		bars_init_font(fontstr);
 		bars_init_dc();
-		initialized = 1;
+		initialized = true;
 	}
 }
 
 void
 bars_init_dc(void)
 {
-	dc.drawable = XCreatePixmap(dpy, root, DisplayWidth(dpy, screen),
-			font.height, DefaultDepth(dpy, screen));
+	dc.drawable = XCreatePixmap(dpy, root, screen_w, font.height,
+			DefaultDepth(dpy, screen));
 	dc.gc = XCreateGC(dpy, root, 0, NULL);
 }
 
