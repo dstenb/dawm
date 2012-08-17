@@ -3,7 +3,7 @@
 struct rule *rule_append(struct rule *, struct rule *);
 static int rule_applicable(const struct rule *, const char *,
 		const char *, const char *);
-static void rule_apply(struct rule *, struct client *);
+static void rule_apply(struct rule_settings *, struct client *);
 struct rule_match *rule_create_match(const char *, const char *, const char *);
 struct rule_settings *rule_create_settings(void);
 static struct rule *rule_free(struct rule *);
@@ -37,9 +37,12 @@ rule_applicable(const struct rule *rule, const char *class,
 }
 
 void
-rule_apply(struct rule *rule, struct client *c)
+rule_apply(struct rule_settings *s, struct client *c)
 {
-	switch (rule->settings->honor_size) {
+	if (s->set_ws && VALID_WORKSPACE(s->ws))
+		client_set_ws(c, s->ws);
+
+	switch (s->honor_size) {
 		case RuleTrue:
 			c->shints->honor = true;
 			break;
@@ -50,18 +53,27 @@ rule_apply(struct rule *rule, struct client *c)
 			break;
 	}
 
-	switch (rule->settings->floating) {
+	switch (s->floating) {
 		case RuleTrue:
-			c->floating = true;
+			client_set_floating(c, true);
 			break;
 		case RuleFalse:
-			c->floating = false;
+			client_set_floating(c, false);
 			break;
 		case RuleIgnore:
 			break;
 	}
 
-	rule_print(rule);
+	switch (s->fullscreen) {
+		case RuleTrue:
+			client_set_fullscreen(c, true);
+			break;
+		case RuleFalse:
+			client_set_fullscreen(c, false);
+			break;
+		case RuleIgnore:
+			break;
+	}
 }
 
 struct rule *
@@ -95,7 +107,7 @@ rule_create_settings(void)
 
 	s->mn = -1;
 	s->ws = 0;
-	s->set_ws = 0;
+	s->set_ws = false;
 	s->switch_to_ws = RuleIgnore;
 	s->floating = RuleIgnore;
 	s->fullscreen = RuleIgnore;
@@ -149,7 +161,7 @@ rules_apply(struct client *c)
 
 	for (rule = _rules ; rule; rule = rule->next) {
 		if (rule_applicable(rule, class, instance, c->name))
-			rule_apply(rule, c);
+			rule_apply(rule->settings, c);
 	}
 
 	if(hint.res_class)

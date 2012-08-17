@@ -165,6 +165,12 @@ parse_rule(config_setting_t *elem)
 		rule->settings->honor_size = i ? RuleTrue : RuleFalse;
 	if (config_setting_lookup_bool(elem, "float", &i))
 		rule->settings->floating = i ? RuleTrue : RuleFalse;
+	if (config_setting_lookup_bool(elem, "fullscreen", &i))
+		rule->settings->fullscreen = i ? RuleTrue : RuleFalse;
+	if (config_setting_lookup_int(elem, "ws", &i)) {
+		rule->settings->set_ws = true;
+		rule->settings->ws = i;
+	}
 
 	rules_add(rule);
 }
