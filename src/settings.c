@@ -168,8 +168,11 @@ parse_rule(config_setting_t *elem)
 	if (config_setting_lookup_bool(elem, "fullscreen", &i))
 		rule->settings->fullscreen = i ? RuleTrue : RuleFalse;
 	if (config_setting_lookup_int(elem, "ws", &i)) {
+		if (i <= 0)
+			rule->settings->ws = ALL_WS;
+		else
+			rule->settings->ws = i - 1;
 		rule->settings->set_ws = true;
-		rule->settings->ws = i;
 	}
 
 	rules_add(rule);
