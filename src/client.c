@@ -289,12 +289,12 @@ client_set_focus(struct client *c, bool focus)
 void
 client_set_fullscreen(struct client *c, bool fullscreen)
 {
-	if (fullscreen) {
+	if (fullscreen && !c->fullscreen) {
 		ewmh_client_set_state(c->win, netatom(NetWMFullscreen));
 
+		c->ostate = c->floating;
 		c->fullscreen = true;
 		c->floating = true;
-		c->ostate = c->floating;
 		c->obw = c->bw;
 
 		c->ox = c->x;
@@ -306,7 +306,7 @@ client_set_fullscreen(struct client *c, bool fullscreen)
 		client_move_resize(c, c->mon->mx, c->mon->my, c->mon->mw,
 				c->mon->mh, false, false);
 		client_raise(c);
-	} else {
+	} else if (!fullscreen && c->fullscreen) {
 		ewmh_client_set_state(c->win, 0);
 
 		c->fullscreen = false;
