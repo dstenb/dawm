@@ -85,6 +85,10 @@
 #define WS_NAME_SIZE 32
 #define DEFAULT_LAYOUT TileHorzLayout
 
+/* Mouse constants */
+#define L_BUTTON 1
+#define R_BUTTON 3
+
 /* Key modifiers */
 #define MOD_ALT   Mod1Mask
 #define MOD_CTRL  ControlMask

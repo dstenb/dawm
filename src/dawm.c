@@ -205,7 +205,7 @@ eventloop(void)
 		FD_SET(dpy_fd, &fds);
 
 		if ((n = select(dpy_fd + 1, &fds, NULL, NULL, &tv)) < 0) {
-			if (errno == EINTR) /* interrupt during select() */
+			if (errno == EINTR) /* Interrupt during select() */
 				continue;
 			die("select(): %s\n", strerror(errno));
 		} else if (n > 0) {
@@ -240,6 +240,7 @@ init(const char *_cmd)
 	sysinfo_init();
 
 	colors_init(settings()->colors);
+
 	bars_init(settings()->barfont);
 
 	/* Select wvents to handle */
@@ -268,6 +269,7 @@ init(const char *_cmd)
 	ewmh_root_set_current_desktop(0);
 
 	get_windows();
+
 	set_environment();
 }
 
@@ -319,9 +321,9 @@ handler_buttonpress(XEvent *ev)
 	motion->start = ev->xbutton;
 
 	/* Set the motion type */
-	if (motion->start.button == 1)
+	if (motion->start.button == L_BUTTON)
 		motion->type = MovementMotion;
-	else if (motion->start.button == 3)
+	else if (motion->start.button == R_BUTTON)
 		motion->type = ResizeMotion;
 }
 
@@ -818,13 +820,11 @@ key_handler_spawn(struct key *key)
 void
 key_handler_swap(struct key *key)
 {
-	struct monitor *mon = selmon;
-
 	if (key->args) {
 		if (STREQ(key->args, "next"))
-			monitor_swap_next_client(mon);
+			monitor_swap_next_client(selmon);
 		else if (STREQ(key->args, "prev"))
-			monitor_swap_prev_client(mon);
+			monitor_swap_prev_client(selmon);
 	}
 }
 

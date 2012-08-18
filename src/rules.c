@@ -132,13 +132,6 @@ rule_free(struct rule *rule)
 }
 
 void
-rule_print(const struct rule *rule)
-{
-	DBG("%s(): '%s' '%s' '%s'\n", __func__, rule->match->class,
-			rule->match->instance, rule->match->title);
-}
-
-void
 rules_add(struct rule *rule)
 {
 	_rules = rule_append(_rules, rule);
@@ -147,8 +140,7 @@ rules_add(struct rule *rule)
 void
 rules_apply(struct client *c)
 {
-	const char *class;
-	const char *instance;
+	const char *class, *instance;
 	struct rule *rule;
 	XClassHint hint = { NULL, NULL};
 
@@ -156,8 +148,6 @@ rules_apply(struct client *c)
 
 	class = hint.res_class ? hint.res_class : "";
 	instance = hint.res_name ? hint.res_name : "";
-
-	DBG("%s(): '%s', '%s', '%s'\n", __func__, class, instance, c->name);
 
 	for (rule = _rules ; rule; rule = rule->next) {
 		if (rule_applicable(rule, class, instance, c->name))

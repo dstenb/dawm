@@ -131,9 +131,9 @@ client_free(struct client *c)
 void
 client_grab_buttons(struct client *c)
 {
-	XGrabButton(dpy, 1, BUTTON_MOD, c->win, True, ButtonPressMask,
+	XGrabButton(dpy, L_BUTTON, BUTTON_MOD, c->win, True, ButtonPressMask,
 			GrabModeAsync, GrabModeAsync, None, None);
-	XGrabButton(dpy, 3, BUTTON_MOD, c->win, True, ButtonPressMask,
+	XGrabButton(dpy, R_BUTTON, BUTTON_MOD, c->win, True, ButtonPressMask,
 			GrabModeAsync, GrabModeAsync, None, None);
 }
 
@@ -256,7 +256,7 @@ client_set_floating(struct client *c, bool floating)
 		client_raise(c);
 		c->floating = true;
 	} else {
-		/* save current size */
+		/* Save current size */
 		if(c->floating) {
 			c->ox = c->x;
 			c->oy = c->y;
@@ -346,8 +346,6 @@ client_setup(struct client *c, struct monitor *selmon, struct monitor *mons,
 {
 	unsigned long ws;
 
-	client_update_title(c);
-
 	if (trans) {
 		c->mon = trans->mon;
 		ws = trans->ws;
@@ -367,6 +365,7 @@ client_setup(struct client *c, struct monitor *selmon, struct monitor *mons,
 	client_reset_size_hints(c, true);
 	client_set_ws(c, ws);
 	client_set_border(c, settings()->bw);
+	client_update_title(c);
 	client_update_window_type(c);
 	client_update_wm_hints(c, true);
 	client_update_size_hints(c);
