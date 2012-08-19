@@ -106,7 +106,7 @@ ewmh_client_get_state(Window win, Atom *state)
 int
 ewmh_client_get_strut(Window win, struct strut_data *sd)
 {
-	unsigned long *values;
+	unsigned long *values = NULL;
 	unsigned n;
 	int ret = 0;
 
@@ -118,10 +118,10 @@ ewmh_client_get_strut(Window win, struct strut_data *sd)
 			sd->bottom = values[3];
 			ret = 1;
 		}
-	}
 
-	if (values)
-		XFree(values);
+		if (values)
+			XFree(values);
+	}
 
 	return ret;
 }
@@ -129,7 +129,7 @@ ewmh_client_get_strut(Window win, struct strut_data *sd)
 int
 ewmh_client_get_strut_partial(Window win, struct strut_data *sd)
 {
-	unsigned long *values;
+	unsigned long *values = NULL;
 	unsigned n;
 	int ret = 0;
 
@@ -150,13 +150,12 @@ ewmh_client_get_strut_partial(Window win, struct strut_data *sd)
 			sd->bottom_end_x = values[11];
 			ret = 1;
 		}
+
+		if (values)
+			XFree(values);
 	}
 
-	if (values)
-		XFree(values);
-
 	return ret;
-
 }
 
 int
