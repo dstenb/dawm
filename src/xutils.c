@@ -37,7 +37,7 @@ get_state(Window win)
 	return result;
 }
 
-int
+bool
 send_event(Window win, Atom proto)
 {
 	XEvent ev;
@@ -52,9 +52,9 @@ send_event(Window win, Atom proto)
 
 		XSendEvent(dpy, win, False, NoEventMask, &ev);
 
-		return 1;
+		return true;
 	} else {
-		return 0;
+		return false;
 	}
 }
 

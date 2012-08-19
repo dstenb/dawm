@@ -91,24 +91,24 @@ ewmh_root_set_desktop_names(unsigned char *names, unsigned n)
 	atom_set_utf8array(root, netatom(NetDesktopNames), names, n);
 }
 
-int
+bool
 ewmh_client_get_desktop(Window win, unsigned long *d)
 {
 	return atom_get_cardinal(win, netatom(NetDesktop), d);
 }
 
-int
+bool
 ewmh_client_get_state(Window win, Atom *state)
 {
 	return atom_get_atom(win, netatom(NetWMState), state);
 }
 
-int
+bool
 ewmh_client_get_strut(Window win, struct strut_data *sd)
 {
 	unsigned long *values = NULL;
 	unsigned n;
-	int ret = 0;
+	bool ret = false;
 
 	if (atom_get_cardinals(win, netatom(NetWMStrut), &values, &n)) {
 		if (n == 4) {
@@ -116,7 +116,7 @@ ewmh_client_get_strut(Window win, struct strut_data *sd)
 			sd->right = values[1];
 			sd->top = values[2];
 			sd->bottom = values[3];
-			ret = 1;
+			ret = true;
 		}
 
 		if (values)
@@ -126,12 +126,12 @@ ewmh_client_get_strut(Window win, struct strut_data *sd)
 	return ret;
 }
 
-int
+bool
 ewmh_client_get_strut_partial(Window win, struct strut_data *sd)
 {
 	unsigned long *values = NULL;
 	unsigned n;
-	int ret = 0;
+	bool ret = false;
 
 	if (atom_get_cardinals(win, netatom(NetWMStrutPartial),
 				&values, &n)) {
@@ -148,7 +148,7 @@ ewmh_client_get_strut_partial(Window win, struct strut_data *sd)
 			sd->top_end_x = values[9];
 			sd->bottom_start_x = values[10];
 			sd->bottom_end_x = values[11];
-			ret = 1;
+			ret = true;
 		}
 
 		if (values)
@@ -158,7 +158,7 @@ ewmh_client_get_strut_partial(Window win, struct strut_data *sd)
 	return ret;
 }
 
-int
+bool
 ewmh_client_get_window_types(Window win, Atom **t, unsigned *n)
 {
 	return atom_get_atoms(win, netatom(NetWMWindowType), t, n);

@@ -192,7 +192,7 @@ key_init(void)
 }
 
 /** returns non-zero if the key is pressed */
-int
+bool
 key_pressed(struct key *key, KeyCode code, unsigned int state)
 {
 	return ((XKeysymToKeycode(dpy, key->keysym) == code) &&

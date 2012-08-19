@@ -76,17 +76,17 @@ strfvs(char **v, char c)
 
 /** POSIX regex wrapper that returns non-zero if the given string matches to
  * the given regex. The function uses the POSIX Extended syntax. */
-int
+bool
 strmatch(const char *regex, const char *str)
 {
 	regex_t preg;
 	int pregret;
-	int ret = 0;
+	int ret = false;
 	char buf[256];
 
 	if ((pregret = regcomp(&preg, regex, REG_EXTENDED)) == 0) {
 		if (regexec(&preg, str, 0, NULL, 0) == 0)
-			ret = 1;
+			ret = true;
 	} else {
 		regerror(pregret, &preg, buf, sizeof(buf));
 		error("%s(\"%s\", \"%s\"): %s\n", __func__, regex, str, buf);

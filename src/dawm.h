@@ -402,11 +402,11 @@ Atom atom(AtomID);
 void atoms_init(void);
 void atom_append_window(Window, Atom, Window);
 void atom_delete(Window, Atom);
-int atom_get_atom(Window, Atom, Atom *);
-int atom_get_atoms(Window, Atom, Atom **, unsigned *);
-int atom_get_cardinal(Window, Atom, unsigned long *);
-int atom_get_cardinals(Window, Atom, unsigned long **, unsigned *);
-int atom_get_string(Window, Atom, char *, unsigned int);
+bool atom_get_atom(Window, Atom, Atom *);
+bool atom_get_atoms(Window, Atom, Atom **, unsigned *);
+bool atom_get_cardinal(Window, Atom, unsigned long *);
+bool atom_get_cardinals(Window, Atom, unsigned long **, unsigned *);
+bool atom_get_string(Window, Atom, char *, unsigned int);
 void atom_set_atom(Window, Atom, Atom);
 void atom_set_atoms(Window, Atom, Atom *, unsigned);
 void atom_set_cardinal(Window, Atom, unsigned long);
@@ -465,11 +465,11 @@ void ewmh_root_set_current_desktop(unsigned long);
 void ewmh_root_set_name(char *);
 void ewmh_root_set_number_of_desktops(unsigned long);
 void ewmh_root_set_desktop_names(unsigned char *, unsigned);
-int ewmh_client_get_desktop(Window, unsigned long *);
-int ewmh_client_get_state(Window, Atom *);
-int ewmh_client_get_strut(Window, struct strut_data *);
-int ewmh_client_get_strut_partial(Window, struct strut_data *);
-int ewmh_client_get_window_types(Window, Atom **, unsigned *);
+bool ewmh_client_get_desktop(Window, unsigned long *);
+bool ewmh_client_get_state(Window, Atom *);
+bool ewmh_client_get_strut(Window, struct strut_data *);
+bool ewmh_client_get_strut_partial(Window, struct strut_data *);
+bool ewmh_client_get_window_types(Window, Atom **, unsigned *);
 void ewmh_client_set_desktop(Window, unsigned long);
 void ewmh_client_set_state(Window, Atom);
 
@@ -483,7 +483,7 @@ struct key *key_default_keys(void);
 struct key *key_free_all(struct key *);
 void key_grab_all(struct key *);
 void key_init(void);
-int key_pressed(struct key *, KeyCode, unsigned int);
+bool key_pressed(struct key *, KeyCode, unsigned int);
 KeyAction key_str2action(const char *);
 int key_str2mod(const char *);
 
@@ -557,7 +557,7 @@ void die(const char *, ...);
 void error(const char *, ...);
 void spawn(const char *);
 char *strfvs(char **, char);
-int strmatch(const char *, const char *);
+bool strmatch(const char *, const char *);
 char *strtr(char *, const char *);
 char *strtrb(char *, const char *);
 char *strtrf(char *, const char *);
@@ -577,7 +577,7 @@ void x11_destroy(void);
 
 /* xutils.c */
 long get_state(Window);
-int send_event(Window, Atom);
+bool send_event(Window, Atom);
 int xerror_dummy(Display *, XErrorEvent *);
 
 #endif

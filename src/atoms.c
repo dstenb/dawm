@@ -44,7 +44,7 @@ atom_delete(Window win, Atom prop)
 }
 
 /** Get a atom value from the given property */
-int
+bool
 atom_get_atom(Window win, Atom prop, Atom *value)
 {
 	Atom a;
@@ -56,15 +56,15 @@ atom_get_atom(Window win, Atom prop, Atom *value)
 				XA_ATOM, &a, &f, &n, &r, &p) == Success && p) {
 		*value = *(Atom *) p;
 		XFree(p);
-		return 1;
+		return true;
 	}
 
-	return 0;
+	return false;
 }
 
 /** Get a list of atom values from the given property. The given list should
  * be freed with XFree() */
-int
+bool
 atom_get_atoms(Window win, Atom prop, Atom **values, unsigned *n_values)
 {
 	Atom a;
@@ -76,15 +76,15 @@ atom_get_atoms(Window win, Atom prop, Atom **values, unsigned *n_values)
 				&a, &f, &n, &r, &p) == Success && p) {
 		*values = (Atom *) p;
 		*n_values = n;
-		return 1;
+		return true;
 	}
 
-	return 0;
+	return false;
 }
 
 /** Get a list of cardinal values from the given property. The given list should
  * be freed with XFree() */
-int
+bool
 atom_get_cardinals(Window win, Atom prop, unsigned long **values, unsigned *n)
 {
 	Atom a;
@@ -97,15 +97,15 @@ atom_get_cardinals(Window win, Atom prop, unsigned long **values, unsigned *n)
 			&& p) {
 		*values = (Atom *) p;
 		*n = _n;
-		return 1;
+		return true;
 	}
 
-	return 0;
+	return false;
 
 }
 
 /** Get a string value from the given property */
-int
+bool
 atom_get_string(Window win, Atom prop, char *str, unsigned int size)
 {
 	char **list = NULL;
@@ -113,15 +113,17 @@ atom_get_string(Window win, Atom prop, char *str, unsigned int size)
 	XTextProperty name;
 
 	if(!str || size == 0)
-		return 0;
+		return false;
+
 	str[0] = '\0';
 	XGetTextProperty(dpy, win, &name, prop);
-	if(!name.nitems)
-		return 0;
-	if(name.encoding == XA_STRING)
+
+	if (!name.nitems)
+		return false;
+	if (name.encoding == XA_STRING)
 		strncpy(str, (char *)name.value, size - 1);
 	else {
-		if(XmbTextPropertyToTextList(dpy, &name, &list, &n)
+		if (XmbTextPropertyToTextList(dpy, &name, &list, &n)
 				>= Success && n > 0 && *list) {
 			strncpy(str, *list, size - 1);
 			XFreeStringList(list);
@@ -129,11 +131,11 @@ atom_get_string(Window win, Atom prop, char *str, unsigned int size)
 	}
 	str[size - 1] = '\0';
 	XFree(name.value);
-	return 1;
+	return true;
 }
 
 /** Get a cardinal value from the given property */
-int
+bool
 atom_get_cardinal(Window win, Atom prop, unsigned long *value)
 {
 	Atom a;
@@ -145,10 +147,10 @@ atom_get_cardinal(Window win, Atom prop, unsigned long *value)
 				&f, &n, &r, &p) == Success && p) {
 		*value = *(unsigned long *) p;
 		XFree(p);
-		return 1;
+		return true;
 	}
 
-	return 0;
+	return false;
 }
 
 /** Set the given property to the given atom value */
