@@ -247,6 +247,8 @@ monitor_draw_bar(struct monitor *mon)
 
 	sysinfo_format(settings()->barfmt, buf, sizeof(buf), &fd);
 	bar_draw(mon->bar, buf);
+
+	free(fd.layout);
 }
 
 /** Set the floating state for the selected client */

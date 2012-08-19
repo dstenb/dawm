@@ -410,10 +410,28 @@ layout_str2id(const char *str)
 	return -1;
 }
 
-const char *
+char *
 layout_symbol(const struct layout *layout)
 {
-	static const char *symbols[] = { "|", "-", "M" };
+	char buf[10];
 
-	return (layout->id < LASTLayout) ? symbols[layout->id] : "";
+	switch(layout->id) {
+	case TileHorzLayout:
+		strcpy(buf, "|");
+		break;
+	case TileVertLayout:
+		strcpy(buf, "-");
+		break;
+	case MaxLayout:
+		if (layout->n > 0)
+			snprintf(buf, sizeof(buf), "%u", layout->n);
+		else
+			strcpy(buf, "M");
+		break;
+	default:
+		strcpy(buf, "");
+		break;
+	}
+
+	return xstrdup(buf);
 }

@@ -325,8 +325,8 @@ struct client {
 
 /* Format data struct */
 struct format_data {
-	const char *layout;    /* layout symbol */
-	const char *workspace; /* workspace name */
+	char *layout;    /* layout symbol */
+	char *workspace; /* workspace name */
 };
 
 /* Key struct */
@@ -498,7 +498,7 @@ void layout_set_geom(struct layout *, int, int);
 void layout_set_mfact(struct layout *, float);
 void layout_set_nmaster(struct layout *, unsigned);
 int layout_str2id(const char *);
-const char *layout_symbol(const struct layout *);
+char *layout_symbol(const struct layout *);
 
 /* monitor.c */
 #define monitor_toggle_bar(M) monitor_show_bar(M, !M->bar->showbar);
