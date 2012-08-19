@@ -163,22 +163,22 @@ typedef enum {
 } CursorID;
 
 typedef enum {
-	KillAction,          /* kill client */
-	MoveWindowAction,    /* move client to another workspace */
-	QuitAction,          /* close the window manager */
-	RestartAction,       /* restart the window manager */
-	SetLayoutAction,     /* set the layout for the current workspace */
-	SelectAction,        /* select a client */
-	SetMasterAction,     /* move the client to the master position */
-	SetMasterFactAction, /* set the master size */
-	SetMasterNumAction,  /* set the number of master clients */
-	SetWsAction,         /* set the current workspace */
-	SpawnAction,         /* spawn a program in the background */
-	SwapAction,          /* swap windows */
-	ToggleBarAction,     /* show/hide the bar on the current monitor */
-	ToggleFloatAction,   /* float/arrange the selected client */
-	ToggleFsAction,      /*  */
-	ToggleWsAction,      /*  */
+	Kill,          /* kill client */
+	MoveWindow,    /* move client to another workspace */
+	Quit,          /* close the window manager */
+	Restart,       /* restart the window manager */
+	SetLayout,     /* set the layout for the current workspace */
+	Select,        /* select a client */
+	SetMaster,     /* move the client to the master position */
+	SetMasterFact, /* set the master size */
+	SetMasterNum,  /* set the number of master clients */
+	SetWs,         /* set the current workspace */
+	Spawn,         /* spawn a program in the background */
+	Swap,          /* swap windows */
+	ToggleBar,     /* show/hide the bar on the current monitor */
+	ToggleFloat,   /* float/arrange the selected client */
+	ToggleFs,      /*  */
+	ToggleWs,      /*  */
 	LASTAction,
 	InvalidAction = -1
 } KeyAction;

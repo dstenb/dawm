@@ -84,22 +84,22 @@ static void (*event_handler[LASTEvent]) (XEvent *) = {
 };
 
 static void (*key_handler[LASTAction]) (struct key *) = {
-	[KillAction] = key_handler_kill,
-	[MoveWindowAction] = key_handler_movewindow,
-	[QuitAction] = key_handler_quit,
-	[RestartAction] = key_handler_restart,
-	[SelectAction] = key_handler_select,
-	[SetLayoutAction] = key_handler_setlayout,
-	[SetMasterAction] = key_handler_setmaster,
-	[SetMasterFactAction] = key_handler_setmfact,
-	[SetMasterNumAction] = key_handler_setmnum,
-	[SetWsAction] = key_handler_setws,
-	[SpawnAction] = key_handler_spawn,
-	[SwapAction] = key_handler_swap,
-	[ToggleBarAction] = key_handler_togglebar,
-	[ToggleFloatAction] = key_handler_togglefloat,
-	[ToggleFsAction] = key_handler_togglefs,
-	[ToggleWsAction] = key_handler_togglews
+	[Kill] = key_handler_kill,
+	[MoveWindow] = key_handler_movewindow,
+	[Quit] = key_handler_quit,
+	[Restart] = key_handler_restart,
+	[Select] = key_handler_select,
+	[SetLayout] = key_handler_setlayout,
+	[SetMaster] = key_handler_setmaster,
+	[SetMasterFact] = key_handler_setmfact,
+	[SetMasterNum] = key_handler_setmnum,
+	[SetWs] = key_handler_setws,
+	[Spawn] = key_handler_spawn,
+	[Swap] = key_handler_swap,
+	[ToggleBar] = key_handler_togglebar,
+	[ToggleFloat] = key_handler_togglefloat,
+	[ToggleFs] = key_handler_togglefs,
+	[ToggleWs] = key_handler_togglews
 };
 
 /*** Global variables ***/
