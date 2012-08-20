@@ -15,6 +15,7 @@ static char *atom_names[LASTNetAtom] = {
 	"_NET_WM_DESKTOP",
 	"_NET_NUMBER_OF_DESKTOPS",
 	"_NET_DESKTOP_NAMES",
+	"_NET_SUPPORTING_WM_CHECK",
 	"_NET_SUPPORTED",
 	"_NET_WM_STATE_FULLSCREEN",
 	"_NET_WM_NAME",
@@ -30,6 +31,10 @@ static char *atom_names[LASTNetAtom] = {
 static Atom netatoms[LASTNetAtom];
 static const unsigned n_netatoms = ARRSIZE(netatoms);
 
+/** Child window for _NET_SUPPORTING_WM_CHECK
+ * http://standards.freedesktop.org/wm-spec/wm-spec-latest.html#id2577320 */
+static Window child_win;
+
 Atom
 netatom(NetAtomID id)
 {
@@ -38,8 +43,13 @@ netatom(NetAtomID id)
 }
 
 void
-ewmh_init(void)
+ewmh_init(char *name)
 {
+	XSetWindowAttributes attr = {
+		.override_redirect = True,
+		.event_mask = 0
+	};
+
 	error("%s\n", __func__);
 
 	/* init atoms */
@@ -47,6 +57,15 @@ ewmh_init(void)
 
 	/* set supported atoms */
 	atom_set_atoms(root, netatom(NetSupported), netatoms, n_netatoms);
+
+	child_win = XCreateWindow(dpy, root, -10, -10, 1, 1, 0,
+			DefaultDepth(dpy, screen), CopyFromParent,
+			DefaultVisual(dpy, screen), 0, &attr);
+
+	atom_set_window(root, netatom(NetSupportingCheck), child_win);
+	atom_set_window(child_win, netatom(NetSupportingCheck), child_win);
+
+	ewmh_root_set_name(name);
 }
 
 void
@@ -77,6 +96,7 @@ void
 ewmh_root_set_name(char *name)
 {
 	atom_set_string(root, netatom(NetWMName), name);
+	atom_set_string(child_win, netatom(NetWMName), name);
 }
 
 void

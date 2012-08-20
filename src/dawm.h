@@ -204,6 +204,7 @@ typedef enum {
 	NetDesktop,
 	NetDesktops,
 	NetDesktopNames,
+	NetSupportingCheck,
 	NetSupported,
 	NetWMFullscreen,
 	NetWMName,
@@ -457,7 +458,7 @@ void cursors_free(void);
 /* ewmh.c */
 Atom netatom(NetAtomID id);
 
-void ewmh_init(void);
+void ewmh_init(char *);
 void ewmh_root_client_list_add(Window);
 void ewmh_root_client_list_clear(void);
 void ewmh_root_set_active_window(Window);

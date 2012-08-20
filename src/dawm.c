@@ -109,6 +109,8 @@ static struct key *keys = NULL;
 static struct motion *motion = NULL;
 static const char *cmd = NULL;
 
+static char *wm_name = WMNAME;
+
 static void
 dbg_print(const char *str)
 {
@@ -257,8 +259,7 @@ init(const char *_cmd)
 
 	/* Init atoms and EWMH */
 	atoms_init();
-	ewmh_init();
-	ewmh_root_set_name(WMNAME);
+	ewmh_init(wm_name);
 
 	/* Create monitors */
 	create_monitors();
