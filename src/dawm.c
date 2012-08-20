@@ -138,9 +138,11 @@ create_client(Window win, XWindowAttributes *attr)
 	tc = find_client_by_trans(mons, win);
 
 	client_setup(c, selmon, mons, tc);
-	client_map_window(c);
 
 	rules_apply(c);
+
+	client_map_window(c);
+	client_move_resize(c, c->x, c->y, c->w, c->h, true, true);
 
 	monitor_add_client(c->mon, c);
 }
