@@ -36,11 +36,11 @@ void
 bar_copy_area(struct bar *bar)
 {
 #ifdef XFT
+	(void) bar;
 #else
 	XCopyArea(dpy, dc.drawable, bar->win, dc.gc,
 			0, 0, bar->w, bar->h, 0, 0);
 	XSync(dpy, False);
-
 #endif
 }
 
