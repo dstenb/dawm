@@ -243,8 +243,7 @@ init(const char *_cmd)
 
 	sysinfo_init();
 
-	colors_init(settings()->colors);
-
+	clients_init();
 	bars_init(settings()->barfont);
 
 	/* Select wvents to handle */
@@ -921,11 +920,14 @@ restart(void)
 void
 set_environment(void)
 {
+	/* TODO */
+#if 0
 	setenv("BAR_FONT", settings()->barfont, 1);
 	setenv("BAR_NORM_FG", settings()->colors[BarNormFG], 1);
 	setenv("BAR_NORM_BG", settings()->colors[BarNormBG], 1);
 	setenv("BAR_SEL_FG", settings()->colors[BarSelFG], 1);
 	setenv("BAR_SEL_BG", settings()->colors[BarSelBG], 1);
+#endif
 }
 
 void

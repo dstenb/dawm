@@ -1,9 +1,5 @@
 #include "dawm.h"
 
-static unsigned long get_color(const char *);
-
-static unsigned long colors[LASTColor];
-
 static const char *colorstr[] = {
 	"bar_border",
 	"bar_norm_fg",
@@ -13,35 +9,6 @@ static const char *colorstr[] = {
 	"win_norm_border",
 	"win_sel_border"
 };
-
-unsigned long
-get_color(const char *str)
-{
-	Colormap cmap = DefaultColormap(dpy, screen);
-	XColor c;
-
-	if(!XAllocNamedColor(dpy, cmap, str, &c, &c))
-		die("error, cannot allocate color '%s'\n", str);
-	return c.pixel;
-}
-
-/* get color with the given id */
-unsigned long
-color(ColorID id)
-{
-	assert(id < LASTColor);
-	return colors[id];
-}
-
-/* initializes the colors */
-void
-colors_init(char *const str[LASTColor])
-{
-	int i;
-
-	for (i = 0; i < LASTColor; i++)
-		colors[i] = get_color(str[i]);
-}
 
 const char *
 color_id2str(ColorID id)
@@ -60,4 +27,64 @@ color_str2id(const char *str)
 	}
 
 	return InvalidColor;
+}
+
+#ifdef XFT
+void
+color_alloc_xft(const struct color *c, XftColor *xftc)
+{
+	XRenderColor xrc = { .red = c->r, .green = c->g,
+		.blue = c->b,.alpha = 0xFFFF
+	};
+
+	XftColorAllocValue(dpy, DefaultVisual(dpy, screen),
+			DefaultColormap(dpy, screen), &xrc, xftc);
+}
+#endif
+
+void
+color_alloc_xlib(const struct color *c, unsigned long *value)
+{
+	Colormap cmap = DefaultColormap(dpy, screen);
+	XColor cell = { .flags = DoRed | DoGreen | DoBlue,
+		.red = c->r,
+		.green = c->g,
+		.blue = c->b
+	};
+
+	if(!XAllocColor(dpy, cmap, &cell))
+		die("error, cannot allocate color '%s'\n", color_string(c));
+
+	*value = cell.pixel;
+}
+
+static unsigned short
+hex(char c)
+{
+	if (c >= '0' && c <= '9')
+		return c - '0';
+	else if (c >= 'a' && c <= 'z')
+		return 0xA + (c - 'a');
+	else
+		return 0xA + (c - 'A');
+}
+
+bool
+color_parse(const char *str, struct color *c)
+{
+	if (strmatch("^#[0-9A-Fa-f]{6}", str)) {
+		c->r = hex(str[1]) << 4 | hex(str[2]);
+		c->g = hex(str[3]) << 4 | hex(str[4]);
+		c->b = hex(str[5]) << 4 | hex(str[6]);
+		return true;
+	}
+	return false;
+}
+
+char *
+color_string(const struct color *c)
+{
+	char *str = xcalloc(7, sizeof(char));
+	sprintf(str, "#%02X%02X%02X", c->r, c->g, c->b);
+	return str;
 }

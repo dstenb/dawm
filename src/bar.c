@@ -5,6 +5,7 @@
 static void bar_copy_area(struct bar *);
 static void bar_draw_bg(struct bar *);
 static void bar_draw_text(struct bar *, char *, int);
+static void bars_init_colors(void);
 static void bars_init_dc(void);
 static void bars_init_font(const char *);
 
@@ -13,6 +14,8 @@ static struct {
 	XftColor fg_color;
 	XftColor bg_color;
 #else
+	unsigned long fg_color;
+	unsigned long bg_color;
 	Drawable drawable;
 	GC gc;
 #endif
@@ -93,7 +96,7 @@ bar_draw_bg(struct bar *bar)
 #ifdef XFT
 	XftDrawRect(bar->xftdraw, &dc.bg_color, 0, 0, bar->w, bar->h);
 #else
-	XSetForeground(dpy, dc.gc, color(BarNormBG));
+	XSetForeground(dpy, dc.gc, dc.bg_color);
 	XFillRectangle(dpy, dc.drawable, dc.gc, 0, 0, bar->w, bar->h);
 
 #endif
@@ -115,7 +118,7 @@ bar_draw_text(struct bar *bar, char *str, int len)
 	int x = BAR_PADDING_X;
 	int y = (bar->h / 2) - (font.height / 2) + font.ascent;
 
-	XSetForeground(dpy, dc.gc, color(BarNormFG));
+	XSetForeground(dpy, dc.gc, dc.fg_color);
 
 	if(font.set)
 		XmbDrawString(dpy, dc.drawable, font.set, dc.gc,
@@ -138,33 +141,31 @@ bars_init(const char *fontstr)
 {
 	if (!initialized) {
 		bars_init_font(fontstr);
+		bars_init_colors();
 		bars_init_dc();
 		initialized = true;
 	}
 }
 
-#ifdef XFT
-static void
-init_xft_color(unsigned short r, unsigned g, unsigned b,
-		unsigned short a, XftColor *xftc)
+void
+bars_init_colors(void)
 {
-	XRenderColor xrc = { .red = r, .green = g, .blue = b, .alpha = a };
-
-	XftColorAllocValue(dpy, DefaultVisual(dpy, screen),
-			DefaultColormap(dpy, screen), &xrc, xftc);
-}
+#ifdef XFT
+	color_alloc_xft(settings_color(BarNormFG), &dc.fg_color);
+	color_alloc_xft(settings_color(BarNormBG), &dc.bg_color);
+#else
+	color_alloc_xlib(settings_color(BarNormFG), &dc.fg_color);
+	color_alloc_xlib(settings_color(BarNormBG), &dc.bg_color);
 #endif
+}
 
 void
 bars_init_dc(void)
 {
-#ifdef XFT
-	init_xft_color(0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, &dc.fg_color);
-	init_xft_color(0x0000, 0x0000, 0x0000, 0xFFFF, &dc.bg_color);
-#else
+#ifndef XFT
+	dc.gc = XCreateGC(dpy, root, 0, NULL);
 	dc.drawable = XCreatePixmap(dpy, root, screen_w, font.height,
 			DefaultDepth(dpy, screen));
-	dc.gc = XCreateGC(dpy, root, 0, NULL);
 #endif
 }
 

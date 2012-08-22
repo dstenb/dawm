@@ -5,10 +5,13 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <limits.h>
 #include <regex.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <unistd.h>
 #include <X11/Xatom.h>
@@ -16,6 +19,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
+#undef XFT
 #ifdef XFT
 #include <X11/Xft/Xft.h>
 #endif /* XFT */
@@ -329,6 +333,11 @@ struct client {
 	struct client *snext;        /* next client in stack */
 };
 
+/* Color struct */
+struct color {
+	unsigned short r, g, b;
+};
+
 /* Format data struct */
 struct format_data {
 	char *layout;    /* layout symbol */
@@ -364,7 +373,7 @@ struct settings {
 	struct key *keys;        /* key bindings */
 	char *barfmt;            /* bar format string */
 	char *barfont;           /* bar font */
-	char *colors[LASTColor]; /* color values, in "#XXXXXX" form */
+	struct color colors[LASTColor]; /* color values */
 	struct ws_settings ws[N_WORKSPACES];
 	int bw;
 };
@@ -447,12 +456,17 @@ void client_update_size_hints(struct client *);
 void client_update_title(struct client *);
 void client_update_window_type(struct client *);
 void client_update_wm_hints(struct client *, bool);
+void clients_init(void);
 
 /* colors.c */
-unsigned long color(ColorID);
-void colors_init(char * const[LASTColor]);
+#ifdef XFT
+void color_alloc_xft(const struct color *, XftColor *);
+#endif
+void color_alloc_xlib(const struct color *, unsigned long *);
 const char *color_id2str(ColorID);
+bool color_parse(const char *, struct color *);
 int color_str2id(const char *);
+char *color_string(const struct color *);
 
 /* cursors.c */
 Cursor cursor(CursorID);
@@ -550,6 +564,7 @@ char *settings_default_path(void);
 void settings_init(void);
 void settings_free(void);
 void settings_read(const char *);
+struct color *settings_color(ColorID);
 
 /* sysinfo.c */
 const struct sysinfo *sysinfo(void);

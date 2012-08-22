@@ -16,14 +16,14 @@ static void replace_str(char **, char *);
 
 static char default_path[PATH_MAX + 1];
 
-static const char *default_colors[LASTColor] = {
-	[BarBorder] = "#FF0000",
-	[BarNormFG] = "#DDDDDD",
-	[BarNormBG] = "#000000",
-	[BarSelFG] = "#FF0000",
-	[BarSelBG] = "#000000",
-	[WinNormBorder] = "#000000",
-	[WinSelBorder] = "#FF0000"
+static struct color default_colors[LASTColor] = {
+	[BarBorder] = { 0xFFFF, 0x0000, 0x0000 },
+	[BarNormFG] = { 0xDDDD, 0xDDDD, 0xDDDD },
+	[BarNormBG] = { 0x1D00, 0x1F21, 0x2100 },
+	[BarSelFG] = { 0xFF00, 0x0000, 0x0000 },
+	[BarSelBG] = { 0xDDDD, 0xDDDD, 0xDDDD },
+	[WinNormBorder] = { 0x1D00, 0x1F21, 0x2100 },
+	[WinSelBorder] = { 0x0000, 0x6900, 0x8700 }
 };
 
 static struct settings _settings;
@@ -275,8 +275,11 @@ settings_init()
 	_settings.barfmt = xstrdup(BAR_FMT);
 	_settings.barfont = xstrdup(BAR_FONT);
 
-	for (i = 0; i < LASTColor; i++)
-		_settings.colors[i] = xstrdup(default_colors[i]);
+	for (i = 0; i < LASTColor; i++) {
+		_settings.colors[i].r = default_colors[i].r;
+		_settings.colors[i].g = default_colors[i].g;
+		_settings.colors[i].b = default_colors[i].b;
+	}
 
 	for (i = 0; i < N_WORKSPACES; i++) {
 		snprintf(_settings.ws[i].name, WS_NAME_SIZE, "%i", (i + 1));
@@ -291,8 +294,6 @@ settings_free()
 {
 	int i;
 
-	for (i = 0; i < LASTColor; i++)
-		free(_settings.colors[i]);
 	key_free_all(_settings.keys);
 	free(_settings.barfont);
 }
@@ -346,4 +347,12 @@ replace_str(char **p, char *new)
 	if (*p)
 		free(*p);
 	*p = new;
+}
+
+struct color *
+settings_color(ColorID cid)
+{
+	assert(cid < LASTColor);
+
+	return &settings()->colors[cid];
 }

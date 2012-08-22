@@ -15,6 +15,9 @@ void client_set_border(struct client *, int);
 void client_set_dialog_wtype(struct client *);
 void client_set_dock_wtype(struct client *);
 
+static unsigned long norm_color;
+static unsigned long sel_color;
+
 bool
 client_apply_hints(struct client *c, int *x, int *y,
 		int *w, int *h, bool interact)
@@ -215,14 +218,16 @@ void
 client_set_border(struct client *c, int bw)
 {
 	XWindowChanges wc;
-	ColorID cid = WinNormBorder;
+	unsigned long color;
 
 	if (c->mon && (c->mon->sel == c) && !c->neverfocus)
-		cid = WinSelBorder;
+		color = sel_color;
+	else
+		color = norm_color;
 
 	wc.border_width = c->bw = bw;
 	XConfigureWindow(dpy, c->win, CWBorderWidth, &wc);
-	XSetWindowBorder(dpy, c->win, color(cid));
+	XSetWindowBorder(dpy, c->win, color);
 }
 
 /**  */
@@ -273,7 +278,7 @@ client_set_focus(struct client *c, bool focus)
 {
 	if (focus) {
 		if (!c->neverfocus) {
-			XSetWindowBorder(dpy, c->win, color(WinSelBorder));
+			XSetWindowBorder(dpy, c->win, sel_color);
 			XSetInputFocus(dpy, c->win, RevertToPointerRoot,
 					CurrentTime);
 		}
@@ -281,7 +286,7 @@ client_set_focus(struct client *c, bool focus)
 		ewmh_root_set_active_window(c->win);
 		send_event(c->win, atom(WMTakeFocus));
 	} else {
-		XSetWindowBorder(dpy, c->win, color(WinNormBorder));
+		XSetWindowBorder(dpy, c->win, norm_color);
 	}
 }
 
@@ -511,4 +516,11 @@ client_update_wm_hints(struct client *c, bool selected)
 
 		XFree(hints);
 	}
+}
+
+void
+clients_init(void)
+{
+	color_alloc_xlib(settings_color(WinNormBorder), &norm_color);
+	color_alloc_xlib(settings_color(WinSelBorder), &sel_color);
 }
