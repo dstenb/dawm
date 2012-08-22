@@ -65,6 +65,8 @@
 #endif /* SYSINFO_EXTENDED */
 
 #define BAR_FONT "-*-profont-*-*-*-*-10-*-*-*-*-*-*-*"
+#define BAR_PADDING_X 5
+#define BAR_PADDING_Y 2
 #define BAR_UPDATE_RATE 5
 
 #define TIME_FMT "%y/%m/%d %H:%M"
@@ -300,6 +302,9 @@ struct bar {
 	bool topbar;    /* top/bottom of the screen */
 	bool showbar;   /* show/hide the bar */
 	int x, y, w, h; /* bar geometry */
+#ifdef XFT
+	XftDraw *xftdraw;
+#endif
 };
 
 /* Client struct */
@@ -417,7 +422,7 @@ void atom_set_window(Window, Atom, Window);
 
 /* bar.c */
 struct bar *bar_create(bool, bool, int, int, int);
-void bar_draw(struct bar *, const char *str);
+void bar_draw(struct bar *, char *str);
 void bar_free(struct bar *);
 void bars_init(const char *fontstr);
 void bars_free(void);
