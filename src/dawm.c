@@ -22,6 +22,7 @@ static void quit(const char *);
 static void remove_client(struct client *, bool);
 static void restart(void);
 static void set_environment(void);
+static void set_environment_color(const char *, const struct color *);
 static void set_fullscreen(struct client *, bool);
 static void set_monitor(struct monitor *);
 static void update_bars(void);
@@ -920,14 +921,19 @@ restart(void)
 void
 set_environment(void)
 {
-	/* TODO */
-#if 0
 	setenv("BAR_FONT", settings()->barfont, 1);
-	setenv("BAR_NORM_FG", settings()->colors[BarNormFG], 1);
-	setenv("BAR_NORM_BG", settings()->colors[BarNormBG], 1);
-	setenv("BAR_SEL_FG", settings()->colors[BarSelFG], 1);
-	setenv("BAR_SEL_BG", settings()->colors[BarSelBG], 1);
-#endif
+	set_environment_color("BAR_NORM_FG", settings_color(BarNormFG));
+	set_environment_color("BAR_NORM_BG", settings_color(BarNormBG));
+	set_environment_color("BAR_SEL_FG", settings_color(BarSelFG));
+	set_environment_color("BAR_SEL_BG", settings_color(BarSelBG));
+}
+
+void
+set_environment_color(const char *name, const struct color *c)
+{
+	char *value = color_string_short(c);
+	setenv(name, value, 1);
+	free(value);
 }
 
 void
