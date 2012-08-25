@@ -19,7 +19,6 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-#undef XFT
 #ifdef XFT
 #include <X11/Xft/Xft.h>
 #endif /* XFT */
@@ -226,8 +225,8 @@ typedef enum {
 
 typedef enum {
 	RuleIgnore = -1,
-	RuleTrue,
-	RuleFalse
+	RuleFalse = 0,
+	RuleTrue = 1
 } RuleStatus;
 
 struct layout_pos {
@@ -463,10 +462,9 @@ void clients_init(void);
 void color_alloc_xft(const struct color *, XftColor *);
 #endif
 void color_alloc_xlib(const struct color *, unsigned long *);
-const char *color_id2str(ColorID);
 bool color_parse(const char *, struct color *);
-int color_str2id(const char *);
-char *color_string(const struct color *);
+char *color_string_long(const struct color *);
+char *color_string_short(const struct color *);
 
 /* cursors.c */
 Cursor cursor(CursorID);
@@ -559,12 +557,12 @@ void rules_apply(struct client *);
 void rules_free(void);
 
 /* settings.c */
-const struct settings *settings(void);
 char *settings_default_path(void);
 void settings_init(void);
 void settings_free(void);
 void settings_read(const char *);
-struct color *settings_color(ColorID);
+const struct settings *settings(void);
+const struct color *settings_color(ColorID);
 
 /* sysinfo.c */
 const struct sysinfo *sysinfo(void);

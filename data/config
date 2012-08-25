@@ -4,19 +4,17 @@ bar:
 {
   show_bar = true;
   top_bar = true;
-  font = "-*-profont-*-*-*-*-10-*-*-*-*-*-*-*";
+  font = "profont 9";
 };
 
 colors:
-(
-  { name="bar_border"; value="#FF0000"; },
-  { name="bar_norm_fg"; value="#DDDDDD"; },
-  { name="bar_norm_bg"; value="#000000"; },
-  { name="bar_sel_fg"; value="#000000"; },
-  { name="bar_sel_bg"; value="#0000FF"; },
-  { name="win_norm_border"; value="#000000"; },
-  { name="win_sel_border"; value="#FF0000"; }
-);
+{
+  /* #XXXXXX or XXXX/XXXX/XXXX */
+  bar_normal_fg = "DDDD/DDDD/DDDD";
+  bar_normal_bg = "1D00/1F21/2100";
+  normal_border = "1D00/1F21/2100";
+  selected_border = "0000/6900/8700";
+};
 
 bindings:
 {

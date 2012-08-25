@@ -68,8 +68,7 @@ bar_create(bool topbar, bool showbar, int x, int y, int w)
 
 	bar->win = XCreateWindow(dpy, root, bar->x, bar->y, bar->w, bar->h, 0,
 			DefaultDepth(dpy, screen), CopyFromParent,
-			DefaultVisual(dpy, screen),
-			EVENT_MASK, &attr);
+			DefaultVisual(dpy, screen), EVENT_MASK, &attr);
 
 #ifdef XFT
 	bar->xftdraw = XftDrawCreate(dpy, bar->win, DefaultVisual(dpy, screen),

@@ -1,6 +1,7 @@
 #include "dawm.h"
 
 static void parse_bar(config_t *);
+static void parse_color(config_setting_t *, const char *, ColorID);
 static void parse_colors(config_t *);
 static void parse_key_binding(config_setting_t *);
 static void parse_key_bindings_list(config_setting_t *);
@@ -51,10 +52,30 @@ parse_bar(config_t *cfg)
 }
 
 void
+parse_color(config_setting_t *colors, const char *sid, ColorID cid)
+{
+	const char *str;
+
+	if (config_setting_lookup_string(colors, sid, &str)) {
+		if (!color_parse(str, &_settings.colors[cid]))
+			die("unable to parse color: %s\n", str);
+	}
+}
+
+void
 parse_colors(config_t *cfg)
 {
-	/* TODO */
-	(void)cfg;
+	config_setting_t *colors;
+
+	if (!(colors = config_lookup(cfg, "colors")))
+		return;
+	if (!config_setting_is_group(colors))
+		die("colors must be a group\n");
+
+	parse_color(colors, "bar_normal_fg", BarNormFG);
+	parse_color(colors, "bar_normal_bg", BarNormBG);
+	parse_color(colors, "normal_border", WinNormBorder);
+	parse_color(colors, "sel_border", WinSelBorder);
 }
 
 /* TODO: cleanup */
@@ -292,8 +313,6 @@ settings_init()
 void
 settings_free()
 {
-	int i;
-
 	key_free_all(_settings.keys);
 	free(_settings.barfont);
 }
@@ -349,10 +368,10 @@ replace_str(char **p, char *new)
 	*p = new;
 }
 
-struct color *
+const struct color *
 settings_color(ColorID cid)
 {
 	assert(cid < LASTColor);
 
-	return &settings()->colors[cid];
+	return &_settings.colors[cid];
 }
