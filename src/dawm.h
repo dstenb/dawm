@@ -74,6 +74,8 @@
 
 #define TIME_FMT "%y/%m/%d %H:%M"
 
+#define LAUNCHER_BUFSIZE 256
+
 /* Client macros */
 #define CLIENT_NAME_SIZE 128
 #define ISDOCK(c)               (c->wtype & Dock)
@@ -172,6 +174,7 @@ typedef enum {
 	MoveWindow,    /* move client to another workspace */
 	Quit,          /* close the window manager */
 	Restart,       /* restart the window manager */
+	SetLauncher,
 	SetLayout,     /* set the layout for the current workspace */
 	Select,        /* select a client */
 	SetMaster,     /* move the client to the master position */
@@ -228,6 +231,13 @@ typedef enum {
 	RuleFalse = 0,
 	RuleTrue = 1
 } RuleStatus;
+
+struct launcher {
+	bool active;
+	Window win;
+	char buf[LAUNCHER_BUFSIZE];
+	int pos;
+};
 
 struct layout_pos {
 	int x, y, w, h;
@@ -504,6 +514,12 @@ void key_init(void);
 bool key_pressed(struct key *, KeyCode, unsigned int);
 KeyAction key_str2action(const char *);
 int key_str2mod(const char *);
+
+/* launcher.c */
+void launcher_grab(struct launcher *);
+void launcher_init(struct launcher **);
+bool launcher_keypress(struct launcher *, XKeyEvent *);
+void launcher_ungrab(struct launcher *);
 
 /* layouts.c */
 struct layout *layout_init(LayoutID, int, int, int, int, int, float);

@@ -53,6 +53,7 @@ static void key_handler_movewindow(struct key *);
 static void key_handler_quit(struct key *);
 static void key_handler_restart(struct key *);
 static void key_handler_select(struct key *);
+static void key_handler_setlauncher(struct key *);
 static void key_handler_setlayout(struct key *);
 static void key_handler_setmaster(struct key *);
 static void key_handler_setmfact(struct key *);
@@ -90,6 +91,7 @@ static void (*key_handler[LASTAction]) (struct key *) = {
 	[Quit] = key_handler_quit,
 	[Restart] = key_handler_restart,
 	[Select] = key_handler_select,
+	[SetLauncher] = key_handler_setlauncher,
 	[SetLayout] = key_handler_setlayout,
 	[SetMaster] = key_handler_setmaster,
 	[SetMasterFact] = key_handler_setmfact,
@@ -108,6 +110,7 @@ static struct monitor *mons = NULL;
 static struct monitor *selmon = NULL;
 static struct key *keys = NULL;
 static struct motion *motion = NULL;
+static struct launcher *launcher = NULL;
 static const char *cmd = NULL;
 
 static char *wm_name = WMNAME;
@@ -246,6 +249,7 @@ init(const char *_cmd)
 
 	clients_init();
 	bars_init(settings()->barfont);
+	launcher_init(&launcher);
 
 	/* Select wvents to handle */
 	XSelectInput(dpy, root, WM_EVENT_MASK);
@@ -515,6 +519,9 @@ handler_keypress(XEvent *ev)
 
 	dbg_print(__func__);
 
+	if (kev->window == launcher->win && launcher_keypress(launcher, kev))
+		return;
+
 	for (key = keys; key; key = key->next) {
 		if (key_pressed(key, kev->keycode, kev->state)) {
 			if (key->action >= 0 && key->action < LASTAction &&
@@ -734,6 +741,13 @@ key_handler_select(struct key *key)
 			error("%s: invalid arg: '%s'", __func__, key->args);
 		}
 	}
+}
+
+void
+key_handler_setlauncher(struct key *key)
+{
+	(void)key;
+	launcher_grab(launcher);
 }
 
 void

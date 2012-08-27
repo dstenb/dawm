@@ -53,7 +53,9 @@ static struct key default_keys[] = {
 	{ MOD_SUPER,       XK_v,      SetLayout,     "vert",   NULL },
 	{ MOD_SUPER,       XK_m,      SetLayout,     "max",    NULL },
 	{ MOD_SUPER,       XK_space,  SetLayout,     "next",   NULL },
-	{ MOD_SHIFT_SUPER, XK_space,  SetLayout,     "prev",   NULL }
+	{ MOD_SHIFT_SUPER, XK_space,  SetLayout,     "prev",   NULL },
+
+	{ MOD_SUPER,       XK_r,      SetLauncher,   NULL,     NULL }
 };
 
 /* strings corresponding to KeyAction values */

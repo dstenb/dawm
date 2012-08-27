@@ -2,7 +2,7 @@ include config.mk
 
 SRC = dawm.h main.c atoms.c bar.c client.c colors.c cursors.c ewmh.c keys.c \
       monitor.c rules.c settings.c sysinfo.c utils.c xutils.c layouts.c \
-      x11.c dawm.c
+      x11.c launcher.c dawm.c
 HEADERS = dawm.h version.h
 OBJ = ${SRC:.c=.o}
 
