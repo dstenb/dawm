@@ -110,7 +110,6 @@ static struct monitor *mons = NULL;
 static struct monitor *selmon = NULL;
 static struct key *keys = NULL;
 static struct motion *motion = NULL;
-static struct launcher *launcher = NULL;
 static const char *cmd = NULL;
 
 static char *wm_name = WMNAME;
@@ -249,7 +248,7 @@ init(const char *_cmd)
 
 	clients_init();
 	bars_init(settings()->barfont);
-	launcher_init(&launcher);
+	launcher_init();
 
 	/* Select wvents to handle */
 	XSelectInput(dpy, root, WM_EVENT_MASK);
@@ -519,7 +518,7 @@ handler_keypress(XEvent *ev)
 
 	dbg_print(__func__);
 
-	if (kev->window == launcher->win && launcher_keypress(launcher, kev))
+	if (kev->window == launcher_window() && launcher_keypress(kev))
 		return;
 
 	for (key = keys; key; key = key->next) {
@@ -747,7 +746,7 @@ void
 key_handler_setlauncher(struct key *key)
 {
 	(void)key;
-	launcher_grab(launcher);
+	launcher_grab();
 }
 
 void

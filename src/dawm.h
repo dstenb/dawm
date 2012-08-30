@@ -516,10 +516,12 @@ KeyAction key_str2action(const char *);
 int key_str2mod(const char *);
 
 /* launcher.c */
-void launcher_grab(struct launcher *);
-void launcher_init(struct launcher **);
-bool launcher_keypress(struct launcher *, XKeyEvent *);
-void launcher_ungrab(struct launcher *);
+const char *launcher_buffer(void);
+void launcher_grab(void);
+void launcher_init(void);
+bool launcher_keypress(XKeyEvent *);
+void launcher_ungrab(void);
+Window launcher_window(void);
 
 /* layouts.c */
 struct layout *layout_init(LayoutID, int, int, int, int, int, float);
