@@ -43,8 +43,8 @@ bar_copy_area(struct bar *bar)
 #else
 	XCopyArea(dpy, dc.drawable, bar->win, dc.gc,
 			0, 0, bar->w, bar->h, 0, 0);
-	XSync(dpy, False);
 #endif
+	XSync(dpy, False);
 }
 
 struct bar *
@@ -59,6 +59,7 @@ bar_create(bool topbar, bool showbar, int x, int y, int w)
 
 	bar = xcalloc(1, sizeof(struct bar));
 
+	bar->fmt = xstrdup(settings()->barfmt);
 	bar->topbar = topbar;
 	bar->showbar = showbar;
 	bar->x = x;
@@ -82,10 +83,19 @@ bar_create(bool topbar, bool showbar, int x, int y, int w)
 }
 
 void
-bar_draw(struct bar *bar, char *str)
+bar_draw(struct bar *bar, struct format_data *fd)
 {
+	char buf[1024];
+
 	bar_draw_bg(bar);
-	bar_draw_text(bar, str, strlen(str));
+
+	if (launcher_activated()) {
+		snprintf(buf, sizeof(buf), "  Run: %s", launcher_buffer());
+	} else {
+		sysinfo_format(bar->fmt, buf, sizeof(buf), fd);
+	}
+
+	bar_draw_text(bar, buf, strlen(buf));
 	bar_copy_area(bar);
 }
 
@@ -132,6 +142,12 @@ bar_free(struct bar *bar)
 {
 	XUnmapWindow(dpy, bar->win);
 	XDestroyWindow(dpy, bar->win);
+
+#ifdef XFT
+	XftDrawDestroy(bar->xftdraw);
+#endif
+
+	free(bar->fmt);
 	free(bar);
 }
 

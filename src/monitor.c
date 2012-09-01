@@ -243,11 +243,8 @@ monitor_draw_bar(struct monitor *mon)
 		.layout = layout_symbol(mon->selws->layout),
 		.workspace = mon->selws->name
 	};
-	char buf[1024];
 
-	sysinfo_format(settings()->barfmt, buf, sizeof(buf), &fd);
-	bar_draw(mon->bar, buf);
-
+	bar_draw(mon->bar, &fd);
 	free(fd.layout);
 }
 

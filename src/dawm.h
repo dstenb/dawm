@@ -315,6 +315,7 @@ struct bar {
 	bool topbar;    /* top/bottom of the screen */
 	bool showbar;   /* show/hide the bar */
 	int x, y, w, h; /* bar geometry */
+	char *fmt;
 #ifdef XFT
 	XftDraw *xftdraw;
 #endif
@@ -440,7 +441,7 @@ void atom_set_window(Window, Atom, Window);
 
 /* bar.c */
 struct bar *bar_create(bool, bool, int, int, int);
-void bar_draw(struct bar *, char *str);
+void bar_draw(struct bar *, struct format_data *);
 void bar_free(struct bar *);
 void bars_init(const char *fontstr);
 void bars_free(void);
@@ -516,6 +517,7 @@ KeyAction key_str2action(const char *);
 int key_str2mod(const char *);
 
 /* launcher.c */
+bool launcher_activated(void);
 const char *launcher_buffer(void);
 void launcher_grab(void);
 void launcher_init(void);

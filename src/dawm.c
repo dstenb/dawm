@@ -8,6 +8,7 @@
 static void checkotherwm(void);
 static void create_client(Window, XWindowAttributes *);
 static void create_monitors(void);
+static void draw_bars(void);
 static void get_windows(void);
 static void handler_clientmessage_client(XClientMessageEvent *);
 static void handler_clientmessage_root(XClientMessageEvent *);
@@ -194,6 +195,17 @@ destroy(void)
 	rules_free();
 
 	x11_destroy();
+}
+
+void
+draw_bars(void)
+{
+	struct monitor *mon;
+
+	for (mon = mons; mon; mon = mon->next)
+		monitor_draw_bar(mon);
+
+	dbg_print(__func__);
 }
 
 void
@@ -518,8 +530,11 @@ handler_keypress(XEvent *ev)
 
 	dbg_print(__func__);
 
-	if (kev->window == launcher_window() && launcher_keypress(kev))
+	/* Handle launcher keys */
+	if (kev->window == launcher_window() && launcher_keypress(kev)) {
+		draw_bars();
 		return;
+	}
 
 	for (key = keys; key; key = key->next) {
 		if (key_pressed(key, kev->keycode, kev->state)) {
@@ -747,6 +762,7 @@ key_handler_setlauncher(struct key *key)
 {
 	(void)key;
 	launcher_grab();
+	draw_bars();
 }
 
 void
@@ -974,14 +990,9 @@ set_monitor(struct monitor *mon)
 void
 update_bars(void)
 {
-	struct monitor *mon;
-
 	sysinfo_update();
-
-	for (mon = mons; mon; mon = mon->next)
-		monitor_draw_bar(mon);
-
 	dbg_print(__func__);
+	draw_bars();
 }
 
 void

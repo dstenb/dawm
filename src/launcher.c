@@ -20,6 +20,12 @@ static void launcher_move_left(void);
 static void launcher_move_right(void);
 static void launcher_spawn(void);
 
+bool
+launcher_activated(void)
+{
+	return launcher.active;
+}
+
 const char *
 launcher_buffer(void)
 {
@@ -29,7 +35,6 @@ launcher_buffer(void)
 void
 launcher_char_add(char c)
 {
-	error("%s\n", __func__);
 	if (launcher.pos < (LAUNCHER_BUFSIZE - 1)) {
 		launcher.buf[launcher.pos++] = c;
 		launcher.buf[launcher.pos] = '\0';
@@ -39,16 +44,14 @@ launcher_char_add(char c)
 void
 launcher_char_del(void)
 {
-	error("%s\n", __func__);
 	if (launcher.pos > 0) {
-		launcher.buf[launcher.pos--] = '\0';
+		launcher.buf[--launcher.pos] = '\0';
 	}
 }
 
 void
 launcher_clear(void)
 {
-	error("%s\n", __func__);
 	memset(launcher.buf, 0, LAUNCHER_BUFSIZE);
 	launcher.pos = 0;
 }
@@ -56,41 +59,28 @@ launcher_clear(void)
 bool
 launcher_handle_char(XKeyEvent *kev)
 {
-	error("%s\n", __func__);
-	KeySym key;
+	bool handled = false;
 	char text[8];
+	KeySym key;
 
 	if (XLookupString(kev, text, sizeof(text), &key, 0) == 1) {
 		launcher_char_add(text[0]);
-		return true;
-	} else {
-		return false;
+		handled = true;
 	}
+	return handled;
 }
 
 void
 launcher_init(void)
 {
-	error("%s\n", __func__);
-
-	XSetWindowAttributes attr = {
-		.override_redirect = True,
-		.event_mask = 0
-	};
-
-	launcher.win = XCreateWindow(dpy, root, -10, -10, 1, 1, 0,
-			DefaultDepth(dpy, screen), CopyFromParent,
-			DefaultVisual(dpy, screen), 0, &attr);
 	launcher.active = false;
+	launcher.win = None;
 	launcher_clear();
-
-	XMapWindow(dpy, launcher.win);
 }
 
 bool
 launcher_keypress(XKeyEvent *kev)
 {
-	error("%s\n", __func__);
 	bool handled = false;
 
 	if (key_pressed(&keys.escape, kev->keycode, kev->state)) {
@@ -118,9 +108,16 @@ launcher_keypress(XKeyEvent *kev)
 void
 launcher_grab(void)
 {
+	XSetWindowAttributes attr = {
+		.override_redirect = True,
+		.event_mask = 0
+	};
 	int i;
 
-	error("%s\n", __func__);
+	launcher.win = XCreateWindow(dpy, root, -10, -10, 1, 1, 0,
+			DefaultDepth(dpy, screen), CopyFromParent,
+			DefaultVisual(dpy, screen), 0, &attr);
+	XMapWindow(dpy, launcher.win);
 
 	for (i = 0; i < 100; i++) {
 		if (XGrabKeyboard(dpy, launcher.win, False, GrabModeAsync,
@@ -128,29 +125,26 @@ launcher_grab(void)
 			launcher.active = true;
 			return;
 		}
-		printf("i: %i\n", i);
 		usleep(20);
 	}
+
 }
 
 void
 launcher_move_left(void)
 {
-	error("%s\n", __func__);
 	/* TODO */
 }
 
 void
 launcher_move_right(void)
 {
-	error("%s\n", __func__);
 	/* TODO */
 }
 
 void
 launcher_spawn(void)
 {
-	error("%s\n", __func__);
 	spawn(launcher.buf);
 	launcher_clear();
 	launcher_ungrab();
@@ -159,9 +153,12 @@ launcher_spawn(void)
 void
 launcher_ungrab(void)
 {
-	error("%s\n", __func__);
 	XUngrabKeyboard(dpy, CurrentTime);
+	XUnmapWindow(dpy, launcher.win);
+	XDestroyWindow(dpy, launcher.win);
+
 	launcher.active = false;
+	launcher.win = None;
 }
 
 Window
