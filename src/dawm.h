@@ -80,8 +80,8 @@
 #define CLIENT_NAME_SIZE 128
 #define ISDOCK(c)               (c->wtype & Dock)
 #define ISFOCUSABLE(c)          (ISVISIBLE(c) && !ISDOCK(c))
-#define ISMOVEABLE(c)           (c->floating && !ISDOCK(c))
-#define ISRESIZABLE(c)          (c->floating || !ISARRANGED(c->mon))
+#define ISMOVEABLE(c)           (c->floating && !c->fullscreen && !ISDOCK(c))
+#define ISRESIZABLE(c)          (c->floating && !c->fullscreen && !ISDOCK(c))
 #define ISSELECTABLE(c)         (ISVISIBLE(c) && !ISDOCK(c))
 #define ISTILED(c)              (!c->floating && ISVISIBLE(c))
 #define ISVISIBLE(c)            (c->ws == c->mon->selws_i || c->ws == ALL_WS)
