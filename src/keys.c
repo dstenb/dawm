@@ -65,6 +65,7 @@ static char *action_str[LASTAction] = {
 	[Quit] = "quit",
 	[Restart] = "restart",
 	[Select] = "select",
+	[SetLauncher] = "launcher",
 	[SetLayout] = "set_layout",
 	[SetMaster] = "sel_to_master",
 	[SetMasterFact] = "set_mfact",

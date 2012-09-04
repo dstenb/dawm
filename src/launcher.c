@@ -85,6 +85,7 @@ launcher_keypress(XKeyEvent *kev)
 
 	if (key_pressed(&keys.escape, kev->keycode, kev->state)) {
 		launcher_ungrab();
+		launcher_clear();
 		handled = true;
 	} else if (key_pressed(&keys.enter, kev->keycode, kev->state)) {
 		launcher_spawn();
