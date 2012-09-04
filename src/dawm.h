@@ -4,6 +4,7 @@
 #include <sys/types.h>
 
 #include <assert.h>
+#include <dirent.h>
 #include <errno.h>
 #include <limits.h>
 #include <regex.h>
@@ -37,6 +38,7 @@
 #define ARRSIZE(x) (int)(sizeof(x) / sizeof(*x))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define STRPREFIX(s1, s2) (strstr(s1, s2) == s1)
 #define STREQ(s1, s2) (strcmp(s1, s2) == 0)
 #define INSIDE(x, y, bx, by, bw, bh) ((x >= bx) && x <= (bx + bw) && \
 		(y >= by) && y <= (by + bh))
@@ -231,6 +233,12 @@ typedef enum {
 	RuleFalse = 0,
 	RuleTrue = 1
 } RuleStatus;
+
+struct list {
+	struct list *next;
+	struct list *prev;
+	void *data;
+};
 
 struct launcher {
 	bool active;
@@ -538,6 +546,14 @@ void layout_set_nmaster(struct layout *, unsigned);
 int layout_str2id(const char *);
 char *layout_symbol(const struct layout *);
 
+/* list.c */
+struct list *list_append(struct list *, void *);
+struct list *list_create(void *);
+struct list *list_destroy(struct list *, void (void *));
+int list_length(struct list *);
+struct list *list_prepend(struct list *, void *);
+struct list *list_sort(struct list *, int (void *, void *));
+
 /* monitor.c */
 #define monitor_toggle_bar(M) monitor_show_bar(M, !M->bar->showbar);
 void monitor_add_client(struct monitor *, struct client *);
@@ -570,7 +586,10 @@ struct monitor *find_monitor_by_num(struct monitor *, int);
 struct monitor *find_monitor_by_pos(struct monitor *, int, int);
 struct monitor *find_monitor_by_ws(struct monitor *, unsigned);
 
-/* rules.h */
+/* program.c */
+void program_init(const char *);
+
+/* rules.c */
 struct rule *rule_create(const char *, const char *, const char *);
 void rules_add(struct rule *);
 void rules_apply(struct client *);

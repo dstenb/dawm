@@ -278,6 +278,9 @@ init(const char *_cmd)
 	atoms_init();
 	ewmh_init(wm_name);
 
+	/* Init program lists */
+	program_init(getenv("PATH"));
+
 	/* Create monitors */
 	create_monitors();
 
