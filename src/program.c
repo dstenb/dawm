@@ -85,8 +85,10 @@ program_init(const char *paths)
 		return;
 
 	for (path = strtok(buf, ":"); path; path = strtok(NULL, ":")) {
-		if (!program_load_from_dir(path))
-			error("couldn't open %s: %s", path, strerror(errno));
+		char rpath[PATH_MAX + 1];
+		realpath(path, rpath);
+		if (!program_load_from_dir(rpath))
+			error("couldn't open %s: %s", rpath, strerror(errno));
 	}
 
 	for (i = 0; i < 256; i++)
