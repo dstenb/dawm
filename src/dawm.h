@@ -588,6 +588,7 @@ struct monitor *find_monitor_by_ws(struct monitor *, unsigned);
 
 /* program.c */
 void program_init(const char *);
+void program_list_from_prefix(const char *, struct list **);
 
 /* rules.c */
 struct rule *rule_create(const char *, const char *, const char *);
@@ -619,6 +620,7 @@ bool strmatch(const char *, const char *);
 char *strtr(char *, const char *);
 char *strtrb(char *, const char *);
 char *strtrf(char *, const char *);
+int strwc(const char *);
 void *xcalloc(size_t, size_t);
 void *xmalloc(size_t);
 void *xrealloc(void *, size_t);

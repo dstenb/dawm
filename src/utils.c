@@ -127,6 +127,24 @@ strtrf(char *s, const char *skip)
 	return s;
 }
 
+int
+strwc(const char *s)
+{
+	int i = 0;
+	int word = 0;
+
+	for (; *s; s++) {
+		if (*s == ' ') {
+			word = 0;
+		} else if (!word) {
+			word = 1;
+			i++;
+		}
+	}
+
+	return i;
+}
+
 /** A calloc() wrapper that will exit if unable to allocate */
 void *
 xcalloc(size_t nmemb, size_t size)
