@@ -11,4 +11,4 @@ xterm -T "3" -n "3" -fg black -bg orange &
 
 setxkbmap se
 
-valgrind ./dawm -c ../data/config
+valgrind --tool=memcheck --leak-check=yes ./dawm -c ../data/config
