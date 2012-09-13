@@ -259,9 +259,11 @@ sysinfo_format(const char *fmt, char *str, unsigned size,
 				j += l;
 				break;
 			case 'U': /* Uptime */
-				snprintf(buf, sizeof(buf), "%ld:%02ld",
-						_sysinfo.uptime / 3600,
-						(_sysinfo.uptime / 60) % 60);
+				snprintf(buf, sizeof(buf),
+					"%ld days, %ld:%02ld",
+					(_sysinfo.uptime / (3600 * 24)),
+					(_sysinfo.uptime / 3600) % 24,
+					(_sysinfo.uptime / 60) % 60);
 				l = MIN(size - j, strlen(buf));
 				p = stpncpy(p, buf, l);
 				j += l;
